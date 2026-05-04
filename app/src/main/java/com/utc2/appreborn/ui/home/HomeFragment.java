@@ -41,34 +41,36 @@ import com.utc2.appreborn.utils.MockHelper;
  * HomeFragment — FINAL FIXES
  * ──────────────────────────────────────────────────────────────
  * Fix 1 — Status bar overlap (Android 15 edge-to-edge):
- *   Dùng WindowInsetsCompat để đọc chiều cao status bar thực,
- *   rồi set lên View statusBarSpacer trong layout. Cách này hoạt
- *   động đúng trên mọi thiết bị, mọi API level, kể cả SDK 36.
- *
+ * Dùng WindowInsetsCompat để đọc chiều cao status bar thực,
+ * rồi set lên View statusBarSpacer trong layout. Cách này hoạt
+ * động đúng trên mọi thiết bị, mọi API level, kể cả SDK 36.
+ * <p>
  * Fix 2 — Profile bar bị che khi scroll:
- *   Toolbar đã có android:elevation="8dp" trong layout.
- *   Thêm bUpdateToolbarIconTint() để đổi tint đúng lúc.
- *
+ * Toolbar đã có android:elevation="8dp" trong layout.
+ * Thêm bUpdateToolbarIconTint() để đổi tint đúng lúc.
+ * <p>
  * Fix 3 — Bỏ iv_add_btn:
- *   Đã xóa khỏi layout và toàn bộ listener liên quan.
- *
+ * Đã xóa khỏi layout và toàn bộ listener liên quan.
+ * <p>
  * Package: com.utc2.appreborn.ui.home
  */
 public class HomeFragment extends Fragment {
 
-    private static final String TAG          = "HomeFragment";
+    private static final String TAG = "HomeFragment";
     private static final String URL_ALL_NEWS = "https://utc2.edu.vn/sinh-vien/thong-bao";
 
     // Ngưỡng collapsed (0.0 = fully expanded, 1.0 = fully collapsed)
     private static final float COLLAPSE_THRESHOLD = 0.85f;
 
     private FragmentHomeBinding binding;
-    private HomeViewModel       viewModel;
-    private NewsAdapter         newsAdapter;
-    private FeatureAdapter      featureAdapter;
-    private boolean             isToolbarCollapsed = false;
+    private HomeViewModel viewModel;
+    private NewsAdapter newsAdapter;
+    private FeatureAdapter featureAdapter;
+    private boolean isToolbarCollapsed = false;
 
-    public HomeFragment() { super(R.layout.fragment_home); }
+    public HomeFragment() {
+        super(R.layout.fragment_home);
+    }
 
     // ═══════════════════════════════════════════════════════════
     //  Lifecycle
@@ -114,17 +116,17 @@ public class HomeFragment extends Fragment {
     /**
      * Đọc chiều cao status bar thực từ WindowInsets và set lên
      * View statusBarSpacer (height ban đầu = 0dp trong XML).
-     *
+     * <p>
      * Tại sao không dùng fitsSystemWindows="true":
-     *   Android 15 (API 35+) bắt buộc edge-to-edge cho app targetSdk ≥ 35.
-     *   Trong Fragment, fitsSystemWindows không được đảm bảo dispatch
-     *   đúng qua toàn bộ view hierarchy. Cách dùng WindowInsetsCompat
-     *   trực tiếp hoạt động đáng tin cậy trên mọi API level.
-     *
+     * Android 15 (API 35+) bắt buộc edge-to-edge cho app targetSdk ≥ 35.
+     * Trong Fragment, fitsSystemWindows không được đảm bảo dispatch
+     * đúng qua toàn bộ view hierarchy. Cách dùng WindowInsetsCompat
+     * trực tiếp hoạt động đáng tin cậy trên mọi API level.
+     * <p>
      * Kết quả:
-     *   statusBarSpacer = 24dp (hoặc bất kỳ giá trị thực của device)
-     *   CoordinatorLayout bắt đầu ngay dưới status bar ✓
-     *   Ảnh hero KHÔNG đè lên status bar ✓
+     * statusBarSpacer = 24dp (hoặc bất kỳ giá trị thực của device)
+     * CoordinatorLayout bắt đầu ngay dưới status bar ✓
+     * Ảnh hero KHÔNG đè lên status bar ✓
      */
     private void applyStatusBarInset() {
         ViewCompat.setOnApplyWindowInsetsListener(
@@ -150,11 +152,11 @@ public class HomeFragment extends Fragment {
 
     /**
      * Theo dõi AppBarLayout offset để biết khi nào Toolbar collapsed.
-     *
+     * <p>
      * Khi collapsed (nền #1E1E1E - màu tối):
-     *   Icon 3 nút đổi sang vàng #FFC107 — tương phản cao trên nền tối.
+     * Icon 3 nút đổi sang vàng #FFC107 — tương phản cao trên nền tối.
      * Khi expanded (nền là ảnh):
-     *   Icon giữ nguyên trắng — dễ đọc trên ảnh + gradient overlay.
+     * Icon giữ nguyên trắng — dễ đọc trên ảnh + gradient overlay.
      */
     private void setupToolbarScrollBehavior() {
         binding.appBarLayout.addOnOffsetChangedListener(
@@ -163,7 +165,7 @@ public class HomeFragment extends Fragment {
                     if (total == 0) return;
 
                     float collapseRatio = Math.abs(verticalOffset) / (float) total;
-                    boolean collapsed  = collapseRatio >= COLLAPSE_THRESHOLD;
+                    boolean collapsed = collapseRatio >= COLLAPSE_THRESHOLD;
 
                     if (collapsed != isToolbarCollapsed) {
                         isToolbarCollapsed = collapsed;
@@ -287,8 +289,8 @@ public class HomeFragment extends Fragment {
 
     private void handleNewsClick(NewsItem item) {
         Intent intent = new Intent(requireContext(), NewsDetailActivity.class);
-        intent.putExtra(NewsDetailActivity.EXTRA_TITLE,   item.getTitle());
-        intent.putExtra(NewsDetailActivity.EXTRA_DATE,    item.getDate());
+        intent.putExtra(NewsDetailActivity.EXTRA_TITLE, item.getTitle());
+        intent.putExtra(NewsDetailActivity.EXTRA_DATE, item.getDate());
         intent.putExtra(NewsDetailActivity.EXTRA_CONTENT, item.getContent());
         startActivity(intent);
     }
@@ -301,8 +303,9 @@ public class HomeFragment extends Fragment {
     }
 
     private void handleNotificationClick() {
-        // TODO: mở NotificationFragment
-        Toast.makeText(requireContext(), "Thông báo", Toast.LENGTH_SHORT).show();
+        ((MainActivity) requireActivity())
+                .pushFragment(new com.utc2.appreborn.ui.notification.NotificationFragment(),
+                        com.utc2.appreborn.ui.notification.NotificationFragment.TAG);
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -311,7 +314,7 @@ public class HomeFragment extends Fragment {
 
     private void openQrFragment() {
         StudentProfile p = viewModel.getStudentProfileLiveData().getValue();
-        String name = (p != null) ? p.getFullName()    : MockHelper.getMockFullName();
+        String name = (p != null) ? p.getFullName() : MockHelper.getMockFullName();
         String code = (p != null) ? p.getStudentCode() : MockHelper.getMockStudentCode();
         ((MainActivity) requireActivity())
                 .pushFragment(QrFragment.newInstance(name, code), QrFragment.TAG);
