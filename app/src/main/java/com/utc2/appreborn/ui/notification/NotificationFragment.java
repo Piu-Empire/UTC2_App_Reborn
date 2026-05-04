@@ -231,6 +231,7 @@ public class NotificationFragment extends Fragment {
                 true
         ));
 
+
         mockList.add(new NotificationItem(
                 "Phòng QLSV",
                 "Nộp bản sao học bạ THPT cho sinh viên năm nhất",
