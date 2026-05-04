@@ -1,20 +1,24 @@
 package com.utc2.appreborn.ui.assessment;
 
 import android.content.Context;
-import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.utc2.appreborn.R;
 import com.utc2.appreborn.databinding.ItemAssessmentCriteriaBinding;
 import com.utc2.appreborn.databinding.ItemAssessmentDeductionBinding;
+import com.utc2.appreborn.databinding.ItemAssessmentFooterCvhtBinding;
+import com.utc2.appreborn.databinding.ItemAssessmentFooterRlsvBinding;
 import com.utc2.appreborn.databinding.ItemAssessmentHeaderBinding;
 import com.utc2.appreborn.model.AssessmentCriteria;
 
@@ -23,24 +27,25 @@ import java.util.List;
 
 public class AssessmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    // ─── Callback Interfaces ──────────────────────────────────────────────────
+    public static final int COL_SV     = 0;
+    public static final int COL_TAPTHE = 1;
+    public static final int COL_KHOA   = 2;
+    public static final int COL_TRUONG = 3;
 
     public interface OnScoreChangedListener {
         void onScoreChanged(List<AssessmentCriteria> updatedList);
     }
 
     public interface OnEvidenceClickListener {
-        void onEvidenceClick(int criteriaId);
+        void onAddEvidence(int criteriaId);
+        void onRemoveEvidence(int criteriaId, int fileIndex);
     }
 
-    // ─── Fields ───────────────────────────────────────────────────────────────
-
-    private List<AssessmentCriteria> items = new ArrayList<>();
+    private List<AssessmentCriteria> items         = new ArrayList<>();
     private OnScoreChangedListener   scoreListener;
     private OnEvidenceClickListener  evidenceListener;
-
-    /** Đếm STT thực (bỏ qua HEADER) để hiển thị đúng số thứ tự */
-    private List<Integer> sttMap = new ArrayList<>();
+    private boolean                  isStudentTab  = true;
+    private int                      columnMode    = COL_SV;
 
     public AssessmentAdapter(OnScoreChangedListener scoreListener,
                              OnEvidenceClickListener evidenceListener) {
@@ -48,45 +53,32 @@ public class AssessmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.evidenceListener = evidenceListener;
     }
 
-    // ─── Data ─────────────────────────────────────────────────────────────────
-
     public void submitList(List<AssessmentCriteria> newList) {
-        this.items = newList != null ? newList : new ArrayList<>();
-        rebuildSttMap();
+        this.items = (newList != null) ? newList : new ArrayList<>();
         notifyDataSetChanged();
-    }
-
-    /** Xây dựng bảng ánh xạ vị trí → STT thực (bỏ qua header và deduction) */
-    private void rebuildSttMap() {
-        sttMap.clear();
-        int stt = 0;
-        for (AssessmentCriteria item : items) {
-            if (item.getViewType() == AssessmentCriteria.TYPE_CRITERIA) {
-                stt++;
-                sttMap.add(stt);
-            } else {
-                sttMap.add(0); // 0 = không hiển thị STT
-            }
-        }
     }
 
     public List<AssessmentCriteria> getItems() { return items; }
 
+    public void setStudentTab(boolean isStudent) {
+        this.isStudentTab = isStudent;
+        if (!isStudent) this.columnMode = COL_SV;
+        notifyDataSetChanged();
+    }
+
+    public void setColumnMode(int mode) {
+        this.columnMode = mode;
+        notifyDataSetChanged();
+    }
+
     public void notifyEvidenceUpdated(int criteriaId) {
         for (int i = 0; i < items.size(); i++) {
-            if (items.get(i).getId() == criteriaId) {
-                notifyItemChanged(i);
-                return;
-            }
+            if (items.get(i).getId() == criteriaId) { notifyItemChanged(i); return; }
         }
     }
 
-    // ─── RecyclerView ─────────────────────────────────────────────────────────
-
-    @Override
-    public int getItemViewType(int position) {
-        return items.get(position).getViewType();
-    }
+    @Override public int getItemViewType(int pos) { return items.get(pos).getViewType(); }
+    @Override public int getItemCount()           { return items.size(); }
 
     @NonNull
     @Override
@@ -94,14 +86,15 @@ public class AssessmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         LayoutInflater inf = LayoutInflater.from(parent.getContext());
         switch (viewType) {
             case AssessmentCriteria.TYPE_SECTION_HEADER:
-                return new HeaderViewHolder(
-                        ItemAssessmentHeaderBinding.inflate(inf, parent, false));
+                return new HeaderVH(ItemAssessmentHeaderBinding.inflate(inf, parent, false));
             case AssessmentCriteria.TYPE_DEDUCTION:
-                return new DeductionViewHolder(
-                        ItemAssessmentDeductionBinding.inflate(inf, parent, false));
+                return new DeductionVH(ItemAssessmentDeductionBinding.inflate(inf, parent, false));
+            case AssessmentCriteria.TYPE_FOOTER_RLSV:
+                return new FooterRlsvVH(ItemAssessmentFooterRlsvBinding.inflate(inf, parent, false));
+            case AssessmentCriteria.TYPE_FOOTER_CVHT:
+                return new FooterCvhtVH(ItemAssessmentFooterCvhtBinding.inflate(inf, parent, false));
             default:
-                return new CriteriaViewHolder(
-                        ItemAssessmentCriteriaBinding.inflate(inf, parent, false));
+                return new CriteriaVH(ItemAssessmentCriteriaBinding.inflate(inf, parent, false));
         }
     }
 
@@ -110,173 +103,223 @@ public class AssessmentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         AssessmentCriteria item = items.get(position);
         switch (item.getViewType()) {
             case AssessmentCriteria.TYPE_SECTION_HEADER:
-                ((HeaderViewHolder) holder).bind(item);
-                break;
+                ((HeaderVH) holder).bind(item);   break;
             case AssessmentCriteria.TYPE_DEDUCTION:
-                ((DeductionViewHolder) holder).bind(item);
-                break;
+                ((DeductionVH) holder).bind(item); break;
+            case AssessmentCriteria.TYPE_FOOTER_RLSV:
+            case AssessmentCriteria.TYPE_FOOTER_CVHT:
+                break; // nội dung tĩnh trong XML
             default:
-                int stt = (position < sttMap.size()) ? sttMap.get(position) : 0;
-                ((CriteriaViewHolder) holder).bind(item, stt);
-                break;
+                ((CriteriaVH) holder).bind(item, columnMode, isStudentTab);
         }
     }
 
-    @Override
-    public int getItemCount() { return items.size(); }
+    // ── Header ────────────────────────────────────────────────────────────────
 
-    // ─── ViewHolder: Section Header ───────────────────────────────────────────
-
-    class HeaderViewHolder extends RecyclerView.ViewHolder {
+    class HeaderVH extends RecyclerView.ViewHolder {
         private final ItemAssessmentHeaderBinding b;
-
-        HeaderViewHolder(ItemAssessmentHeaderBinding binding) {
-            super(binding.getRoot());
-            b = binding;
-        }
+        HeaderVH(ItemAssessmentHeaderBinding binding) { super(binding.getRoot()); b = binding; }
 
         void bind(AssessmentCriteria item) {
             b.tvSectionTitle.setText(item.getTitle());
-            // Tiêu đề mục trừ điểm dùng màu đỏ
-            if (item.getTitle() != null && item.getTitle().contains("TRỪ ĐIỂM")) {
-                b.tvSectionTitle.setTextColor(
-                        b.getRoot().getContext().getColor(android.R.color.holo_red_dark));
-            } else {
-                b.tvSectionTitle.setTextColor(0xFF0057A8); // xanh dương
-            }
+            boolean isDeduct = item.getTitle() != null && item.getTitle().contains("TRỪ ĐIỂM");
+            int color = isDeduct ? 0xFFCC0000 : 0xFF0057A8;
+            b.tvSectionTitle.setTextColor(color);
+            b.viewAccent.setBackgroundColor(color);
         }
     }
 
-    // ─── ViewHolder: Criteria ─────────────────────────────────────────────────
+    // ── Criteria ──────────────────────────────────────────────────────────────
 
-    class CriteriaViewHolder extends RecyclerView.ViewHolder {
+    class CriteriaVH extends RecyclerView.ViewHolder {
         private final ItemAssessmentCriteriaBinding b;
         private TextWatcher activeWatcher;
 
-        CriteriaViewHolder(ItemAssessmentCriteriaBinding binding) {
+        CriteriaVH(ItemAssessmentCriteriaBinding binding) {
             super(binding.getRoot());
             b = binding;
         }
 
-        void bind(AssessmentCriteria item, int stt) {
-            // STT
-            b.tvStt.setText(stt > 0 ? String.valueOf(stt) : "");
-
-            // Nội dung
+        void bind(AssessmentCriteria item, int colMode, boolean isStudent) {
             b.tvCriteriaTitle.setText(item.getTitle());
 
-            // Điểm tối đa
-            b.tvMaxScore.setText(formatScore(item.getMaxScore()));
+            if (item.getDescription() != null && !item.getDescription().isEmpty()) {
+                b.tvDescription.setVisibility(View.VISIBLE);
+                b.tvDescription.setText(item.getDescription());
+            } else {
+                b.tvDescription.setVisibility(View.GONE);
+            }
 
-            // Dropdown điểm
-            setupScoreDropdown(b.actvScore, item);
+            boolean editable = !isStudent || colMode == COL_SV;
+            if (editable) {
+                b.actvScore.setVisibility(View.VISIBLE);
+                b.tvReadonlyScore.setVisibility(View.GONE);
+                setupScoreDropdown(b.actvScore, item);
+            } else {
+                b.actvScore.setVisibility(View.GONE);
+                b.tvReadonlyScore.setVisibility(View.VISIBLE);
+                b.tvReadonlyScore.setText(fmt(getReadonlyScore(item, colMode)));
+            }
 
-            // Minh chứng
             if (item.isRequiresEvidence()) {
-                b.layoutEvidence.setVisibility(View.VISIBLE);
-                updateEvidenceButton(item);
-                b.btnEvidence.setOnClickListener(v -> {
-                    if (evidenceListener != null) evidenceListener.onEvidenceClick(item.getId());
-                });
+                b.layoutEvidenceSection.setVisibility(View.VISIBLE);
+                refreshEvidenceUI(item);
             } else {
-                b.layoutEvidence.setVisibility(View.GONE);
+                b.layoutEvidenceSection.setVisibility(View.GONE);
             }
         }
 
-        private void updateEvidenceButton(AssessmentCriteria item) {
-            if (item.hasEvidence()) {
-                b.btnEvidence.setText("✓ Đã nộp MC");
-                b.btnEvidence.setTextColor(
-                        b.getRoot().getContext().getColor(android.R.color.holo_green_dark));
-            } else {
-                b.btnEvidence.setText("Nộp MC");
-                b.btnEvidence.setTypeface(b.btnEvidence.getTypeface(), Typeface.BOLD);
-                b.btnEvidence.setTextColor(
-                        b.getRoot().getContext().getColor(android.R.color.black));
+        private float getReadonlyScore(AssessmentCriteria item, int mode) {
+            switch (mode) {
+                case COL_TAPTHE: return item.getTapTheScore();
+                case COL_KHOA:   return item.getKhoaScore();
+                case COL_TRUONG: return item.getTruongScore();
+                default:         return item.getCurrentScore();
             }
         }
 
-        private void setupScoreDropdown(MaterialAutoCompleteTextView actv,
-                                        AssessmentCriteria item) {
+        private void setupScoreDropdown(AutoCompleteTextView actv, AssessmentCriteria item) {
             Context ctx = actv.getContext();
             List<String> opts = new ArrayList<>();
-            if (item.getScoreOptions() != null) {
-                for (Float f : item.getScoreOptions()) opts.add(formatScore(f));
-            }
+            if (item.getScoreOptions() != null)
+                for (Float f : item.getScoreOptions()) opts.add(fmt(f));
+
+            // FIX: dùng dropdown_score_item.xml → trắng, đẹp
             ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    ctx, android.R.layout.simple_dropdown_item_1line, opts);
+                    ctx, R.layout.dropdown_score_item, opts);
             actv.setAdapter(adapter);
 
+            // FIX: popup trắng
+            actv.setDropDownBackgroundDrawable(new ColorDrawable(android.graphics.Color.WHITE));
+            actv.setOnClickListener(v -> actv.showDropDown());
+            actv.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) actv.showDropDown();
+            });
+
             if (activeWatcher != null) actv.removeTextChangedListener(activeWatcher);
-            actv.setText(formatScore(item.getCurrentScore()), false);
+            actv.setText(fmt(item.getCurrentScore()), false);
 
             activeWatcher = new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {}
-                @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) {}
+                @Override public void beforeTextChanged(CharSequence s, int a, int b2, int c) {}
+                @Override public void onTextChanged(CharSequence s, int a, int b2, int c)     {}
                 @Override
                 public void afterTextChanged(Editable s) {
                     try {
-                        float val = Float.parseFloat(s.toString().trim());
-                        item.setCurrentScore(val);
+                        item.setCurrentScore(Float.parseFloat(s.toString().trim()));
                         if (scoreListener != null) scoreListener.onScoreChanged(items);
                     } catch (NumberFormatException ignored) {}
                 }
             };
             actv.addTextChangedListener(activeWatcher);
         }
+
+        private void refreshEvidenceUI(AssessmentCriteria item) {
+            List<String> uris = item.getEvidenceUris();
+            if (uris.isEmpty()) {
+                b.btnEvidence.setVisibility(View.VISIBLE);
+                b.layoutEvidenceList.setVisibility(View.GONE);
+                b.btnAddMoreEvidence.setVisibility(View.GONE);
+                b.btnEvidence.setOnClickListener(v -> {
+                    if (evidenceListener != null) evidenceListener.onAddEvidence(item.getId());
+                });
+            } else {
+                b.btnEvidence.setVisibility(View.GONE);
+                b.layoutEvidenceList.setVisibility(View.VISIBLE);
+                b.btnAddMoreEvidence.setVisibility(View.VISIBLE);
+                b.layoutEvidenceList.removeAllViews();
+
+                LayoutInflater inf = LayoutInflater.from(b.getRoot().getContext());
+                for (int i = 0; i < uris.size(); i++) {
+                    final int idx = i;
+                    View row = inf.inflate(R.layout.item_evidence_file,
+                            b.layoutEvidenceList, false);
+                    ((TextView) row.findViewById(R.id.tvEvidenceFileName))
+                            .setText(extractFileName(uris.get(i)));
+                    row.findViewById(R.id.btnDeleteEvidence).setOnClickListener(v -> {
+                        if (evidenceListener != null)
+                            evidenceListener.onRemoveEvidence(item.getId(), idx);
+                    });
+                    b.layoutEvidenceList.addView(row);
+                }
+
+                b.btnAddMoreEvidence.setOnClickListener(v -> {
+                    if (evidenceListener != null) evidenceListener.onAddEvidence(item.getId());
+                });
+            }
+        }
+
+        private String extractFileName(String uri) {
+            if (uri == null) return "file";
+            int slash = uri.lastIndexOf('/');
+            if (slash >= 0 && slash < uri.length() - 1) {
+                String name = uri.substring(slash + 1);
+                try { name = java.net.URLDecoder.decode(name, "UTF-8"); }
+                catch (Exception ignored) {}
+                return name;
+            }
+            return uri;
+        }
     }
 
-    // ─── ViewHolder: Deduction ────────────────────────────────────────────────
+    // ── Deduction ─────────────────────────────────────────────────────────────
 
-    class DeductionViewHolder extends RecyclerView.ViewHolder {
+    class DeductionVH extends RecyclerView.ViewHolder {
         private final ItemAssessmentDeductionBinding b;
         private TextWatcher activeWatcher;
 
-        DeductionViewHolder(ItemAssessmentDeductionBinding binding) {
+        DeductionVH(ItemAssessmentDeductionBinding binding) {
             super(binding.getRoot());
             b = binding;
         }
 
         void bind(AssessmentCriteria item) {
             b.tvDeductionTitle.setText(item.getTitle());
-            b.tvMaxDeduction.setText(formatScore(item.getMaxScore()));
-            setupScoreDropdown(b.actvDeductionScore, item);
-        }
+            Context ctx = b.actvDeductionScore.getContext();
 
-        private void setupScoreDropdown(MaterialAutoCompleteTextView actv,
-                                        AssessmentCriteria item) {
-            Context ctx = actv.getContext();
             List<String> opts = new ArrayList<>();
-            if (item.getScoreOptions() != null) {
-                for (Float f : item.getScoreOptions()) opts.add(formatScore(f));
-            }
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                    ctx, android.R.layout.simple_dropdown_item_1line, opts);
-            actv.setAdapter(adapter);
+            if (item.getScoreOptions() != null)
+                for (Float f : item.getScoreOptions()) opts.add(fmt(f));
 
-            if (activeWatcher != null) actv.removeTextChangedListener(activeWatcher);
-            actv.setText(formatScore(item.getCurrentScore()), false);
+            // FIX: popup trắng cho deduction cũng
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    ctx, R.layout.dropdown_score_item, opts);
+            b.actvDeductionScore.setAdapter(adapter);
+            b.actvDeductionScore.setDropDownBackgroundDrawable(
+                    new ColorDrawable(android.graphics.Color.WHITE));
+            b.actvDeductionScore.setOnClickListener(v -> b.actvDeductionScore.showDropDown());
+            b.actvDeductionScore.setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) b.actvDeductionScore.showDropDown();
+            });
+
+            if (activeWatcher != null) b.actvDeductionScore.removeTextChangedListener(activeWatcher);
+            b.actvDeductionScore.setText(fmt(item.getCurrentScore()), false);
 
             activeWatcher = new TextWatcher() {
-                @Override public void beforeTextChanged(CharSequence s, int i, int i1, int i2) {}
-                @Override public void onTextChanged(CharSequence s, int i, int i1, int i2) {}
+                @Override public void beforeTextChanged(CharSequence s, int a, int b2, int c) {}
+                @Override public void onTextChanged(CharSequence s, int a, int b2, int c)     {}
                 @Override
                 public void afterTextChanged(Editable s) {
                     try {
-                        float val = Float.parseFloat(s.toString().trim());
-                        item.setCurrentScore(val);
+                        item.setCurrentScore(Float.parseFloat(s.toString().trim()));
                         if (scoreListener != null) scoreListener.onScoreChanged(items);
                     } catch (NumberFormatException ignored) {}
                 }
             };
-            actv.addTextChangedListener(activeWatcher);
+            b.actvDeductionScore.addTextChangedListener(activeWatcher);
         }
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    // ── Footer ViewHolders ────────────────────────────────────────────────────
 
-    private String formatScore(float v) {
-        if (v == (int) v) return String.valueOf((int) v);
-        return String.valueOf(v);
+    class FooterRlsvVH extends RecyclerView.ViewHolder {
+        FooterRlsvVH(ItemAssessmentFooterRlsvBinding b) { super(b.getRoot()); }
+    }
+
+    class FooterCvhtVH extends RecyclerView.ViewHolder {
+        FooterCvhtVH(ItemAssessmentFooterCvhtBinding b) { super(b.getRoot()); }
+    }
+
+    private String fmt(float v) {
+        return (v == (int) v) ? String.valueOf((int) v) : String.valueOf(v);
     }
 }

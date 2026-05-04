@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_assessment_footer_rlsv.xml
+    Footer cuối list khi tab RLSV (Sinh viên):
+    - KẾT QUẢ ĐIỂM RÈN LUYỆN
+    - Kết quả HĐ thông qua
+    - Ghi chú (các điều kiện)
+    - Quy định phân loại
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="16dp">
+
+    <!-- Tiêu đề KQ -->
+    <TextView
+        android:id="@+id/tvResultTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="KẾT QUẢ ĐIỂM RÈN LUYỆN"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#0057A8"
+        android:gravity="center"
+        android:paddingBottom="6dp"/>
+
+    <!-- Row: HĐ thông qua -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Kết quả điểm rèn luyện do Hội đồng đánh giá thông qua:"
+            android:textSize="12sp"
+            android:textColor="#555"/>
+
+        <TextView
+            android:id="@+id/tvCouncilScore"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#111"
+            android:layout_marginStart="4dp"/>
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="#E0E0E0"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Ghi chú -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Ghi chú:"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#333"
+        android:paddingBottom="4dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="- Trước khi tổ chức đánh giá RLSV, yêu cầu CVHT, Cán bộ lớp phổ biến chi tiết cho từng sinh viên thực hiện đúng nội quy quy định.\n- Từng sinh viên căn cứ vào kết quả rèn luyện, tự đánh giá theo mức điểm chi tiết. Bản đánh giá phải thông qua họp lớp dưới sự chủ trì của CVHT và phải có ít nhất 2/3 số sinh viên trong lớp tham gia.\n- Điểm RLSV được dùng để xét học tiếp, ngừng học, xét thi đua khen thưởng, xét tốt nghiệp."
+        android:textSize="11sp"
+        android:textColor="#666"
+        android:lineSpacingMultiplier="1.4"
+        android:paddingBottom="8dp"/>
+
+    <!-- Phân loại -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Quy định phân loại kết quả rèn luyện sinh viên:"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:textColor="#0057A8"
+        android:paddingBottom="4dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="- Từ 90 đến 100 điểm: Loại xuất sắc\n- Từ 80 đến dưới 90 điểm: Loại tốt\n- Từ 65 đến dưới 80 điểm: Loại khá\n- Từ 50 đến dưới 65 điểm: Loại trung bình\n- Từ 35 đến dưới 50 điểm: Loại yếu\n- Dưới 35 điểm: Loại kém"
+        android:textSize="11sp"
+        android:textColor="#444"
+        android:lineSpacingMultiplier="1.5"/>
+
+</LinearLayout>

@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    item_assessment_deduction.xml
-    Dòng trừ điểm:
-      [Nội dung (màu đỏ)] [Điểm trừ] [Dropdown chọn mức trừ]
-    Background hơi đỏ nhạt để phân biệt với tiêu chí thường.
--->
+<!-- item_assessment_deduction.xml (fix_v4) - bỏ drawableEnd, click thẳng để chọn -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#FFF5F5">
 
-    <!-- Divider đỏ nhạt -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
@@ -22,56 +17,57 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:gravity="center_vertical"
-        android:minHeight="48dp"
-        android:background="#FFF5F5">
+        android:minHeight="52dp">
 
-        <!-- Nội dung trừ điểm -->
-        <TextView
-            android:id="@+id/tvDeductionTitle"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13sp"
-            android:textColor="#CC0000"
-            android:lineSpacingExtra="2dp"
-            android:layout_marginEnd="8dp"/>
+            android:orientation="vertical"
+            android:layout_marginEnd="10dp">
 
-        <!-- Mức trừ tối đa -->
-        <TextView
-            android:id="@+id/tvMaxDeduction"
-            android:layout_width="44dp"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#CC0000"
-            android:textStyle="bold"
-            android:gravity="center"/>
-
-        <!-- Dropdown chọn mức trừ -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilDeductionScore"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="64dp"
-            android:layout_height="wrap_content"
-            app:boxStrokeColor="#CC0000"
-            app:hintTextColor="#CC0000"
-            app:boxBackgroundColor="#FFF5F5">
-
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/actvDeductionScore"
+            <TextView
+                android:id="@+id/tvDeductionTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
-                android:textColor="#CC0000"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="none"/>
+                android:textColor="@color/assessment_deduction_red"
+                android:lineSpacingMultiplier="1.3"/>
 
-        </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:id="@+id/tvPenalty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="#FF6666"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+        <!-- FIX: bỏ drawableEnd, click thẳng để mở dropdown -->
+        <AutoCompleteTextView
+            android:id="@+id/actvDeductionScore"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_score_box"
+            android:backgroundTint="#FFF5F5"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:gravity="center"
+            android:inputType="none"
+            android:textSize="14sp"
+            android:textColor="@color/assessment_deduction_red"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:cursorVisible="false"/>
 
     </LinearLayout>
 

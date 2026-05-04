@@ -15,12 +15,21 @@
     android:paddingEnd="16dp"
     android:paddingTop="12dp"
     android:paddingBottom="6dp"
+    android:gravity="center_vertical"
     android:background="#FAFAFA">
+
+    <View
+        android:id="@+id/viewAccent"
+        android:layout_width="3dp"
+        android:layout_height="14dp"
+        android:layout_marginEnd="8dp"
+        android:background="#0057A8"/>
 
     <TextView
         android:id="@+id/tvSectionTitle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textSize="13sp"
         android:textStyle="bold"
         android:textColor="#0057A8"

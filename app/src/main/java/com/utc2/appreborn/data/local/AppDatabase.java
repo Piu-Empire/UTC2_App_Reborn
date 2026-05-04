@@ -1,8 +1,4 @@
 // PATH: app/src/main/java/com/utc2/appreborn/data/local/AppDatabase.java
-// ⚠️ Thay thế hoàn toàn file AppDatabase.java hiện có bằng file này.
-// Tăng version từ 1 → 2 vì thêm 3 entity mới.
-// Dùng fallbackToDestructiveMigration() cho môi trường dev (xóa và tạo lại DB).
-// TODO: Thay bằng Migration thực khi release production.
 
 package com.utc2.appreborn.data.local;
 
@@ -28,12 +24,12 @@ import com.utc2.appreborn.data.local.entity.UserEntity;
                 CourseEntity.class,
                 SemesterEntity.class,
                 ScheduleEntity.class,
-                // ── Người dùng & Đánh giá (version 2) ────────
+                // ── Người dùng & Đánh giá (version 2+) ────────
                 UserEntity.class,
                 AdvisorEntity.class,
                 StudentProfileEntity.class
         },
-        version = 2,
+        version = 3,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
@@ -57,7 +53,7 @@ public abstract class AppDatabase extends RoomDatabase {
                                     AppDatabase.class,
                                     "schedule_db"
                             )
-                            // TODO: Thay bằng addMigrations(MIGRATION_1_2) khi release
+                            // fallbackToDestructiveMigration() sẽ xóa và tạo lại DB khi version thay đổi
                             .fallbackToDestructiveMigration()
                             .build();
                 }

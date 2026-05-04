@@ -35,6 +35,9 @@ public class StudentProfileEntity {
     @ColumnInfo(name = "user_id")
     public long userId;
 
+    @ColumnInfo(name = "full_name")
+    public String fullName;
+
     @ColumnInfo(name = "student_code")
     public String studentCode;
 

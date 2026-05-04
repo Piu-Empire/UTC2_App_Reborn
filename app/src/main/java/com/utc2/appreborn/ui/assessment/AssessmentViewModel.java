@@ -1,5 +1,3 @@
-// PATH: app/src/main/java/com/utc2/appreborn/ui/assessment/AssessmentViewModel.java
-
 package com.utc2.appreborn.ui.assessment;
 
 import android.app.Application;
@@ -9,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Transformations;
 
 import com.utc2.appreborn.data.local.AppDatabase;
 import com.utc2.appreborn.data.local.dao.AdvisorDao;
@@ -26,6 +23,8 @@ import java.util.concurrent.Executors;
 
 public class AssessmentViewModel extends AndroidViewModel {
 
+    public interface SaveCallback { void onResult(boolean success); }
+
     // ─── Deps ─────────────────────────────────────────────────────────────────
     private final AssessmentRepository repository;
     private final UserDao              userDao;
@@ -33,118 +32,148 @@ public class AssessmentViewModel extends AndroidViewModel {
     private final ExecutorService      executor = Executors.newSingleThreadExecutor();
 
     // ─── State ────────────────────────────────────────────────────────────────
-    /** true = đang xem tab RLSV, false = CVHT */
-    private final MutableLiveData<Boolean> isStudentTab = new MutableLiveData<>(true);
-
-    /** Đợt đánh giá đang được chọn */
-    private final MutableLiveData<AssessmentPeriod> selectedPeriod = new MutableLiveData<>();
-
-    /** Tổng điểm tính real-time */
-    private final MutableLiveData<Float> totalScore = new MutableLiveData<>(0f);
-
-    /** Xếp loại dựa trên tổng điểm */
-    private final MutableLiveData<String> classification = new MutableLiveData<>("");
-
-    /** Danh sách tiêu chí theo tab đang chọn */
+    private final MutableLiveData<Boolean>  isStudentTab   = new MutableLiveData<>(true);
+    private final MutableLiveData<Float>    totalScore     = new MutableLiveData<>(0f);
+    private final MutableLiveData<String>   classification = new MutableLiveData<>("");
     private final MediatorLiveData<List<AssessmentCriteria>> criteria = new MediatorLiveData<>();
-    private LiveData<List<AssessmentCriteria>> currentCriteriaSource;
-
-    /** Danh sách học kỳ */
     private final LiveData<List<AssessmentPeriod>> periods;
 
-    /** Thông tin sinh viên (mock userId = 1 để test) */
-    private final MutableLiveData<String> studentCode     = new MutableLiveData<>("");
-    private final MutableLiveData<String> advisorName     = new MutableLiveData<>("");
+    // Header RLSV
+    private final MutableLiveData<String>   studentName  = new MutableLiveData<>("");
+    private final MutableLiveData<String>   studentCode  = new MutableLiveData<>("");
+    private final MutableLiveData<String>   studentClass = new MutableLiveData<>("");
+
+    // Header CVHT
+    private final MutableLiveData<String>   advisorName  = new MutableLiveData<>("");
+
+    private final MutableLiveData<AssessmentPeriod> selectedPeriod = new MutableLiveData<>();
+    private LiveData<List<AssessmentCriteria>> currentSource;
 
     // ─── Constructor ──────────────────────────────────────────────────────────
 
     public AssessmentViewModel(@NonNull Application application) {
         super(application);
-        repository  = AssessmentRepository.getInstance();
-        userDao     = AppDatabase.getInstance(application).userDao();
-        advisorDao  = AppDatabase.getInstance(application).advisorDao();
-        periods     = repository.getAssessmentPeriods();
+        repository = AssessmentRepository.getInstance();
+        userDao    = AppDatabase.getInstance(application).userDao();
+        advisorDao = AppDatabase.getInstance(application).advisorDao();
+        periods    = repository.getAssessmentPeriods();
 
-        // Load student info từ local DB (dùng userId = 1 cho mock)
         loadStudentInfo(1L);
-
-        // Lần đầu load criteria theo tab mặc định (RLSV)
         switchTab(true);
     }
 
-    // ─── Public API ───────────────────────────────────────────────────────────
+    // ─── Public LiveData ──────────────────────────────────────────────────────
 
     public LiveData<List<AssessmentCriteria>> getCriteria()       { return criteria; }
     public LiveData<List<AssessmentPeriod>>   getPeriods()        { return periods; }
     public LiveData<Float>                    getTotalScore()     { return totalScore; }
     public LiveData<String>                   getClassification() { return classification; }
     public LiveData<Boolean>                  getIsStudentTab()   { return isStudentTab; }
-    public LiveData<String>                   getStudentCode()    { return studentCode; }
-    public LiveData<String>                   getAdvisorName()    { return advisorName; }
 
-    /** Gọi khi người dùng bấm tab RLSV hoặc CVHT */
+    // Header RLSV
+    public LiveData<String> getStudentName()  { return studentName; }
+    public LiveData<String> getStudentCode()  { return studentCode; }
+    public LiveData<String> getStudentClass() { return studentClass; }
+
+    // Header CVHT
+    public LiveData<String> getAdvisorName()  { return advisorName; }
+
+    // ─── Tab switch ───────────────────────────────────────────────────────────
+
     public void switchTab(boolean toStudentTab) {
         isStudentTab.setValue(toStudentTab);
-
-        // Xóa nguồn cũ nếu có
-        if (currentCriteriaSource != null) {
-            criteria.removeSource(currentCriteriaSource);
-        }
-
-        currentCriteriaSource = repository.getAssessmentCriteria(toStudentTab);
-        criteria.addSource(currentCriteriaSource, list -> {
+        if (currentSource != null) criteria.removeSource(currentSource);
+        currentSource = repository.getAssessmentCriteria(toStudentTab);
+        criteria.addSource(currentSource, list -> {
             criteria.setValue(list);
             recalculate(list);
         });
     }
 
-    /** Gọi từ Adapter khi người dùng thay đổi điểm của một tiêu chí */
-    public void onScoreChanged(List<AssessmentCriteria> currentList) {
-        recalculate(currentList);
-    }
-
-    /** Cập nhật URI minh chứng cho tiêu chí có id tương ứng */
-    public void updateEvidenceUri(int criteriaId, String uri) {
-        List<AssessmentCriteria> list = criteria.getValue();
-        if (list == null) return;
-        for (AssessmentCriteria c : list) {
-            if (c.getId() == criteriaId) {
-                c.setEvidenceUri(uri);
-                break;
-            }
-        }
-        criteria.setValue(list); // Trigger observer để refresh item
-    }
+    // ─── Period ───────────────────────────────────────────────────────────────
 
     public void setSelectedPeriod(AssessmentPeriod period) {
         selectedPeriod.setValue(period);
     }
 
-    // ─── Private Helpers ──────────────────────────────────────────────────────
+    // ─── Score ────────────────────────────────────────────────────────────────
 
-    /**
-     * Tính tổng điểm và xếp loại real-time.
-     * Chỉ cộng TYPE_CRITERIA và TYPE_DEDUCTION, bỏ qua SECTION_HEADER.
-     */
+    public void onScoreChanged(List<AssessmentCriteria> list) {
+        recalculate(list);
+    }
+
+    // ─── Evidence ────────────────────────────────────────────────────────────
+
+    public void addEvidenceUri(int criteriaId, String uri) {
+        List<AssessmentCriteria> list = criteria.getValue();
+        if (list == null) return;
+        for (AssessmentCriteria c : list) {
+            if (c.getId() == criteriaId) { c.addEvidenceUri(uri); break; }
+        }
+        criteria.setValue(list);
+    }
+
+    public void removeEvidenceUri(int criteriaId, int fileIndex) {
+        List<AssessmentCriteria> list = criteria.getValue();
+        if (list == null) return;
+        for (AssessmentCriteria c : list) {
+            if (c.getId() == criteriaId) { c.removeEvidenceAt(fileIndex); break; }
+        }
+        criteria.setValue(list);
+    }
+
+    // ─── Save RLSV ───────────────────────────────────────────────────────────
+
+    public void saveAssessment(List<AssessmentCriteria> criteriaList, SaveCallback callback) {
+        executor.execute(() -> {
+            try {
+                Thread.sleep(400); // giả lập DB write
+
+                // TODO: Uncomment khi AssessmentDao sẵn sàng
+                // AssessmentDao dao = AppDatabase.getInstance(getApplication()).assessmentDao();
+                // dao.insertOrReplace(buildEntity(criteriaList));
+
+                postResult(callback, true);
+            } catch (Exception e) {
+                postResult(callback, false);
+            }
+        });
+    }
+
+    // ─── Submit CVHT ─────────────────────────────────────────────────────────
+
+    public void submitCvht(List<AssessmentCriteria> criteriaList,
+                           String opinion,
+                           SaveCallback callback) {
+        executor.execute(() -> {
+            try {
+                Thread.sleep(400); // giả lập DB write
+
+                // TODO: Uncomment khi CvhtAssessmentDao sẵn sàng
+                // CvhtAssessmentDao dao = AppDatabase.getInstance(getApplication()).cvhtAssessmentDao();
+                // dao.insertOrReplace(buildCvhtEntity(criteriaList, opinion));
+
+                postResult(callback, true);
+            } catch (Exception e) {
+                postResult(callback, false);
+            }
+        });
+    }
+
+    // ─── Private ─────────────────────────────────────────────────────────────
+
     private void recalculate(List<AssessmentCriteria> list) {
         if (list == null) return;
         float sum = 0f;
         for (AssessmentCriteria c : list) {
-            if (c.getViewType() == AssessmentCriteria.TYPE_CRITERIA
-                    || c.getViewType() == AssessmentCriteria.TYPE_DEDUCTION) {
+            int t = c.getViewType();
+            if (t == AssessmentCriteria.TYPE_CRITERIA || t == AssessmentCriteria.TYPE_DEDUCTION)
                 sum += c.getCurrentScore();
-            }
         }
         totalScore.setValue(sum);
         classification.setValue(classify(sum, Boolean.TRUE.equals(isStudentTab.getValue())));
     }
 
-    /**
-     * Xếp loại theo thang điểm.
-     * RLSV: 90–100 Xuất sắc | 80–<90 Tốt | 65–<80 Khá | 50–<65 Trung bình |
-     *        35–<50 Yếu | <35 Kém
-     * CVHT: tổng 12 tiêu chí × 5 = 60 điểm tối đa. Tỷ lệ tương đương.
-     */
     private String classify(float score, boolean isRlsv) {
         if (isRlsv) {
             if (score >= 90) return "Xuất sắc";
@@ -154,7 +183,6 @@ public class AssessmentViewModel extends AndroidViewModel {
             if (score >= 35) return "Yếu";
             return "Kém";
         } else {
-            // CVHT: 60 điểm tối đa → quy đổi sang 100
             float pct = (score / 60f) * 100f;
             if (pct >= 90) return "Xuất sắc";
             if (pct >= 80) return "Tốt";
@@ -164,26 +192,41 @@ public class AssessmentViewModel extends AndroidViewModel {
         }
     }
 
-    /** Load thông tin sinh viên và cố vấn từ Room DB */
     private void loadStudentInfo(long userId) {
         executor.execute(() -> {
-            StudentProfileEntity profile = userDao.getStudentProfileByUserId(userId);
-            if (profile != null) {
-                studentCode.postValue(profile.studentCode != null ? profile.studentCode : "N/A");
+            try {
+                StudentProfileEntity profile = userDao.getStudentProfileByUserId(userId);
+                if (profile != null) {
+                    studentName.postValue(profile.fullName != null ? profile.fullName : "Sinh viên");
+                    studentCode.postValue(profile.studentCode != null ? profile.studentCode : "—");
+                    studentClass.postValue(profile.className != null ? profile.className : "—");
 
-                if (profile.advisorId != null) {
-                    AdvisorEntity advisor = advisorDao.getAdvisorById(profile.advisorId);
-                    if (advisor != null) {
-                        advisorName.postValue(advisor.fullName);
-                        return;
+                    if (profile.advisorId != null) {
+                        AdvisorEntity advisor = advisorDao.getAdvisorById(profile.advisorId);
+                        if (advisor != null) {
+                            advisorName.postValue(advisor.fullName);
+                            return;
+                        }
                     }
+                } else {
+                    // Mock fallback
+                    studentName.postValue("Nguyễn Văn B");
+                    studentCode.postValue("2251060xxx");
+                    studentClass.postValue("CQ.65.CNTT");
                 }
-            } else {
-                // === Mock data khi chưa có DB thực ===
+            } catch (Exception e) {
+                studentName.postValue("Nguyễn Văn B");
                 studentCode.postValue("2251060xxx");
+                studentClass.postValue("CQ.65.CNTT");
             }
-            advisorName.postValue("ThS. Nguyễn Văn A"); // Mock
+            advisorName.postValue("ThS. Nguyễn Văn A");
         });
+    }
+
+    private void postResult(SaveCallback callback, boolean success) {
+        if (callback == null) return;
+        new android.os.Handler(android.os.Looper.getMainLooper())
+                .post(() -> callback.onResult(success));
     }
 
     @Override

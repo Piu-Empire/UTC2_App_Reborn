@@ -1,120 +1,152 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    item_assessment_criteria.xml
-    Layout 1 hàng tiêu chí trong bảng đánh giá:
-      [STT] [Nội dung (multi-line)] [Điểm max] [Dropdown SV đánh giá]
-
-    Tab RLSV:  hiện tvStt, tvContent, tvMaxScore, tilScore
-    Tab CVHT:  giống RLSV, chỉ khác số cột (xử lý từ Adapter)
+    item_assessment_criteria.xml  (fix_v4)
+    Fix:
+    - Bỏ drawableEnd (ic_chevron_down) khỏi actvScore → click trực tiếp
+    - Tăng btnEvidence lên 40dp, text đủ hiển thị
+    - Tăng btnAddMoreEvidence lên 36dp
+    - actvScore paddingEnd giảm (không cần nhường chỗ cho icon)
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@android:color/white">
 
-    <!-- Divider trên -->
     <View
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:background="#E0E0E0"/>
 
-    <!-- Hàng nội dung -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:gravity="center_vertical"
-        android:minHeight="48dp"
-        android:background="@android:color/white">
+        android:minHeight="52dp">
 
-        <!-- STT -->
-        <TextView
-            android:id="@+id/tvStt"
-            android:layout_width="28dp"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#333"
-            android:gravity="center"/>
-
-        <!-- Nội dung tiêu chí (chiếm phần lớn) -->
+        <!-- Nội dung: title + description + evidence -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="8dp">
+            android:layout_marginEnd="10dp">
 
             <TextView
                 android:id="@+id/tvCriteriaTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="13sp"
-                android:textColor="#222"
-                android:lineSpacingExtra="2dp"/>
+                android:textColor="#222222"
+                android:lineSpacingMultiplier="1.3"/>
 
-            <!-- Nút nộp minh chứng (chỉ hiện khi cần) -->
-            <LinearLayout
-                android:id="@+id/layoutEvidence"
+            <!-- Mô tả khung điểm (xám nhỏ) -->
+            <TextView
+                android:id="@+id/tvDescription"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="4dp"
+                android:textSize="11sp"
+                android:textColor="#888888"
+                android:lineSpacingMultiplier="1.2"
+                android:layout_marginTop="2dp"
+                android:visibility="gone"/>
+
+            <!-- Evidence section -->
+            <LinearLayout
+                android:id="@+id/layoutEvidenceSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
                 android:visibility="gone">
 
-                <Button
+                <!-- FIX: tăng height lên 40dp, padding đủ → chữ không bị che -->
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnEvidence"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="30dp"
+                    android:layout_height="40dp"
+                    android:minWidth="140dp"
                     android:text="@string/assessment_btn_evidence"
-                    android:textSize="11sp"
+                    android:textSize="12sp"
                     android:textAllCaps="false"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="8dp"
-                    android:stateListAnimator="@null"
-                    app:strokeColor="@android:color/black"/>
+                    android:textColor="@android:color/black"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    app:backgroundTint="@android:color/white"
+                    app:strokeColor="@android:color/black"
+                    app:strokeWidth="1dp"
+                    app:cornerRadius="6dp"
+                    app:rippleColor="#22000000"
+                    app:elevation="0dp"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+
+                <!-- Danh sách file đã nộp — được add bằng Java -->
+                <LinearLayout
+                    android:id="@+id/layoutEvidenceList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"/>
+
+                <!-- FIX: tăng height lên 36dp → đủ hiển thị text -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAddMoreEvidence"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="@string/assessment_btn_add_evidence"
+                    android:textSize="12sp"
+                    android:textAllCaps="false"
+                    android:textColor="@color/assessment_header_blue"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    app:backgroundTint="@android:color/transparent"
+                    app:elevation="0dp"
+                    app:rippleColor="#220057A8"
+                    android:visibility="gone"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
-        <!-- Điểm tối đa -->
+        <!-- Score box: AutoCompleteTextView bare + bg_score_box
+             FIX: BỎ drawableEnd → không có icon chevron, click thẳng để chọn -->
+        <AutoCompleteTextView
+            android:id="@+id/actvScore"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_score_box"
+            android:paddingStart="0dp"
+            android:paddingEnd="0dp"
+            android:gravity="center"
+            android:inputType="none"
+            android:textSize="14sp"
+            android:textColor="#111111"
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:cursorVisible="false"/>
+
+        <!-- Read-only box (TapThe/Khoa/Truong) -->
         <TextView
-            android:id="@+id/tvMaxScore"
-            android:layout_width="44dp"
-            android:layout_height="wrap_content"
-            android:textSize="13sp"
-            android:textColor="#333"
-            android:gravity="center"/>
-
-        <!-- Dropdown SV đánh giá -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilScore"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="64dp"
-            android:layout_height="wrap_content"
-            app:boxStrokeColor="@android:color/black"
-            app:hintTextColor="#666"
-            app:boxBackgroundColor="@android:color/white">
-
-            <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                android:id="@+id/actvScore"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="13sp"
-                android:textColor="#111"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:inputType="none"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:id="@+id/tvReadonlyScore"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_score_box"
+            android:backgroundTint="@color/assessment_readonly_bg"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </LinearLayout>
 

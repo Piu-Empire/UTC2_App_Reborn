@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">UTC2 App Reborn</string>
     <string name="utc2_subtitle">UTC2 - Phân hiệu TP.HCM</string>
-
-    <!-- Nav labels -->
     <string name="nav_label_home">Trang chủ</string>
     <string name="nav_label_register">Đăng ký</string>
     <string name="nav_label_schedule">Lịch học</string>
     <string name="nav_label_result">Kết quả</string>
     <string name="nav_label_profile">Cá nhân</string>
-
-    <!-- Login -->
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
@@ -48,78 +43,64 @@
     <string name="desc_size_toggle">Phóng to/Thu nhỏ lịch</string>
     <string name="desc_view_mode">Đổi chế độ Ngày/Tuần</string>
     <string name="desc_go_today">Quay về ngày hiện tại</string>
-    <string name="desc_prev">Ngày trước</string>
-    <string name="desc_next">Ngày sau</string>
+    <string name="desc_prev">Trước</string>
+    <string name="desc_next">Sau</string>
     <string name="contentDescriptionCheduleChange">Chuyển chế độ xem</string>
     <string name="session_morning">SÁNG</string>
     <string name="session_afternoon">CHIỀU</string>
     <string name="session_evening">TỐI</string>
     <string name="label_pick_date">Chọn ngày xem lịch</string>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- Màn hình Đánh giá                                         -->
-    <!-- ══════════════════════════════════════════════════════════ -->
-
-    <!-- Header -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- Assessment                                              -->
+    <!-- ═══════════════════════════════════════════════════════ -->
     <string name="assessment_title">Đánh giá</string>
-    <string name="assessment_label_student_code">MSSV:</string>
-    <string name="assessment_label_advisor">CVHT:</string>
-    <string name="assessment_placeholder_dash">—</string>
-
-    <!-- Tab -->
     <string name="assessment_tab_student">Sinh viên</string>
     <string name="assessment_tab_advisor">Cố vấn học tập</string>
 
-    <!-- Period + Choose -->
+    <!-- Header labels -->
+    <string name="assessment_label_student_code">MSSV:</string>
+    <string name="assessment_label_class">Lớp:</string>
+    <string name="assessment_label_advisor">CVHT:</string>
+    <string name="assessment_placeholder_dash">—</string>
+
+    <!-- Period -->
     <string name="assessment_hint_period">Đợt đánh giá</string>
     <string name="assessment_btn_choose">Chọn</string>
 
     <!-- Column headers -->
-    <string name="assessment_col_stt">STT</string>
     <string name="assessment_col_content">Nội dung</string>
-    <string name="assessment_col_score">Điểm</string>
     <string name="assessment_col_sv_score">SV đánh giá</string>
     <string name="assessment_col_tapthe">Tập thể lớp</string>
-    <string name="assessment_col_khoa">Khoa/Bộ môn</string>
+    <string name="assessment_col_khoa">Khoa/BM</string>
     <string name="assessment_col_truong">Trường</string>
 
-    <!-- Summary RLSV -->
+    <!-- Summary -->
     <string name="assessment_label_total_score">Tổng điểm</string>
     <string name="assessment_label_classification">Xếp loại</string>
     <string name="assessment_default_score">0</string>
     <string name="assessment_default_classification">—</string>
-    <string name="assessment_result_title">KẾT QUẢ ĐIỂM RÈN LUYỆN</string>
-    <string name="assessment_result_council_label">Kết quả điểm rèn luyện do Hội đồng đánh giá thông qua:</string>
-    <string name="assessment_total_and_classification">TỔNG ĐIỂM VÀ XẾP LOẠI</string>
 
     <!-- Buttons -->
-    <string name="assessment_btn_evidence">Nộp MC</string>
-    <string name="assessment_btn_evidence_done">✓ Đã nộp MC</string>
-    <string name="assessment_btn_print">In đánh giá</string>
+    <string name="assessment_btn_evidence">Nộp minh chứng</string>
+    <string name="assessment_btn_add_evidence">+ Thêm minh chứng</string>
     <string name="assessment_btn_save">Lưu đánh giá</string>
+    <string name="assessment_btn_print">In đánh giá</string>
+    <string name="assessment_btn_submit_cvht">Nộp đánh giá CVHT</string>
 
-    <!-- Toast -->
+    <!-- Toast / feedback -->
     <string name="assessment_toast_evidence_attached">Đã đính kèm minh chứng</string>
+    <string name="assessment_toast_evidence_removed">Đã xóa minh chứng</string>
+    <string name="assessment_toast_saved">Đã lưu đánh giá thành công</string>
+    <string name="assessment_toast_save_error">Lỗi khi lưu, vui lòng thử lại</string>
+    <string name="assessment_toast_submitted">Đã nộp đánh giá CVHT thành công</string>
+    <string name="assessment_toast_submit_error">Lỗi khi nộp, vui lòng thử lại</string>
 
-    <!-- CVHT section -->
+    <!-- Footer CVHT -->
     <string name="assessment_cvht_opinion_label">2. Ý kiến sinh viên</string>
-    <string name="assessment_cvht_opinion_hint">Ý kiến đóng góp, nhận xét, kiến nghị về CVHT (Vui lòng gõ Tiếng Việt có dấu, nếu không có câu trả lời vui lòng để trống)</string>
+    <string name="assessment_cvht_opinion_hint">Ý kiến đóng góp, nhận xét, kiến nghị về CVHT\n(Vui lòng gõ Tiếng Việt có dấu, nếu không có câu trả lời vui lòng để trống)</string>
     <string name="assessment_cvht_reminder">*Vui lòng kiểm tra các thông tin trước khi nộp phiếu đánh giá.*</string>
 
-    <!-- Ghi chú RLSV -->
-    <string name="assessment_note_1">Trước khi tổ chức đánh giá RLSV, yêu cầu CVHT, Cán bộ lớp phổ biến chi tiết cho từng sinh viên thực hiện đúng nội quy quy định.</string>
-    <string name="assessment_note_2">Từng sinh viên căn cứ vào kết quả rèn luyện, tự đánh giá theo mức điểm chi tiết. Bản đánh giá phải thông qua họp lớp dưới sự chủ trì của CVHT.</string>
-    <string name="assessment_note_3">Điểm RLSV được dùng để xét học tiếp, ngừng học, xét thi đua khen thưởng, xét tốt nghiệp.</string>
-
-    <!-- Thang xếp loại -->
-    <string name="assessment_rank_excellent">Từ 90 đến 100 điểm: Loại xuất sắc</string>
-    <string name="assessment_rank_good">Từ 80 đến dưới 90 điểm: Loại tốt</string>
-    <string name="assessment_rank_fair">Từ 65 đến dưới 80 điểm: Loại khá</string>
-    <string name="assessment_rank_average">Từ 50 đến dưới 65 điểm: Loại trung bình</string>
-    <string name="assessment_rank_weak">Từ 35 đến dưới 50 điểm: Loại yếu</string>
-    <string name="assessment_rank_poor">Dưới 35 điểm: Loại kém</string>
-
-    <!-- Home screen -->
+    <!-- Home -->
     <string name="home_btn_assessment">Đánh giá rèn luyện</string>
-
 </resources>
