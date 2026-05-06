@@ -23,7 +23,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.common.api.Scope;
+// chưa cần này là dùng scope
+// import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -147,7 +148,8 @@ public class LoginActivity extends AppCompatActivity {
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
                 // quyền đọc Gmail
-                .requestScopes(new Scope("https://www.googleapis.com/auth/gmail.readonly"))
+                //tạm thời chưa cần quyền đọc Gmail dươis
+                //.requestScopes(new Scope("https://www.googleapis.com/auth/gmail.readonly"))
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
