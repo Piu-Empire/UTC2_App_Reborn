@@ -173,7 +173,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void performSkipLogin() {
-        sessionManager.createLoginSession("GUEST_TOKEN", "role", "guest");
         navigateToMain();
     }
 
