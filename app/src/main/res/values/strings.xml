@@ -265,4 +265,5 @@
     <string name="huy_dang_ky">Hủy đăng ký</string>
     <string name="mssv_title">Mã số sinh viên</string>
     <string name="continue_gg">Tiếp tục với Google</string>
+    <string name="settings_title">Settings</string>
 </resources>

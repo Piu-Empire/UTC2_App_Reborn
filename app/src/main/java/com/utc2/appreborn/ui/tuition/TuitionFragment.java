@@ -57,7 +57,7 @@ public class TuitionFragment extends Fragment {
             }
         });
 
-        // Kiểm tra mạng tức thời khi người dùng nhấn chọn chức năng[cite: 8]
+        // Kiểm tra mạng tức thời khi người dùng nhấn chọn chức năng
         cardTuitionSubject.setOnClickListener(v -> checkNetworkAndNavigate(SubjectTuitionActivity.class));
         cardDormitory.setOnClickListener(v -> checkNetworkAndNavigate(DormitoryTuitionActivity.class));
         cardInvoice.setOnClickListener(v -> checkNetworkAndNavigate(InvoiceActivity.class));

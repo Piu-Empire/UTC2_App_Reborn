@@ -13,7 +13,7 @@
         android:fillViewport="true"
         android:scrollbars="none"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottom_bar_compose">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -27,7 +27,9 @@
                 android:contentDescription="@string/logo_desc"
                 android:scaleType="centerCrop"
                 android:src="@drawable/bg_profile"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <ImageView
                 android:layout_width="45dp"
@@ -48,8 +50,8 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="@string/title_support"
-                android:src="@drawable/ic_bell_ring"
+                android:contentDescription="@string/settings_title"
+                android:src="@drawable/ic_settings"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:tint="@color/white" />
@@ -116,7 +118,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
                 android:paddingHorizontal="16dp"
-                app:layout_constraintTop_toBottomOf="@id/imgHeaderBg">
+                app:layout_constraintTop_toBottomOf="@id/imgHeaderBg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnProfileInfo"
                     android:layout_width="0dp"
@@ -128,6 +133,7 @@
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
+
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btnChangePassword"
                     android:layout_width="0dp"
@@ -147,7 +153,10 @@
                 android:layout_margin="16dp"
                 android:background="@drawable/table_border"
                 android:stretchColumns="*"
-                app:layout_constraintTop_toBottomOf="@id/layoutButtons">
+                app:layout_constraintTop_toBottomOf="@id/layoutButtons"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
                 <TableRow>
                     <TextView android:gravity="center" android:padding="8dp" android:text="@string/profile_label_course" android:textSize="11sp" android:textColor="@color/text_black" />
                     <TextView android:gravity="center" android:padding="8dp" android:text="@string/profile_label_faculty" android:textSize="11sp" android:textColor="@color/text_black" />
@@ -170,11 +179,15 @@
                 android:layout_margin="16dp"
                 app:cardCornerRadius="20dp"
                 app:cardElevation="2dp"
-                app:layout_constraintTop_toBottomOf="@id/tableInfo">
+                app:layout_constraintTop_toBottomOf="@id/tableInfo"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -183,7 +196,9 @@
                         android:textColor="@color/text_black"
                         android:textSize="15sp"
                         android:textStyle="bold" />
+
                     <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider_gray" />
+
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -229,7 +244,9 @@
                 android:id="@+id/bottomSpacer"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
-                app:layout_constraintTop_toBottomOf="@id/cardTraining" />
+                app:layout_constraintTop_toBottomOf="@id/cardTraining"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

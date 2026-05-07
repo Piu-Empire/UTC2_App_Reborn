@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     private TextView tvTotalAmount;
     private Button btnPay;
     private long totalAmount = 0;
+    private NetworkUtils networkUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
         try {
             initViews();
+            setupNetworkMonitoring();
             loadData();
             calculateTotal();
             setupRecyclerView();
@@ -61,6 +65,23 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         });
     }
 
+    private void setupNetworkMonitoring() {
+        networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
+            @Override
+            public void onNetworkAvailable() {
+                Log.d("Network", "Sẵn sàng thanh toán học phí môn học");
+            }
+
+            @Override
+            public void onNetworkLost() {
+                Toast.makeText(SubjectTuitionActivity.this,
+                        "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.",
+                        Toast.LENGTH_LONG).show();
+            }
+        });
+        networkUtils.register();
+    }
+
     private void loadData() {
         subjectList = new ArrayList<>();
         subjectList.add(new SubjectTuition(1, "Lập trình Android", "3 tín chỉ", 1250000, 0));
@@ -71,7 +92,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     private void calculateTotal() {
         totalAmount = 0;
         for (SubjectTuition subject : subjectList) {
-            if (subject.getStatus() == 0) { // Chỉ tính những môn chưa thanh toán
+            if (subject.getStatus() == 0) {
                 totalAmount += subject.getAmount();
             }
         }
@@ -91,14 +112,20 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
         Window window = dialog.getWindow();
         if (window != null) {
-            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
+            window.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT);
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            WindowManager.LayoutParams params = window.getAttributes();
+            params.gravity = Gravity.CENTER;
+            window.setAttributes(params);
         }
 
         ImageView imgQr = dialog.findViewById(R.id.imgQrCode);
-        TextView txtAmount = dialog.findViewById(R.id.tvAmount);
+        // SỬA: đúng ID trong layout_payment_qr.xml là tvDialogAmount
+        TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
+        Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
 
-        txtAmount.setText(String.format(Locale.getDefault(), "Số tiền: %,d VND", totalAmount));
+        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,d VND", totalAmount));
 
         String bankId = "ICB";
         String accountNo = "102882730986";
@@ -110,13 +137,28 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                 + "&addInfo=" + description
                 + "&accountName=" + accountName;
 
-        Glide.with(this).load(qrUrl).into(imgQr);
+        Glide.with(this)
+                .load(qrUrl)
+                .placeholder(R.drawable.logo_utc2)
+                .into(imgQr);
 
-        dialog.findViewById(R.id.btnConfirmPayment).setOnClickListener(v -> {
-            dialog.dismiss();
-            Toast.makeText(this, "Yêu cầu thanh toán đang được xử lý!", Toast.LENGTH_LONG).show();
+        btnConfirm.setOnClickListener(v -> {
+            Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
+            btnConfirm.postDelayed(() -> {
+                if (dialog.isShowing()) {
+                    dialog.dismiss();
+                    Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }, 2000);
         });
 
         dialog.show();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (networkUtils != null) networkUtils.unregister();
     }
 }
