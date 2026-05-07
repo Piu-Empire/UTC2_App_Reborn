@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- item_assessment_deduction.xml (fix_v4) - bỏ drawableEnd, click thẳng để chọn -->
+<!--
+    item_assessment_deduction.xml  (fix_v7)
+    Thêm tvReadonlyDeduction — hiện khi cột != SV đánh giá (readonly, nền xám).
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -24,6 +27,7 @@
         android:gravity="center_vertical"
         android:minHeight="52dp">
 
+        <!-- Nội dung trừ điểm -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -50,7 +54,7 @@
 
         </LinearLayout>
 
-        <!-- FIX: bỏ drawableEnd, click thẳng để mở dropdown -->
+        <!-- Editable dropdown (SV đánh giá) -->
         <AutoCompleteTextView
             android:id="@+id/actvDeductionScore"
             android:layout_width="80dp"
@@ -67,7 +71,21 @@
             android:maxLines="1"
             android:focusable="true"
             android:focusableInTouchMode="false"
-            android:cursorVisible="false"/>
+            android:cursorVisible="false"
+            android:visibility="visible"/>
+
+        <!-- Readonly (TapThe / Khoa / Truong) -->
+        <TextView
+            android:id="@+id/tvReadonlyDeduction"
+            android:layout_width="80dp"
+            android:layout_height="44dp"
+            android:background="@drawable/bg_score_box"
+            android:backgroundTint="@color/assessment_readonly_bg"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="#999999"
+            android:textStyle="bold"
+            android:visibility="gone"/>
 
     </LinearLayout>
 
