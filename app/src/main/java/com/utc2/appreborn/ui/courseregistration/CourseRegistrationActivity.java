@@ -162,7 +162,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  TRANG ĐĂNG KÝ
+    //  TRANG ĐĂNG KÝ HỌC PHẦN 
     // ══════════════════════════════════════════════════════════════════════════
 
     private void setupRecyclerView() {
