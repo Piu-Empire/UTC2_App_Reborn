@@ -77,7 +77,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         setSpannedText(holder.txtNgayHoc,     "Bắt đầu: ",  course.getStartDate() + " → " + course.getEndDate());
         setSpannedText(holder.txtSoTiet,      "Số tiết: ",  String.valueOf(course.getTotalPeriods()));
 
-        // ── Thanh sĩ số ──────────────────────────────────────────────────────
+        // ── Thanh sĩ số, CỨ ĐĂNG KÍ THÌ NÓ TĂNG LÊN 1, NẾU HỦY ĐĂNG KÍ THÌ NÓ GIẢM  ──────────────────────────────────────────────────────
         int current = course.getCurrentStudents();
         int max     = course.getMaxStudents();
         boolean full = !course.isAvailable();
