@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="52dp"
+    android:height="52dp"
+    android:viewportWidth="52"
+    android:viewportHeight="52">
+
+    <!-- Background circle (đen) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M26,26 m -22,0 a 22,22 0 1,0 44,0 a 22,22 0 1,0 -44,0" />
+
+    <!-- Top line -->
+    <path
+        android:strokeColor="#FFD700"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M16,20 H36" />
+
+    <!-- Middle line -->
+    <path
+        android:strokeColor="#FFD700"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M16,26 H36" />
+
+    <!-- Bottom line -->
+    <path
+        android:strokeColor="#FFD700"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:pathData="M16,32 H36" />
+
+    <!-- Small accent dot (tạo cảm giác “more”) -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M38,26 m -1.5,0 a 1.5,1.5 0 1,0 3,0 a 1.5,1.5 0 1,0 -3,0" />
+
+</vector>

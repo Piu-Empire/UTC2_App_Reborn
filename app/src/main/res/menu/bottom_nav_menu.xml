@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_house"
+        android:title="Home" />
+
+    <item
+        android:id="@+id/nav_register"
+        android:icon="@drawable/ic_book_open"
+        android:title="Đăng kí học phần" />
+
+    <item
+        android:id="@+id/nav_schedule"
+        android:icon="@drawable/ic_calendar"
+        android:title="Lịch" />
+
+    <item
+        android:id="@+id/nav_result"
+        android:icon="@drawable/ic_graduation_cap"
+        android:title="Kết quả học tập" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_user"
+        android:title="Cá nhân" />
+
+</menu>

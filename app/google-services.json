@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "319562674855",
+    "project_id": "utc2appreborn",
+    "storage_bucket": "utc2appreborn.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:319562674855:android:ad748fcf22394cf6c76182",
+        "android_client_info": {
+          "package_name": "com.utc2.appreborn"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "319562674855-3aga5buil99dcfdpjtgtt44n1opfb2br.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOMwjrScj-ug2eBsGpG13MFXKroIPiN1k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "319562674855-3aga5buil99dcfdpjtgtt44n1opfb2br.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

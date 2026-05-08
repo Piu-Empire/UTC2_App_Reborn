@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_feature_card.xml — REDESIGNED
+    ──────────────────────────────────────────────────────────────
+    Thay đổi:
+      • LinearLayout → MaterialCardView (nổi, bo góc, shadow)
+      • Nền: trắng (#FFFFFF) thay vì nền tối
+      • Text: đen #333333 thay vì trắng
+      • Elevation 6dp + cornerRadius 12dp
+      • Icon vẫn 52dp nhưng tint theo màu accent (#FFC107)
+
+    IDs giữ nguyên: iv_feature_icon, tv_feature_title
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:layout_margin="6dp"
+    app:cardElevation="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardBackgroundColor="@color/white"
+    app:rippleColor="@color/accent_yellow_light"
+    android:clickable="true"
+    android:focusable="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="10dp">
+
+        <!-- Feature icon — accent yellow tint -->
+        <ImageView
+            android:id="@+id/iv_feature_icon"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:scaleType="fitCenter"
+            android:contentDescription="" />
+
+        <!-- Feature label — dark text on white card -->
+        <TextView
+            android:id="@+id/tv_feature_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:gravity="center"
+            android:textColor="#333333"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:lineSpacingMultiplier="1.1" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.UTC2AppReborn" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <!-- TEXT CHÍNH -->
+        <item name="colorOnSurface">#000000</item>
+
+        <!-- TEXT TRÊN PRIMARY -->
+        <item name="colorOnPrimary">#000000</item>
+
+        <!-- TEXT TRÊN BACKGROUND -->
+        <item name="colorOnBackground">#000000</item>
+        
+    </style>
+
+    <style name="Theme.UTC2AppReborn" parent="Base.Theme.UTC2AppReborn" />
+</resources>
