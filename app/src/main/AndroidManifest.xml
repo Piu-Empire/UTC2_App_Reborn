@@ -127,6 +127,12 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+        <!-- MODULE ĐĂNG KÝ HỌC PHẦN -->
+        <activity
+            android:name=".ui.courseregistration.CourseRegistrationActivity"
+            android:exported="false"
+            android:label="Đăng ký học phần"
+            android:windowSoftInputMode="adjustResize" />
 
     </application>
 </manifest>

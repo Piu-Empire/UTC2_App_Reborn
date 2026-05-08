@@ -4,7 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
     <color name="red">#FF0000</color>
-    <color name="primary">#E2FBEFC9</color>
+    <color name="primary">#1565C0</color>
     <color name="accent">#FF4081</color>
 
     <color name="nav_bar_bg">#C6F135</color>
@@ -108,4 +108,5 @@
     <color name="gray">#E0E0E0</color>
     <color name="light_gray">#F5F5F5</color>
     <color name="green">#00C853</color>
+
 </resources>

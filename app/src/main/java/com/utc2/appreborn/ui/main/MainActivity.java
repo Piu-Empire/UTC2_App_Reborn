@@ -14,7 +14,7 @@ import com.utc2.appreborn.ui.profile.ProfileFragment;
 import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.schedule.ScheduleFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
-
+import android.content.Intent;
 public class MainActivity extends AppCompatActivity {
 
     // Tags để quản lý Fragment, tránh tạo mới liên tục gây tốn RAM
@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (navId == R.id.nav_schedule) {
             switchTab(ScheduleFragment.class, TAG_SCHEDULE);
         } else if (navId == R.id.nav_register) {
-            //switchTab(RegisterFragment.class, TAG_REGISTER);
+            Intent intent = new Intent(this, com.utc2.appreborn.ui.courseregistration.CourseRegistrationActivity.class);
+            startActivity(intent);
         } else if (navId == R.id.nav_result) {
             //switchTab(ResultFragment.class, TAG_RESULT);
         } else if (navId == R.id.nav_profile) {
