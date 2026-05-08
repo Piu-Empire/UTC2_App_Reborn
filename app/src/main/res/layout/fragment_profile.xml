@@ -31,6 +31,16 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
 
+            <!-- Gradient overlay — đồng nhất với Home screen -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="280dp"
+                android:background="@drawable/bg_header_gradient"
+                android:rotation="180"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
             <ImageView
                 android:layout_width="45dp"
                 android:layout_height="45dp"
@@ -67,7 +77,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/imgHeaderBg"
-                app:layout_constraintVertical_bias="0.6">
+                app:layout_constraintVertical_bias="0.5">
 
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
@@ -89,12 +99,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:background="@color/profile_name_bg"
                 android:paddingHorizontal="8dp"
                 android:text="@string/default_name"
-                android:textColor="@color/text_black"
+                android:textColor="#FFFFFF"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="2"
+                android:shadowRadius="4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/cardProfilePhoto" />
@@ -103,15 +116,18 @@
                 android:id="@+id/tvStudentId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/profile_name_bg"
+                android:layout_marginTop="2dp"
                 android:paddingHorizontal="8dp"
                 android:text="@string/default_mssv"
-                android:textColor="@color/text_black"
+                android:textColor="#FFFFFF"
                 android:textSize="15sp"
+                android:shadowColor="#80000000"
+                android:shadowDx="1"
+                android:shadowDy="2"
+                android:shadowRadius="4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvStudentName" />
-
             <LinearLayout
                 android:id="@+id/layoutButtons"
                 android:layout_width="match_parent"
