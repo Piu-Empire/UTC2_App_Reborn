@@ -1,56 +1,82 @@
 package com.utc2.appreborn.data.local;
 
 import android.content.Context;
+
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
-
-// Import đầy đủ các DAO từ cả 2 bên
+// ── DAO Imports ─────────────────────────────────────────────
+import com.utc2.appreborn.data.local.dao.AdvisorDao;
+import com.utc2.appreborn.data.local.dao.ScheduleDao;
 import com.utc2.appreborn.data.local.dao.StudentDao;
 import com.utc2.appreborn.data.local.dao.UserDao;
-import com.utc2.appreborn.data.local.dao.ScheduleDao;
 
-// Import đầy đủ các Entity từ cả 2 bên
-import com.utc2.appreborn.data.local.entity.StudentEntity;
-import com.utc2.appreborn.data.local.entity.UserEntity;
+// ── Entity Imports ──────────────────────────────────────────
+import com.utc2.appreborn.data.local.entity.AdvisorEntity;
 import com.utc2.appreborn.data.local.entity.CourseEntity;
 import com.utc2.appreborn.data.local.entity.ScheduleEntity;
 import com.utc2.appreborn.data.local.entity.SemesterEntity;
+import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
+import com.utc2.appreborn.data.local.entity.UserEntity;
 
 @Database(
         entities = {
-                UserEntity.class,
-                StudentEntity.class,
+                // ── Lịch học ─────────────────────────────
                 CourseEntity.class,
                 SemesterEntity.class,
-                ScheduleEntity.class
+                ScheduleEntity.class,
+
+                // ── Người dùng ───────────────────────────
+                UserEntity.class,
+                StudentProfileEntity.class,
+
+                // ── Đánh giá ─────────────────────────────
+                AdvisorEntity.class
         },
-        version  = 1,
+        version = 3,
         exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
 
-    private static final String DB_NAME = "utc2_app.db"; // Thống nhất dùng tên này cho cả app
+    // ── Constants ────────────────────────────────────────────
+
+    private static final String DB_NAME = "utc2_app.db";
+
+    // ── Singleton Instance ───────────────────────────────────
+
     private static volatile AppDatabase instance;
 
+    // ── DAO Methods ──────────────────────────────────────────
+
+    public abstract ScheduleDao scheduleDao();
+
+    public abstract UserDao userDao();
+
+    public abstract StudentDao studentDao();
+
+    public abstract AdvisorDao advisorDao();
+    // ── Singleton Getter ────────────────────────────────────
+
     public static AppDatabase getInstance(Context context) {
+
         if (instance == null) {
+
             synchronized (AppDatabase.class) {
+
                 if (instance == null) {
+
                     instance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     AppDatabase.class,
-                                    DB_NAME)
-                            .fallbackToDestructiveMigration() // Xóa data cũ nếu đổi cấu trúc (rất tiện khi dev)
+                                    DB_NAME
+                            )
+                            // Xóa DB cũ và tạo lại nếu version thay đổi
+                            .fallbackToDestructiveMigration()
                             .build();
                 }
             }
         }
+
         return instance;
     }
-
-    // Khai báo đầy đủ các phương thức để lấy DAO
-    public abstract UserDao userDao();
-    public abstract StudentDao studentDao();
-    public abstract ScheduleDao scheduleDao();
 }

@@ -36,7 +36,7 @@ import com.utc2.appreborn.ui.profile.SupportActivity;
 import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
 import com.utc2.appreborn.utils.MockHelper;
-
+import com.utc2.appreborn.ui.assessment.AssessmentFragment;
 /**
  * HomeFragment — FINAL FIXES
  * ──────────────────────────────────────────────────────────────
@@ -272,7 +272,10 @@ public class HomeFragment extends Fragment {
                 break;
 
             case "danh_gia":
-                Toast.makeText(requireContext(), "Đánh giá", Toast.LENGTH_SHORT).show();
+                mainActivity.pushFragment(
+                        new AssessmentFragment(),
+                        "AssessmentFragment"
+                );
                 break;
             case "ki_tuc_xa":
                 startActivity(new Intent(requireContext(), DormitoryActivity.class));

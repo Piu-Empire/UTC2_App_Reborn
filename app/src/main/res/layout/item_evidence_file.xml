@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- item_evidence_file.xml — 1 file minh chứng đã nộp, có nút xóa -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:layout_marginTop="4dp">
+
+    <!-- Icon file -->
+    <TextView
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:text="📎"
+        android:textSize="12sp"
+        android:gravity="center"/>
+
+    <!-- Tên file (ellipsize nếu dài) -->
+    <TextView
+        android:id="@+id/tvEvidenceFileName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="11sp"
+        android:textColor="#0057A8"
+        android:maxLines="1"
+        android:ellipsize="middle"
+        android:layout_marginStart="4dp"/>
+
+    <!-- Nút xóa -->
+    <TextView
+        android:id="@+id/btnDeleteEvidence"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:text="✕"
+        android:textSize="12sp"
+        android:textColor="#CC0000"
+        android:gravity="center"
+        android:background="?attr/selectableItemBackgroundBorderless"/>
+
+</LinearLayout>

@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    fragment_home.xml — 3 BUG FIXES
-    ──────────────────────────────────────────────────────────────
-    Fix 1 — Status bar overlap (Android 15 edge-to-edge):
-      Root là LinearLayout(vertical). Con đầu tiên là View spacer
-      với height=0dp, được set bằng Java = chiều cao status bar thực.
-      CoordinatorLayout bắt đầu ngay dưới status bar. ✓
 
-    Fix 2 — Profile bar bị che khi scroll:
-      Toolbar dùng android:elevation="8dp" để luôn nằm trên
-      ImageView parallax. CollapsingToolbarLayout đặt thêm
-      app:toolbarId="@id/toolbar" để mapping chính xác. ✓
 
-    Fix 3 — Bỏ iv_add_btn (icon thừa cạnh tên):
-      Đã xóa hoàn toàn khỏi layout. ✓
--->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -23,28 +9,24 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!--
-        FIX 1: Status bar spacer
-        height=0dp ban đầu, được set trong HomeFragment.java
-        bằng WindowInsets để bằng đúng chiều cao status bar thực.
-        Background #1E1E1E khớp với màu toolbar collapsed.
-    -->
+    <!-- Status bar spacer -->
     <View
         android:id="@+id/status_bar_spacer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/toolbar_collapsed_bg" />
 
-    <!-- CoordinatorLayout chiếm toàn bộ phần còn lại -->
+    <!-- Main Content -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- ══════════════════════════════════════════════════
-             APP BAR — Collapsible Hero Header
-             ══════════════════════════════════════════════════ -->
+        <!-- ════════════════════════════════════════════════ -->
+        <!-- APP BAR -->
+        <!-- ════════════════════════════════════════════════ -->
+
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
@@ -61,7 +43,7 @@
                 app:contentScrim="@color/toolbar_collapsed_bg"
                 app:statusBarScrim="@color/toolbar_collapsed_bg">
 
-                <!-- Ảnh nền trường (parallax) -->
+                <!-- Header image -->
                 <ImageView
                     android:id="@+id/iv_header"
                     android:layout_width="match_parent"
@@ -72,7 +54,7 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
 
-                <!-- Gradient overlay (làm tối vùng toolbar để text dễ đọc) -->
+                <!-- Gradient overlay -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -80,12 +62,7 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
 
-                <!--
-                    FIX 2: Toolbar với elevation="8dp" đảm bảo luôn
-                    nằm trên ImageView parallax, không bị che khi scroll.
-                    app:layout_collapseMode="pin" = dính ở trên khi cuộn.
-                    Không có layout_gravity → Toolbar ở TOP của AppBar.
-                -->
+                <!-- Toolbar -->
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
@@ -103,7 +80,7 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
 
-                        <!-- ── LEFT: Avatar + Greeting + Name ─────────── -->
+                        <!-- LEFT -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -111,7 +88,7 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical">
 
-                            <!-- Avatar bo tròn -->
+                            <!-- Avatar -->
                             <FrameLayout
                                 android:id="@+id/iv_avatar"
                                 android:layout_width="44dp"
@@ -125,17 +102,17 @@
                                     android:layout_width="26dp"
                                     android:layout_height="30dp"
                                     android:layout_gravity="center"
-                                    android:contentDescription="@string/cd_avatar"
-                                    android:src="@drawable/ic_user" />
+                                    android:src="@drawable/ic_user"
+                                    android:contentDescription="@string/cd_avatar" />
                             </FrameLayout>
 
-                            <!-- Greeting text -->
+                            <!-- Greeting -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:layout_marginStart="10dp">
+                                android:layout_marginStart="10dp"
+                                android:orientation="vertical">
 
                                 <TextView
                                     android:layout_width="wrap_content"
@@ -145,10 +122,6 @@
                                     android:textSize="11sp"
                                     android:alpha="0.85" />
 
-                                <!--
-                                    FIX 3: Đã XÓA iv_add_btn (icon thừa cạnh tên).
-                                    Chỉ còn TextView tên — QR đã có nút riêng bên phải.
-                                -->
                                 <TextView
                                     android:id="@+id/tv_username"
                                     android:layout_width="wrap_content"
@@ -160,12 +133,13 @@
                                     android:maxLines="1"
                                     android:ellipsize="end"
                                     android:maxWidth="150dp" />
+
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- ── RIGHT: 3 Icon Buttons ──────────────────── -->
+                        <!-- RIGHT BUTTONS -->
 
-                        <!-- Mã QR -->
+                        <!-- QR -->
                         <ImageButton
                             android:id="@+id/btn_qr"
                             android:layout_width="44dp"
@@ -177,7 +151,7 @@
                             android:contentDescription="Mã QR sinh viên"
                             app:tint="#FFFFFF" />
 
-                        <!-- Tìm kiếm -->
+                        <!-- Search -->
                         <ImageButton
                             android:id="@+id/btn_search"
                             android:layout_width="44dp"
@@ -189,7 +163,7 @@
                             android:contentDescription="Tìm kiếm"
                             app:tint="#FFFFFF" />
 
-                        <!-- Thông báo -->
+                        <!-- Notification -->
                         <ImageButton
                             android:id="@+id/btn_notification"
                             android:layout_width="44dp"
@@ -202,13 +176,17 @@
                             app:tint="#FFFFFF" />
 
                     </LinearLayout>
+
                 </androidx.appcompat.widget.Toolbar>
+
             </com.google.android.material.appbar.CollapsingToolbarLayout>
+
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- ══════════════════════════════════════════════════
-             SCROLLABLE CONTENT
-             ══════════════════════════════════════════════════ -->
+        <!-- ════════════════════════════════════════════════ -->
+        <!-- SCROLL CONTENT -->
+        <!-- ════════════════════════════════════════════════ -->
+
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -223,9 +201,8 @@
                 android:orientation="vertical"
                 android:paddingBottom="16dp">
 
-                <!-- ════════════════════════════════
-                     Tính năng mở rộng (3×2 Grid)
-                     ════════════════════════════════ -->
+                <!-- Features -->
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -247,9 +224,8 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never" />
 
-                <!-- ════════════════════════════════
-                     Campus Banner
-                     ════════════════════════════════ -->
+                <!-- Banner -->
+
                 <ImageView
                     android:id="@+id/iv_campus_banner"
                     android:layout_width="match_parent"
@@ -259,9 +235,8 @@
                     android:src="@drawable/bg_campus_banner"
                     android:contentDescription="@string/cd_campus_banner" />
 
-                <!-- ════════════════════════════════
-                     Thông báo mới nhất
-                     ════════════════════════════════ -->
+                <!-- News -->
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -283,6 +258,8 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never" />
 
+                <!-- View All News -->
+
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_view_all_news"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -302,7 +279,9 @@
                     app:backgroundTint="@color/white" />
 
             </LinearLayout>
+
         </androidx.core.widget.NestedScrollView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </LinearLayout>

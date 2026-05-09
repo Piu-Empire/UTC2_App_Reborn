@@ -8,7 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.utc2.appreborn.data.local.entity.StudentEntity;
+import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
 
 /**
  * StudentDao
@@ -25,7 +25,7 @@ public interface StudentDao {
     // ══════════════════════════════════════════════════════════
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insertStudent(StudentEntity student);
+    long insertStudent(StudentProfileEntity student);
 
     // ══════════════════════════════════════════════════════════
     //  READ
@@ -36,20 +36,20 @@ public interface StudentDao {
      * được gọi sau khi Firebase Auth xác thực thành công.
      */
     @Query("SELECT * FROM student_profile WHERE user_id = :userId LIMIT 1")
-    LiveData<StudentEntity> getStudentByUserId(long userId);
+    LiveData<StudentProfileEntity> getStudentByUserId(long userId);
 
     /**
      * Phiên bản đồng bộ — dùng trong background thread
      * (ví dụ: khi generate QR trong QrFragment).
      */
     @Query("SELECT * FROM student_profile WHERE user_id = :userId LIMIT 1")
-    StudentEntity getStudentByUserIdSync(long userId);
+    StudentProfileEntity getStudentByUserIdSync(long userId);
 
     /**
      * Lấy theo MSSV (student_code) — dùng khi scan QR để tra cứu.
      */
     @Query("SELECT * FROM student_profile WHERE student_code = :studentCode LIMIT 1")
-    LiveData<StudentEntity> getStudentByCode(String studentCode);
+    LiveData<StudentProfileEntity> getStudentByCode(String studentCode);
 
     /**
      * Lấy MSSV (String) theo user_id — shortcut tiện lợi
@@ -69,7 +69,7 @@ public interface StudentDao {
     // ══════════════════════════════════════════════════════════
 
     @Update
-    int updateStudent(StudentEntity student);
+    int updateStudent(StudentProfileEntity student);
 
     /**
      * Cập nhật trạng thái sinh viên (ACTIVE, GRADUATED, SUSPENDED...).
@@ -82,7 +82,7 @@ public interface StudentDao {
     // ══════════════════════════════════════════════════════════
 
     @Delete
-    void deleteStudent(StudentEntity student);
+    void deleteStudent(StudentProfileEntity student);
 
     /**
      * Xoá hết khi logout — gọi cùng UserDao.deleteAllUsers().

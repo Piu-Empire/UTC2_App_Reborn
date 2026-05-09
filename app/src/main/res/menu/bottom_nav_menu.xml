@@ -4,26 +4,26 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_house"
-        android:title="Home" />
+        android:title="@string/nav_label_home"/>
 
     <item
         android:id="@+id/nav_register"
         android:icon="@drawable/ic_book_open"
-        android:title="Đăng kí học phần" />
+        android:title="@string/nav_label_register"/>
 
     <item
         android:id="@+id/nav_schedule"
         android:icon="@drawable/ic_calendar"
-        android:title="Lịch" />
+        android:title="@string/nav_label_schedule"/>
 
     <item
         android:id="@+id/nav_result"
         android:icon="@drawable/ic_graduation_cap"
-        android:title="Kết quả học tập" />
+        android:title="@string/nav_label_result"/>
 
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_user"
-        android:title="Cá nhân" />
+        android:title="@string/nav_label_profile"/>
 
 </menu>

@@ -1,31 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- ========================= -->
+    <!-- BASE -->
+    <!-- ========================= -->
     <string name="app_name">UTC2 App Reborn</string>
     <string name="utc2_subtitle">UTC2 - Phân hiệu TP.HCM</string>
+
+    <!-- ========================= -->
+    <!-- NAVIGATION -->
+    <!-- ========================= -->
     <string name="nav_label_home">Trang chủ</string>
     <string name="nav_label_register">Đăng ký</string>
     <string name="nav_label_schedule">Lịch học</string>
     <string name="nav_label_result">Kết quả</string>
     <string name="nav_label_profile">Cá nhân</string>
+
+    <!-- ========================= -->
+    <!-- COMMON -->
+    <!-- ========================= -->
     <string name="Notifications">Notifications</string>
     <string name="back">Quay về</string>
     <string name="home">Trang chủ</string>
     <string name="loading">Đang xử lý...</string>
 
-    <!-- Google Login Strings -->
-    <string name="btn_google_login">Đăng nhập với Google</string>
-    <string name="msg_moving_to_google">Tính năng đang được chuyển sang Google Account</string>
-    <string name="error_no_network">Không có kết nối mạng!</string>
-    <string name="error_connect_network">Vui lòng kết nối mạng để đăng nhập!</string>
-    <string name="welcome_user">Chào mừng</string>
-    <string name="error_login_failed">Lỗi đăng nhập</string>
-    <string name="default_web_client_id">319562674855-3aga5buil99dcfdpjtgtt44n1opfb2br.apps.googleusercontent.com</string>
-
+    <!-- ========================= -->
+    <!-- AUTH -->
+    <!-- ========================= -->
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="login">Login</string>
     <string name="skip_login">Bỏ qua</string>
     <string name="logout">Đăng xuất</string>
+
     <string name="wrong_email_or_pass">Sai email hoặc mật khẩu!!</string>
     <string name="check_email_for_pass">Vui lòng kiểm tra Email để đặt lại mật khẩu!</string>
     <string name="forgot_password">Quên mật khẩu?</string>
@@ -34,16 +41,34 @@
     <string name="reset_email_sent">Đã gửi email đặt lại mật khẩu</string>
     <string name="email_required">Vui lòng nhập email</string>
     <string name="forgot_tips">Thư reset có thể nằm trong thư rác</string>
+
+    <!-- Google Login -->
+    <string name="btn_google_login">Đăng nhập với Google</string>
+    <string name="continue_gg">Tiếp tục với Google</string>
+    <string name="msg_moving_to_google">Tính năng đang được chuyển sang Google Account</string>
+    <string name="error_no_network">Không có kết nối mạng!</string>
+    <string name="error_connect_network">Vui lòng kết nối mạng để đăng nhập!</string>
+    <string name="welcome_user">Chào mừng</string>
+    <string name="error_login_failed">Lỗi đăng nhập</string>
+    <string name="default_web_client_id">319562674855-3aga5buil99dcfdpjtgtt44n1opfb2br.apps.googleusercontent.com</string>
+
+    <!-- Terms -->
     <string name="terms_full">By continuing, you agree to our Terms of Service and Privacy Policy</string>
     <string name="terms_title">Điều khoản sử dụng</string>
     <string name="terms_content">TERMS OF SERVICE\n\nỨng dụng UTC2 Student được phát triển phục vụ sinh viên...</string>
+
     <string name="privacy_title">Chính sách bảo mật</string>
     <string name="privacy_content">PRIVACY POLICY\n\nChúng tôi cam kết bảo vệ thông tin người dùng ở mức tối đa...</string>
 
+    <!-- ========================= -->
+    <!-- HOME -->
+    <!-- ========================= -->
     <string name="greeting">Xin chào !</string>
     <string name="default_username">Sinh viên</string>
+
     <string name="section_features">Tính năng mở rộng:</string>
     <string name="section_news">Thông báo mới nhất:</string>
+
     <string name="feature_hoc_phi">Học phí</string>
     <string name="feature_dich_vu_cong">Dịch vụ công</string>
     <string name="feature_danh_gia">Đánh giá</string>
@@ -51,6 +76,51 @@
     <string name="feature_ho_tro">Hỗ trợ 24/7</string>
     <string name="feature_danh_muc_khac">Danh mục khác</string>
 
+    <string name="home_btn_assessment">Đánh giá rèn luyện</string>
+
+    <!-- ========================= -->
+    <!-- PROFILE -->
+    <!-- ========================= -->
+    <string name="profile_title">Thông tin sinh viên</string>
+
+    <string name="profile_btn_info">Thông tin cá nhân ></string>
+    <string name="profile_btn_password">Đổi mật khẩu ></string>
+
+    <string name="profile_label_course">Khóa học</string>
+    <string name="profile_label_faculty">Khoa</string>
+    <string name="profile_label_status">Tình trạng</string>
+    <string name="profile_label_advisor">Cố vấn</string>
+
+    <string name="profile_val_course">K65\n(2024-2029)</string>
+    <string name="profile_val_faculty">CNTT</string>
+    <string name="profile_val_status">Đang học</string>
+    <string name="profile_val_advisor">KS.Trần Quốc Khánh</string>
+
+    <string name="profile_training_detail">Chuyên ngành: Công nghệ thông tin\nBậc đào tạo: Đại học chính quy</string>
+
+    <string name="profile_subject_list">Danh sách học phần</string>
+    <string name="profile_graduation_req">Yêu cầu tốt nghiệp</string>
+
+    <string name="student_card">Thẻ sinh viên</string>
+    <string name="birth_place">Nơi đăng ký khai sinh</string>
+    <string name="cccd">Số CCCD/CMND</string>
+    <string name="permanent_address">Nơi thường trú</string>
+    <string name="temporary_address">Nơi tạm trú:</string>
+    <string name="current_address">Nơi ở hiện tại:</string>
+
+    <string name="default_name">Nguyễn Minh Phúc</string>
+    <string name="default_email">Chưa đăng nhập</string>
+    <string name="default_class">CNTT K65</string>
+    <string name="default_phone">0123456789</string>
+    <string name="default_dob">01/01/2000</string>
+    <string name="default_mssv">2251050001</string>
+    <string name="default_address">450,Lê Văn Việt,Phường Tăng Nhơn Phú,TP. Hồ Chí Minh</string>
+
+    <string name="training_program">Chương trình đào tạo</string>
+    <string name="back_profile">Quay lại</string>
+    <string name="mssv_title">Mã số sinh viên</string>
+
+    <!-- Change password -->
     <string name="title_change_password">Đổi mật khẩu</string>
     <string name="msg_password_requirement">Vui lòng nhập mật khẩu mới. Mật khẩu phải có ít nhất 6 ký tự để đảm bảo tính bảo mật.</string>
     <string name="label_new_password">Mật khẩu mới</string>
@@ -59,191 +129,47 @@
     <string name="hint_confirm_password">Nhập lại mật khẩu mới</string>
     <string name="btn_update_password">Cập nhật mật khẩu</string>
     <string name="msg_relogin_note">Lưu ý: Bạn có thể cần đăng nhập lại sau khi đổi mật khẩu thành công.</string>
-    <string name="profile_title">Thông tin sinh viên</string>
-    <string name="profile_btn_info">Thông tin cá nhân ></string>
-    <string name="profile_btn_password">Đổi mật khẩu ></string>
-    <string name="profile_label_course">Khóa học</string>
-    <string name="profile_label_faculty">Khoa</string>
-    <string name="profile_label_status">Tình trạng</string>
-    <string name="profile_label_advisor">Cố vấn</string>
-    <string name="profile_val_course">K65\n(2024-2029)</string>
-    <string name="profile_val_faculty">CNTT</string>
-    <string name="profile_val_status">Đang học</string>
-    <string name="profile_val_advisor">KS.Trần Quốc Khánh</string>
-    <string name="profile_training_detail">Chuyên ngành: Công nghệ thông tin\nBậc đào tạo: Đại học chính quy</string>
-    <string name="profile_subject_list">Danh sách học phần</string>
-    <string name="profile_graduation_req">Yêu cầu tốt nghiệp</string>
-    <string name="student_card">Thẻ sinh viên</string>
-    <string name="birth_place">Nơi đăng ký khai sinh</string>
-    <string name="cccd">Số CCCD/CMND</string>
-    <string name="permanent_address">Nơi thường trú</string>
-    <string name="temporary_address">Nơi tạm trú:</string>
-    <string name="current_address">Nơi ở hiện tại:</string>
-    <string name="default_name">Nguyễn Minh Phúc</string>
-    <string name="default_email">Chưa đăng nhập</string>
-    <string name="default_class">CNTT K65</string>
-    <string name="default_phone">0123456789</string>
-    <string name="default_dob">01/01/2000</string>
-    <string name="default_mssv">2251050001</string>
-    <string name="default_address">450,Lê Văn Việt,Phường Tăng Nhơn Phú,TP. Hồ Chí Minh</string>
-    <string name="training_program">Chương trình đào tạo</string>
-    <string name="back_profile">Quay lại</string>
 
+    <!-- ========================= -->
+    <!-- SCHEDULE -->
+    <!-- ========================= -->
     <string name="schedule_title">Thời Khóa biểu</string>
+
     <string name="session_morning">SÁNG</string>
     <string name="session_afternoon">CHIỀU</string>
     <string name="session_evening">TỐI</string>
+    <string name="session_morning_sample">SÁNG</string>
+
     <string name="label_period">TIẾT</string>
     <string name="label_theory">LÝ THUYẾT</string>
     <string name="label_no_class">Không có tiết học</string>
     <string name="label_room">Phòng: </string>
     <string name="label_student_count">Sĩ số: </string>
+
     <string name="prefix_lecturer">GV: %s</string>
+
     <string name="format_remaining_periods">CÒN LẠI: %d TIẾT</string>
     <string name="format_remaining_short">CÒN %d</string>
+
     <string name="label_pick_date">Chọn ngày xem lịch</string>
+
     <string name="today_upper">HÔM NAY</string>
     <string name="separator"> - </string>
+
     <string name="semester_prefix">HK %s</string>
     <string name="week_prefix">Tuần %s</string>
     <string name="month_prefix">Tháng %s</string>
+
     <string name="desc_size_toggle">Phóng to/Thu nhỏ lịch</string>
     <string name="desc_view_mode">Đổi chế độ Ngày/Tuần</string>
     <string name="desc_go_today">Quay về ngày hiện tại</string>
     <string name="desc_prev">Ngày trước</string>
     <string name="desc_next">Ngày sau</string>
+
     <string name="contentDescriptionCheduleChange">Chuyển chế độ xem</string>
     <string name="placeholder_none">None</string>
 
-    <string name="subject_title">Danh sách môn học</string>
-    <string name="subject_code">Mã môn</string>
-    <string name="subject_name">Tên môn</string>
-    <string name="subject_credit">Tín chỉ</string>
-    <string name="subject_score">Điểm</string>
-    <string name="title_graduation_requirements">Yêu cầu tốt nghiệp</string>
-    <string name="header_conditions_graduation">CÁC ĐIỀU KIỆN XÉT TỐT NGHIỆP</string>
-    <string name="graduation_note">Lưu ý: Sinh viên có trách nhiệm thường xuyên kiểm tra tiến độ học tập và cập nhật các thông báo mới nhất từ Phòng Đào tạo.</string>
-    <string name="semester_1">Kỳ 1</string>
-    <string name="semester_2">Kỳ 2</string>
-    <string name="year_2023">2023</string>
-    <string name="year_2024">2024</string>
-    <string name="year_2025">2025</string>
-    <string name="year_2026">2026</string>
-    <string name="search_hint">Tìm kiếm môn học...</string>
-
-    <string name="tuition">Học phí</string>
-    <string name="title_tuition">Học phí</string>
-    <string name="tuition_subject_title">Học phí học\nphần</string>
-    <string name="tuition_subject_sub">Xem học phí học phần</string>
-    <string name="tuition_dorm_title">Tiền KTX</string>
-    <string name="tuition_dorm_sub">Xem tiền ký túc xá</string>
-    <string name="tuition_invoice_title">Hóa đơn</string>
-    <string name="tuition_invoice_sub">Xem hóa đơn thanh toán</string>
-    <string name="tuition_result">Kết quả nộp tiền</string>
-    <string name="hp_hkii">HPCQ HKII 2025-2026</string>
-    <string name="pay_date">Ngày đóng: 19/03/2026</string>
-    <string name="pay_money">Số tiền: 10.509.368 VND</string>
-    <string name="pay_method">Hình thức: QR Code</string>
-    <string name="status_paid">Đã đóng</string>
-    <string name="status_unpaid">Chưa đóng</string>
-    <string name="currency_vnd">VND</string>
-    <string name="semester_ii">Học kỳ II</string>
-    <string name="title_subject_tuition">Học phí học phần</string>
-    <string name="title_dorm_tuition">Tiền ký túc xá</string>
-    <string name="title_invoice">Lịch sử hóa đơn</string>
-    <string name="label_invoice_code">Mã hóa đơn: </string>
-    <string name="label_payment_date">Ngày thanh toán: </string>
-    <string name="label_currency">VND</string>
-    <string name="btn_pay_now">ĐÓNG TIỀN NGAY</string>
-    <string name="title_payment_dialog">THANH TOÁN HỌC PHÍ</string>
-    <string name="label_total_pay">Tổng tiền cần đóng</string>
-    <string name="label_detail_list">Chi tiết danh sách</string>
-    <string name="qr_instruction">Dùng App Ngân hàng hoặc Ví điện tử\nđể quét mã chuyển khoản</string>
-    <string name="btn_confirm_paid">XÁC NHẬN ĐÀ TRẢ TIỀN</string>
-    <string name="msg_checking_transaction">Hệ thống đang kiểm tra giao dịch...</string>
-    <string name="msg_payment_success">Thanh toán thành công!</string>
-    <string name="payment_description_prefix">Nop hoc phi </string>
-    <string name="status_unpaid_ktx">Chưa thanh toán</string>
-    <string name="btn_pay_dorm">ĐÓNG TIỀN KÝ TÚC XÁ</string>
-    <string name="label_total_format">Tổng: %s</string>
-    <string name="semester_name">KỲ HỌC 1</string>
-
-    <string name="title_public_service">Dịch vụ công UTC2</string>
-    <string name="tab_services">Dịch vụ</string>
-    <string name="tab_results">Kết quả</string>
-    <string name="section_public_service">Dịch vụ công</string>
-    <string name="service_list_title">Danh sách dịch vụ công</string>
-    <string name="service_list_desc">Xem về quản lý dịch vụ công</string>
-    <string name="reissue_card_title">Cấp lại thẻ sinh viên</string>
-    <string name="reissue_card_desc">Đăng ký cấp lại thẻ sinh viên bị hỏng hoặc thất lạc</string>
-    <string name="loan_support_title">Hỗ trợ vay vốn</string>
-    <string name="loan_support_desc">Thông tin về đăng ký hỗ trợ vay vốn sinh viên</string>
-    <string name="date_placeholder">Ngày đăng ký: %1$s</string>
-    <string name="status_approved">Đã duyệt</string>
-    <string name="status_pending">Đang xử lý</string>
-    <string name="view_detail">Xem chi tiết</string>
-    <string name="confirm_card_reissue">Xác nhận đăng ký</string>
-    <string name="card_reissue_notes">Lưu ý: Lệ phí cấp lại thẻ là 50.000đ sẽ được trừ vào tài khoản học phí.</string>
-    <string name="class_title">Lớp:</string>
-    <string name="id_title">Mã SV:</string>
-    <string name="name_title">Họ tên:</string>
-    <string name="loan_amount">Số tiền mong muốn (VNĐ)</string>
-    <string name="loan_reason_hint">Nhập lý do vay vốn học tập...</string>
-    <string name="contact_number_title">Số điện thoại liên hệ</string>
-    <string name="loan_amount_hint">Ví dụ: 15.000.000</string>
-    <string name="loan_reason_title">Lý do vay vốn</string>
-    <string name="cardReissue_registration_success">Đăng ký thành công</string>
-    <string name="card_reissue_reason_hint">Ví dụ: Rơi bóp trên xe bus số 50...</string>
-    <string name="card_reissue_reason_title">Lý do mất thẻ (Không bắt buộc)</string>
-    <string name="confirm_registration">XÁC NHẬN ĐĂNG KÝ</string>
-    <string name="student_confirmation_tips">Lưu ý: Giấy xác nhận dùng để bổ sung hồ sơ cá nhân hoặc các thủ tục hành chính liên quan.</string>
-    <string name="student_confirmation_title">Giấy xác nhận sinh viên</string>
-    <string name="student_confirmation_reasons">Lý do đăng ký</string>
-    <string name="student_confirmation_hint">Ví dụ: Vay vốn ngân hàng, xác nhận làm hồ sơ thực tập...</string>
-    <string name="transcript_registration_title">Đăng ký bảng điểm</string>
-    <string name="transcript_academic_year">Năm học</string>
-    <string name="transcript_academic_year_hint">Chọn năm học cần cấp...</string>
-    <string name="transcript_semester">Học kỳ</string>
-    <string name="transcript_semester_hint">Chọn học kỳ...</string>
-    <string name="transcript_quantity">Số lượng bản in</string>
-    <string name="transcript_quantity_hint">Nhập số lượng...</string>
-    <string name="transcript_note">Ghi chú</string>
-    <string name="transcript_note_hint">Nhập lý do hoặc thông tin bổ sung...</string>
-    <string name="transcript_success">Đăng ký cấp bảng điểm thành công!</string>
-
-    <string name="title_support">UTC2 Support</string>
-    <string name="report_title">BÁO CÁO VÀ PHẢN HỒI - UTC2</string>
-    <string name="report_desc">Chúng tôi luôn lắng nghe ý kiến của bạn để cải thiện dịch vụ.</string>
-    <string name="report_notes">Lưu ý:\n\n - Vui lòng chọn đúng lĩnh vực để phản hồi được xử lý nhanh hơn.\n\n - Đảm bảo đã có ứng dụng Gmail trên máy và dùng mail sinh viên để gửi .</string>
-    <string name="field_type">Lĩnh vực cần báo cáo:</string>
-    <string name="field_note">Chọn lĩnh vực-:</string>
-    <string name="content_label">Nội dung báo cáo:</string>
-    <string name="content_hint">Nội dung...</string>
-    <string name="rating_label">Mức độ hài lòng:</string>
-    <string name="rate_1">Rất kém</string>
-    <string name="rate_2">Kém</string>
-    <string name="rate_3">Trung bình</string>
-    <string name="rate_4">Tốt</string>
-    <string name="rate_5">Rất tốt</string>
-    <string name="send_report">Gửi báo cáo</string>
-
-    <string name="logo_desc">Logo UTC2</string>
-    <string name="error_fill_all">Vui lòng nhập đầy đủ thông tin!</string>
-    <string name="error_loading_file">Lỗi tải file</string>
-    <string name="cd_campus_header">Ảnh khuôn viên trường</string>
-    <string name="cd_avatar">Ảnh đại diện</string>
-    <string name="cd_add">Thêm</string>
-    <string name="cd_campus_banner">Banner khuôn viên</string>
-    <string name="desc_money_icon">Biểu tượng học phí</string>
-    <string name="desc_calendar_icon">Biểu tượng lịch học phần</string>
-    <string name="desc_house_icon">Biểu tượng ký túc xá</string>
-    <string name="desc_invoice_icon">Biểu tượng hóa đơn</string>
-    <string name="desc_arrow_icon">Mũi tên chuyển trang</string>
-    <string name="back_button_desc">Quay lại</string>
-
-    <string name="sample_subject_name">Tên môn học</string>
-    <string name="sample_subject_detail">0 tín chỉ - HKII 2025-2026</string>
-    <string name="sample_amount">0 VND</string>
+    <!-- Schedule sample -->
     <string name="sample_time">07:00</string>
     <string name="sample_current_time">14:20</string>
     <string name="sample_class">CQ.65.CNTT</string>
@@ -255,15 +181,290 @@
     <string name="week_sample">T.24</string>
     <string name="date_sample">T3, 07 thg 4</string>
     <string name="sample_semester_short">Kỳ %s</string>
+
+    <!-- ========================= -->
+    <!-- SUBJECT -->
+    <!-- ========================= -->
+    <string name="subject_title">Danh sách môn học</string>
+    <string name="subject_code">Mã môn</string>
+    <string name="subject_name">Tên môn</string>
+    <string name="subject_credit">Tín chỉ</string>
+    <string name="subject_score">Điểm</string>
+
+    <string name="search_hint">Tìm kiếm môn học...</string>
+
+    <!-- Graduation -->
+    <string name="title_graduation_requirements">Yêu cầu tốt nghiệp</string>
+    <string name="header_conditions_graduation">CÁC ĐIỀU KIỆN XÉT TỐT NGHIỆP</string>
+
+    <string name="graduation_note">Lưu ý: Sinh viên có trách nhiệm thường xuyên kiểm tra tiến độ học tập và cập nhật các thông báo mới nhất từ Phòng Đào tạo.</string>
+
+    <string name="semester_1">Kỳ 1</string>
+    <string name="semester_2">Kỳ 2</string>
+
+    <string name="year_2023">2023</string>
+    <string name="year_2024">2024</string>
+    <string name="year_2025">2025</string>
+    <string name="year_2026">2026</string>
+
+    <!-- ========================= -->
+    <!-- TUITION -->
+    <!-- ========================= -->
+    <string name="tuition">Học phí</string>
+    <string name="title_tuition">Học phí</string>
+
+    <string name="tuition_subject_title">Học phí học\nphần</string>
+    <string name="tuition_subject_sub">Xem học phí học phần</string>
+
+    <string name="tuition_dorm_title">Tiền KTX</string>
+    <string name="tuition_dorm_sub">Xem tiền ký túc xá</string>
+
+    <string name="tuition_invoice_title">Hóa đơn</string>
+    <string name="tuition_invoice_sub">Xem hóa đơn thanh toán</string>
+
+    <string name="tuition_result">Kết quả nộp tiền</string>
+
+    <string name="hp_hkii">HPCQ HKII 2025-2026</string>
+
+    <string name="pay_date">Ngày đóng: 19/03/2026</string>
+    <string name="pay_money">Số tiền: 10.509.368 VND</string>
+    <string name="pay_method">Hình thức: QR Code</string>
+
+    <string name="status_paid">Đã đóng</string>
+    <string name="status_unpaid">Chưa đóng</string>
+    <string name="status_unpaid_ktx">Chưa thanh toán</string>
+
+    <string name="currency_vnd">VND</string>
+    <string name="semester_ii">Học kỳ II</string>
+
+    <string name="title_subject_tuition">Học phí học phần</string>
+    <string name="title_dorm_tuition">Tiền ký túc xá</string>
+    <string name="title_invoice">Lịch sử hóa đơn</string>
+
+    <string name="label_invoice_code">Mã hóa đơn: </string>
+    <string name="label_payment_date">Ngày thanh toán: </string>
+    <string name="label_currency">VND</string>
+
+    <string name="btn_pay_now">ĐÓNG TIỀN NGAY</string>
+    <string name="btn_pay_dorm">ĐÓNG TIỀN KÝ TÚC XÁ</string>
+
+    <string name="title_payment_dialog">THANH TOÁN HỌC PHÍ</string>
+
+    <string name="label_total_pay">Tổng tiền cần đóng</string>
+    <string name="label_detail_list">Chi tiết danh sách</string>
+
+    <string name="qr_instruction">Dùng App Ngân hàng hoặc Ví điện tử\nđể quét mã chuyển khoản</string>
+
+    <string name="btn_confirm_paid">XÁC NHẬN ĐÀ TRẢ TIỀN</string>
+
+    <string name="msg_checking_transaction">Hệ thống đang kiểm tra giao dịch...</string>
+    <string name="msg_payment_success">Thanh toán thành công!</string>
+
+    <string name="payment_description_prefix">Nop hoc phi </string>
+
+    <string name="label_total_format">Tổng: %s</string>
+    <string name="semester_name">KỲ HỌC 1</string>
+
+    <!-- ========================= -->
+    <!-- PUBLIC SERVICE -->
+    <!-- ========================= -->
+    <string name="title_public_service">Dịch vụ công UTC2</string>
+
+    <string name="tab_services">Dịch vụ</string>
+    <string name="tab_results">Kết quả</string>
+
+    <string name="section_public_service">Dịch vụ công</string>
+
+    <string name="service_list_title">Danh sách dịch vụ công</string>
+    <string name="service_list_desc">Xem về quản lý dịch vụ công</string>
+
+    <string name="reissue_card_title">Cấp lại thẻ sinh viên</string>
+    <string name="reissue_card_desc">Đăng ký cấp lại thẻ sinh viên bị hỏng hoặc thất lạc</string>
+
+    <string name="loan_support_title">Hỗ trợ vay vốn</string>
+    <string name="loan_support_desc">Thông tin về đăng ký hỗ trợ vay vốn sinh viên</string>
+
+    <string name="date_placeholder">Ngày đăng ký: %1$s</string>
+
+    <string name="status_approved">Đã duyệt</string>
+    <string name="status_pending">Đang xử lý</string>
+
+    <string name="view_detail">Xem chi tiết</string>
+
+    <string name="confirm_card_reissue">Xác nhận đăng ký</string>
+
+    <string name="card_reissue_notes">Lưu ý: Lệ phí cấp lại thẻ là 50.000đ sẽ được trừ vào tài khoản học phí.</string>
+
+    <string name="class_title">Lớp:</string>
+    <string name="id_title">Mã SV:</string>
+    <string name="name_title">Họ tên:</string>
+
+    <string name="loan_amount">Số tiền mong muốn (VNĐ)</string>
+    <string name="loan_amount_hint">Ví dụ: 15.000.000</string>
+
+    <string name="loan_reason_title">Lý do vay vốn</string>
+    <string name="loan_reason_hint">Nhập lý do vay vốn học tập...</string>
+
+    <string name="contact_number_title">Số điện thoại liên hệ</string>
+
+    <string name="cardReissue_registration_success">Đăng ký thành công</string>
+
+    <string name="card_reissue_reason_hint">Ví dụ: Rơi bóp trên xe bus số 50...</string>
+    <string name="card_reissue_reason_title">Lý do mất thẻ (Không bắt buộc)</string>
+
+    <string name="confirm_registration">XÁC NHẬN ĐĂNG KÝ</string>
+
+    <string name="student_confirmation_tips">Lưu ý: Giấy xác nhận dùng để bổ sung hồ sơ cá nhân hoặc các thủ tục hành chính liên quan.</string>
+
+    <string name="student_confirmation_title">Giấy xác nhận sinh viên</string>
+    <string name="student_confirmation_reasons">Lý do đăng ký</string>
+    <string name="student_confirmation_hint">Ví dụ: Vay vốn ngân hàng, xác nhận làm hồ sơ thực tập...</string>
+
+    <string name="transcript_registration_title">Đăng ký bảng điểm</string>
+
+    <string name="transcript_academic_year">Năm học</string>
+    <string name="transcript_academic_year_hint">Chọn năm học cần cấp...</string>
+
+    <string name="transcript_semester">Học kỳ</string>
+    <string name="transcript_semester_hint">Chọn học kỳ...</string>
+
+    <string name="transcript_quantity">Số lượng bản in</string>
+    <string name="transcript_quantity_hint">Nhập số lượng...</string>
+
+    <string name="transcript_note">Ghi chú</string>
+    <string name="transcript_note_hint">Nhập lý do hoặc thông tin bổ sung...</string>
+
+    <string name="transcript_success">Đăng ký cấp bảng điểm thành công!</string>
+
+    <!-- ========================= -->
+    <!-- SUPPORT -->
+    <!-- ========================= -->
+    <string name="title_support">UTC2 Support</string>
+
+    <string name="report_title">BÁO CÁO VÀ PHẢN HỒI - UTC2</string>
+
+    <string name="report_desc">Chúng tôi luôn lắng nghe ý kiến của bạn để cải thiện dịch vụ.</string>
+
+    <string name="report_notes">Lưu ý:\n\n - Vui lòng chọn đúng lĩnh vực để phản hồi được xử lý nhanh hơn.\n\n - Đảm bảo đã có ứng dụng Gmail trên máy và dùng mail sinh viên để gửi .</string>
+
+    <string name="field_type">Lĩnh vực cần báo cáo:</string>
+    <string name="field_note">Chọn lĩnh vực-:</string>
+
+    <string name="content_label">Nội dung báo cáo:</string>
+    <string name="content_hint">Nội dung...</string>
+
+    <string name="rating_label">Mức độ hài lòng:</string>
+
+    <string name="rate_1">Rất kém</string>
+    <string name="rate_2">Kém</string>
+    <string name="rate_3">Trung bình</string>
+    <string name="rate_4">Tốt</string>
+    <string name="rate_5">Rất tốt</string>
+
+    <string name="send_report">Gửi báo cáo</string>
+
+    <!-- ========================= -->
+    <!-- ASSESSMENT -->
+    <!-- ========================= -->
+    <string name="assessment_title">Đánh giá</string>
+
+    <string name="assessment_tab_student">Sinh viên</string>
+    <string name="assessment_tab_advisor">Cố vấn học tập</string>
+
+    <string name="assessment_label_student_code">MSSV:</string>
+    <string name="assessment_label_class">Lớp:</string>
+    <string name="assessment_label_advisor">CVHT:</string>
+
+    <string name="assessment_placeholder_dash">—</string>
+
+    <string name="assessment_hint_period">Đợt đánh giá</string>
+    <string name="assessment_btn_choose">Chọn</string>
+
+    <string name="assessment_col_content">Nội dung</string>
+    <string name="assessment_col_sv_score">SV đánh giá</string>
+    <string name="assessment_col_tapthe">Tập thể lớp</string>
+    <string name="assessment_col_khoa">Khoa/BM</string>
+    <string name="assessment_col_truong">Trường</string>
+
+    <string name="assessment_label_total_score">Tổng điểm</string>
+    <string name="assessment_label_classification">Xếp loại</string>
+
+    <string name="assessment_default_score">0</string>
+    <string name="assessment_default_classification">—</string>
+
+    <string name="assessment_btn_evidence">Nộp minh chứng</string>
+    <string name="assessment_btn_add_evidence">+ Thêm minh chứng</string>
+
+    <string name="assessment_btn_save">Lưu đánh giá</string>
+    <string name="assessment_btn_print">In đánh giá</string>
+
+    <string name="assessment_btn_submit_cvht">Nộp đánh giá CVHT</string>
+
+    <string name="assessment_toast_evidence_attached">Đã đính kèm minh chứng</string>
+    <string name="assessment_toast_evidence_removed">Đã xóa minh chứng</string>
+
+    <string name="assessment_toast_saved">Đã lưu đánh giá thành công</string>
+    <string name="assessment_toast_save_error">Lỗi khi lưu, vui lòng thử lại</string>
+
+    <string name="assessment_toast_submitted">Đã nộp đánh giá CVHT thành công</string>
+    <string name="assessment_toast_submit_error">Lỗi khi nộp, vui lòng thử lại</string>
+
+    <string name="assessment_cvht_opinion_label">2. Ý kiến sinh viên</string>
+
+    <string name="assessment_cvht_opinion_hint">Ý kiến đóng góp, nhận xét, kiến nghị về CVHT\n(Vui lòng gõ Tiếng Việt có dấu, nếu không có câu trả lời vui lòng để trống)</string>
+
+    <string name="assessment_cvht_reminder">*Vui lòng kiểm tra các thông tin trước khi nộp phiếu đánh giá.*</string>
+
+    <!-- ========================= -->
+    <!-- DORM -->
+    <!-- ========================= -->
     <string name="ktx_title">Kí túc xá</string>
+
     <string name="dang_ky">Đăng ký</string>
     <string name="tra_phong">Tra phòng</string>
+
     <string name="toa_nha">Tòa nhà</string>
     <string name="gia_tien">Giá tiền</string>
     <string name="loai_phong">Loại phòng</string>
+
     <string name="phong_da_chon">Phòng đã chọn</string>
+
     <string name="huy_dang_ky">Hủy đăng ký</string>
-    <string name="mssv_title">Mã số sinh viên</string>
-    <string name="continue_gg">Tiếp tục với Google</string>
+
+    <!-- ========================= -->
+    <!-- SETTINGS -->
+    <!-- ========================= -->
     <string name="settings_title">Settings</string>
+
+    <!-- ========================= -->
+    <!-- CONTENT DESCRIPTIONS -->
+    <!-- ========================= -->
+    <string name="logo_desc">Logo UTC2</string>
+
+    <string name="cd_campus_header">Ảnh khuôn viên trường</string>
+    <string name="cd_avatar">Ảnh đại diện</string>
+    <string name="cd_add">Thêm</string>
+    <string name="cd_campus_banner">Banner khuôn viên</string>
+
+    <string name="desc_money_icon">Biểu tượng học phí</string>
+    <string name="desc_calendar_icon">Biểu tượng lịch học phần</string>
+    <string name="desc_house_icon">Biểu tượng ký túc xá</string>
+    <string name="desc_invoice_icon">Biểu tượng hóa đơn</string>
+    <string name="desc_arrow_icon">Mũi tên chuyển trang</string>
+
+    <string name="back_button_desc">Quay lại</string>
+
+    <!-- ========================= -->
+    <!-- ERROR -->
+    <!-- ========================= -->
+    <string name="error_fill_all">Vui lòng nhập đầy đủ thông tin!</string>
+    <string name="error_loading_file">Lỗi tải file</string>
+
+    <!-- ========================= -->
+    <!-- SAMPLE -->
+    <!-- ========================= -->
+    <string name="sample_subject_name">Tên môn học</string>
+    <string name="sample_subject_detail">0 tín chỉ - HKII 2025-2026</string>
+    <string name="sample_amount">0 VND</string>
+
 </resources>

@@ -28,76 +28,140 @@ import androidx.room.PrimaryKey;
  */
 @Entity(
         tableName = "user_profile",
-        indices = { @Index(value = "email", unique = true) }
+        indices = {@Index(value = "email", unique = true)}
 )
 public class UserEntity {
 
     // ── Primary key ───────────────────────────────────────────
     @PrimaryKey
     @ColumnInfo(name = "user_id")
-    private long userId;
+    public long userId;
 
     // ── TABLE USER ────────────────────────────────────────────
     @ColumnInfo(name = "email")
-    private String email;
+    public String email;
 
     /** Không lưu password plaintext — chỉ lưu hash nếu cần offline auth */
     @ColumnInfo(name = "password_hash")
-    private String passwordHash;
+    public String passwordHash;
 
     /** "EMAIL", "GOOGLE", "FACEBOOK", v.v. */
     @ColumnInfo(name = "auth_provider")
-    private String authProvider;
+    public String authProvider;
 
     @ColumnInfo(name = "created_at")
-    private String createdAt;
+    public String createdAt;
 
     @ColumnInfo(name = "updated_at")
-    private String updatedAt;
+    public String updatedAt;
 
     // ── TABLE USER_PROFILE ────────────────────────────────────
     @ColumnInfo(name = "full_name")
-    private String fullName;
+    public String fullName;
 
     @ColumnInfo(name = "phone_number")
-    private String phoneNumber;
+    public String phoneNumber;
 
     @ColumnInfo(name = "avatar_url")
-    private String avatarUrl;
+    public String avatarUrl;
 
     /** Định dạng "yyyy-MM-dd" */
     @ColumnInfo(name = "date_of_birth")
-    private String dateOfBirth;
+    public String dateOfBirth;
 
     /** "MALE", "FEMALE", "OTHER" */
     @ColumnInfo(name = "gender")
-    private String gender;
+    public String gender;
 
     // ── Constructor mặc định (bắt buộc với Room) ─────────────
     public UserEntity() {}
 
     // ── Getters & Setters ─────────────────────────────────────
-    public long   getUserId()       { return userId;       }
-    public String getEmail()        { return email;        }
-    public String getPasswordHash() { return passwordHash; }
-    public String getAuthProvider() { return authProvider; }
-    public String getCreatedAt()    { return createdAt;    }
-    public String getUpdatedAt()    { return updatedAt;    }
-    public String getFullName()     { return fullName;     }
-    public String getPhoneNumber()  { return phoneNumber;  }
-    public String getAvatarUrl()    { return avatarUrl;    }
-    public String getDateOfBirth()  { return dateOfBirth;  }
-    public String getGender()       { return gender;       }
+    public long getUserId() {
+        return userId;
+    }
 
-    public void setUserId(long v)        { userId       = v; }
-    public void setEmail(String v)       { email        = v; }
-    public void setPasswordHash(String v){ passwordHash = v; }
-    public void setAuthProvider(String v){ authProvider = v; }
-    public void setCreatedAt(String v)   { createdAt    = v; }
-    public void setUpdatedAt(String v)   { updatedAt    = v; }
-    public void setFullName(String v)    { fullName     = v; }
-    public void setPhoneNumber(String v) { phoneNumber  = v; }
-    public void setAvatarUrl(String v)   { avatarUrl    = v; }
-    public void setDateOfBirth(String v) { dateOfBirth  = v; }
-    public void setGender(String v)      { gender       = v; }
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public String getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setUserId(long v) {
+        userId = v;
+    }
+
+    public void setEmail(String v) {
+        email = v;
+    }
+
+    public void setPasswordHash(String v) {
+        passwordHash = v;
+    }
+
+    public void setAuthProvider(String v) {
+        authProvider = v;
+    }
+
+    public void setCreatedAt(String v) {
+        createdAt = v;
+    }
+
+    public void setUpdatedAt(String v) {
+        updatedAt = v;
+    }
+
+    public void setFullName(String v) {
+        fullName = v;
+    }
+
+    public void setPhoneNumber(String v) {
+        phoneNumber = v;
+    }
+
+    public void setAvatarUrl(String v) {
+        avatarUrl = v;
+    }
+
+    public void setDateOfBirth(String v) {
+        dateOfBirth = v;
+    }
+
+    public void setGender(String v) {
+        gender = v;
+    }
 }

@@ -18,6 +18,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
         targetCompatibility JavaVersion.VERSION_11
@@ -49,51 +50,84 @@ kotlin {
 }
 
 dependencies {
+    // ─────────────────────────────────────────────────────────
+    // Core AndroidX
+    // ─────────────────────────────────────────────────────────
     implementation libs.appcompat
     implementation libs.material
     implementation libs.constraintlayout
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:34.11.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
 
     // 🔑 THAY THẾ FIREBASE BẰNG GOOGLE SIGN-IN & GMAIL API
     implementation 'com.google.android.gms:play-services-auth:21.0.0'
     implementation 'com.google.apis:google-api-services-gmail:v1-rev20220404-1.32.1'
     implementation 'com.google.api-client:google-api-client-android:2.0.0'
 
-    // ✨ Compose
+    //  Compose BOM (QUAN TRỌNG)
     implementation platform("androidx.compose:compose-bom:2024.10.00")
+
     implementation "androidx.compose.ui:ui"
     implementation "androidx.compose.material3:material3"
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.animation:animation"
     implementation "androidx.activity:activity-compose"
+
     debugImplementation "androidx.compose.ui:ui-tooling"
 
-    // 📦 UI Components
+    // ─────────────────────────────────────────────────────────
+    // RecyclerView / CardView / Fragment
+    // ─────────────────────────────────────────────────────────
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.fragment:fragment:1.8.3'
 
-    // 🔄 Lifecycle & LiveData (Cần thiết cho ViewModel và Repository)
+    // ─────────────────────────────────────────────────────────
+    // Lifecycle
+    // ─────────────────────────────────────────────────────────
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.3'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.8.3'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.8.3'
 
-    // 🌐 Networking (Retrofit 2)
+    // ─────────────────────────────────────────────────────────
+    // Retrofit + Gson + OkHttp
+    // ─────────────────────────────────────────────────────────
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
-    // 💾 Local Database (Room)
+    // Room Database
     def room_version = "2.6.1"
+
     implementation "androidx.room:room-runtime:$room_version"
-    annotationProcessor "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
-    // 🖼️ Image Loading & QR
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    // Retrofit (cho data/remote)
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // Legacy declarations (giữ lại)
+    implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
+    annotationProcessor 'androidx.room:room-compiler:2.6.1'
+
+    // ─────────────────────────────────────────────────────────
+    // Glide
+    // ─────────────────────────────────────────────────────────
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
-    implementation 'com.google.zxing:core:3.5.3'
 
-    // 🧪 Testing
+    // ─────────────────────────────────────────────────────────
+    // ZXing QR
+    // ─────────────────────────────────────────────────────────
+    implementation 'com.google.zxing:core:3.5.3'
+    // ─────────────────────────────────────────────────────────
+    // Testing
+    // ─────────────────────────────────────────────────────────
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
