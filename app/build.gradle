@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    id 'com.google.gms.google-services'
+    // 🗑️ Đã xóa plugin google-services để bỏ Firebase hoàn toàn
 }
 
 android {
@@ -27,22 +27,47 @@ android {
         viewBinding true
         compose true
     }
+
+    // 🛠️ GIẢI QUYẾT LỖI TRÙNG LẶP FILE META-INF (Fix lỗi mergeDebugJavaResource)
+    packaging {
+        resources {
+            excludes += '/META-INF/DEPENDENCIES'
+            excludes += '/META-INF/LICENSE'
+            excludes += '/META-INF/LICENSE.txt'
+            excludes += '/META-INF/license.txt'
+            excludes += '/META-INF/NOTICE'
+            excludes += '/META-INF/NOTICE.txt'
+            excludes += '/META-INF/notice.txt'
+            excludes += '/META-INF/ASL2.0'
+            excludes += '/META-INF/*.kotlin_module'
+        }
+    }
 }
-// ✅ FIX: Đặt JVM target cho Kotlin ở TOP-LEVEL (ngoài android {})
-// Cách này hoạt động với mọi Kotlin plugin, kể cả kotlin.plugin.compose
+
 kotlin {
     jvmToolchain(11)
 }
+
 dependencies {
+    // ─────────────────────────────────────────────────────────
+    // Core AndroidX
+    // ─────────────────────────────────────────────────────────
     implementation libs.appcompat
     implementation libs.material
     implementation libs.constraintlayout
 
-    // 🔥 Firebase
+    // Firebase
     implementation platform('com.google.firebase:firebase-bom:34.11.0')
     implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
 
-    // 🔥🔥 Compose BOM
+    // 🔑 THAY THẾ FIREBASE BẰNG GOOGLE SIGN-IN & GMAIL API
+    implementation 'com.google.android.gms:play-services-auth:21.0.0'
+    implementation 'com.google.apis:google-api-services-gmail:v1-rev20220404-1.32.1'
+    implementation 'com.google.api-client:google-api-client-android:2.0.0'
+
+    //  Compose BOM (QUAN TRỌNG)
     implementation platform("androidx.compose:compose-bom:2024.10.00")
 
     implementation "androidx.compose.ui:ui"
@@ -50,33 +75,58 @@ dependencies {
     implementation "androidx.compose.ui:ui-tooling-preview"
     implementation "androidx.compose.animation:animation"
     implementation "androidx.activity:activity-compose"
+
     debugImplementation "androidx.compose.ui:ui-tooling"
-    // ── RecyclerView & CardView ──────────────────────────────
+
+    // ─────────────────────────────────────────────────────────
+    // RecyclerView / CardView / Fragment
+    // ─────────────────────────────────────────────────────────
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
     implementation 'androidx.cardview:cardview:1.0.0'
-
-    // ── Fragment ─────────────────────────────────────────────
     implementation 'androidx.fragment:fragment:1.8.3'
 
-    // ── Lifecycle: ViewModel + LiveData ──────────────────────
+    // ─────────────────────────────────────────────────────────
+    // Lifecycle
+    // ─────────────────────────────────────────────────────────
     implementation 'androidx.lifecycle:lifecycle-viewmodel:2.8.3'
     implementation 'androidx.lifecycle:lifecycle-livedata:2.8.3'
     implementation 'androidx.lifecycle:lifecycle-common-java8:2.8.3'
 
-    // ── Retrofit 2 + Gson ────────────────────────────────────
+    // ─────────────────────────────────────────────────────────
+    // Retrofit + Gson + OkHttp
+    // ─────────────────────────────────────────────────────────
     implementation 'com.squareup.retrofit2:retrofit:2.11.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 
-    // ── ZXing (QR generation — no scanner UI) ────────────────
-    implementation 'com.google.zxing:core:3.5.3'
+    // Room Database
+    def room_version = "2.6.1"
 
-    // Room Database (bỏ comment khi sẵn sàng dùng DB)
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+    // Retrofit (cho data/remote)
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    // Legacy declarations (giữ lại)
     implementation 'androidx.room:room-runtime:2.6.1'
+    implementation 'androidx.room:room-ktx:2.6.1'
     annotationProcessor 'androidx.room:room-compiler:2.6.1'
-    // Nếu muốn dùng LiveData với Room (đã có sẵn trong lifecycle):
-    implementation 'androidx.room:room-ktx:2.6.1'  // optional cho Kotlin coroutines
 
+    // ─────────────────────────────────────────────────────────
+    // Glide
+    // ─────────────────────────────────────────────────────────
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.16.0'
+
+    // ─────────────────────────────────────────────────────────
+    // ZXing QR
+    // ─────────────────────────────────────────────────────────
+    implementation 'com.google.zxing:core:3.5.3'
+    // ─────────────────────────────────────────────────────────
+    // Testing
+    // ─────────────────────────────────────────────────────────
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

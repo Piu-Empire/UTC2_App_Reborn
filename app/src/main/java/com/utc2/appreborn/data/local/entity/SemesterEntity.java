@@ -17,27 +17,27 @@ public class SemesterEntity {
 
     @PrimaryKey
     @ColumnInfo(name = "semester_id")
-    private long semesterId;
+    public long semesterId;
 
     @ColumnInfo(name = "user_id")
     private long userId;
 
     @ColumnInfo(name = "semester_name")
-    private String semesterName;
-
-    @ColumnInfo(name = "academic_year")
-    private String academicYear;
+    public String semesterName;
 
     @ColumnInfo(name = "semester_number")
-    private int semesterNumber;
+    public int semesterNumber;
+
+    @ColumnInfo(name = "academic_year")
+    public String academicYear;
 
     /** Ngày bắt đầu kỳ học, lưu dạng "yyyy-MM-dd" */
     @ColumnInfo(name = "start_date")
-    private String startDate;
+    public String startDate;
 
     /** Ngày kết thúc kỳ học, lưu dạng "yyyy-MM-dd" */
     @ColumnInfo(name = "end_date")
-    private String endDate;
+    public String endDate;
 
     /** GPA của kỳ học, thang 4.0 */
     @ColumnInfo(name = "gpa")

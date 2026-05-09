@@ -20,31 +20,27 @@ public class CourseEntity {
 
     @PrimaryKey
     @ColumnInfo(name = "course_id")
-    private long courseId;
+    public long courseId;
 
     @ColumnInfo(name = "course_code")
-    private String courseCode;
+    public String courseCode;
 
     @ColumnInfo(name = "course_name")
-    private String courseName;
+    public String courseName;
 
-    @ColumnInfo(name = "credits")
-    private int credits;
+    public int credits;
 
     @ColumnInfo(name = "theory_hours")
-    private int theoryHours;
+    public int theoryHours;
 
     @ColumnInfo(name = "practice_hours")
-    private int practiceHours;
+    public int practiceHours;
 
-    @ColumnInfo(name = "department")
-    private String department;
+    public String department;
 
-    /** Mô tả môn học, ánh xạ từ kiểu TEXT của MySQL */
     @ColumnInfo(name = "description")
     private String description;
 
-    // ─── Constructor ────────────────────────────────────────────────────────────
 
     public CourseEntity(long courseId, String courseCode, String courseName,
                         int credits, int theoryHours, int practiceHours,

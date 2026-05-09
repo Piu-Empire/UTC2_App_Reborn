@@ -9,213 +9,258 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.utc2.appreborn.R
 
-// =======================
-// DATA CLASS (chuẩn)
-// =======================
 data class NavItem(
     val id: Int,
-    val icon: Int
+    val icon: Int,
+    val labelRes: Int = R.string.placeholder_none
 )
 
-// =======================
-// Shape liquid
-// =======================
-fun getLiquidShape(offset: Float, radius: Float) = GenericShape { size, _ ->
-    val topY = 0f // Bắt đầu từ mép trên của thanh điều hướng
-    val curveWidth = radius * 2.2f // Độ rộng của vùng ảnh hưởng chất lỏng
-    val dipDepth = radius * 1.5f // Độ sâu của lỗ lõm xuống
+private data class NavDimensions(
+    val barHeight: Dp,
+    val containerHeight: Dp,
+    val ballSize: Dp,
+    val ballRadius: Dp,
+    val iconActiveSize: Dp,
+    val iconNormalSize: Dp,
+    val labelSizeSp: Float,
+    val dipDepth: Dp,
+    val scaleFactor: Float
+)
+
+@Composable
+private fun rememberNavDimensions(maxWidth: Dp): NavDimensions {
+    // Tự động điều chỉnh kích thước để tương thích nhiều màn hình
+    return remember(maxWidth) {
+        val scaleFactor = (maxWidth.value / 360f).coerceIn(0.8f, 1.4f)
+        val barH = (56 * scaleFactor).dp
+
+        NavDimensions(
+            barHeight = barH,
+            containerHeight = (85 * scaleFactor).dp,
+            ballSize = (48 * scaleFactor).dp,
+            ballRadius = ((48 * scaleFactor) / 2).dp,
+            iconActiveSize = (22 * scaleFactor).dp,
+            iconNormalSize = (18 * scaleFactor).dp,
+            labelSizeSp = (8 * scaleFactor),
+            dipDepth = (barH.value * 0.55f).dp,
+            scaleFactor = scaleFactor
+        )
+    }
+}
+
+fun getLiquidShape(offset: Float, radius: Float, dipDepth: Float) = GenericShape { size, _ ->
+    // Tạo hình dạng thanh điều hướng có vết lõm mềm mại
+    val topY = 0f
+    val curveWidth = radius * 2.2f
 
     moveTo(0f, topY)
-
-    // 1. Vẽ đường thẳng đến vùng bắt đầu của hiệu ứng liquid
     lineTo(offset - curveWidth, topY)
-
-    // 2. Vẽ đường cong mượt bên trái (S-curve)
+    // cubicTo dùng để vẽ các đường cong mượt tại vết lõm
     cubicTo(
         x1 = offset - curveWidth * 0.5f, y1 = topY,
         x2 = offset - radius * 1.2f, y2 = dipDepth,
         x3 = offset, y3 = dipDepth
     )
-
-    // 3. Vẽ đường cong mượt bên phải (S-curve ngược)
     cubicTo(
         x1 = offset + radius * 1.2f, y1 = dipDepth,
         x2 = offset + curveWidth * 0.5f, y2 = topY,
         x3 = offset + curveWidth, y3 = topY
     )
-
-    // 4. Vẽ tiếp sang lề phải và đóng vùng shape
     lineTo(size.width, topY)
     lineTo(size.width, size.height)
     lineTo(0f, size.height)
     close()
 }
-// =======================
-// Bridge cho Java
-// =======================
-fun setupLiquidBottomBar(
-    composeView: ComposeView,
-    onItemSelected: (Int) -> Unit
-) {
-    composeView.setContent {
-        MaterialTheme {
-            LiquidBottomNavigation(onItemSelected)
+
+fun setupLiquidBottomBar(composeView: ComposeView, onItemSelected: (Int) -> Unit) {
+    // Thiết lập môi trường Compose để nhúng vào giao diện XML
+    composeView.apply {
+        setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        setContent {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Transparent)
+            ) {
+                LiquidBottomNavigation(onItemSelected)
+            }
         }
     }
 }
-
-// =======================
-// UI chính
-// =======================
 
 @Composable
 fun LiquidBottomNavigation(
     onItemSelected: (Int) -> Unit
 ) {
+    // Khai báo danh sách các mục hiển thị trên thanh điều hướng
     val items = remember {
         listOf(
-            NavItem(R.id.nav_home, R.drawable.ic_house),
-            NavItem(R.id.nav_schedule, R.drawable.ic_calendar),
-            NavItem(R.id.nav_register, R.drawable.ic_book_open),
-            NavItem(R.id.nav_result, R.drawable.ic_graduation_cap),
-            NavItem(R.id.nav_profile, R.drawable.ic_user)
+            NavItem(R.id.nav_home, R.drawable.ic_house, R.string.nav_label_home),
+            NavItem(R.id.nav_register, R.drawable.ic_book_open, R.string.nav_label_register),
+            NavItem(R.id.nav_schedule, R.drawable.ic_calendar, R.string.nav_label_schedule),
+            NavItem(R.id.nav_result, R.drawable.ic_graduation_cap, R.string.nav_label_result),
+            NavItem(R.id.nav_profile, R.drawable.ic_user, R.string.nav_label_profile)
         )
     }
 
     var selectedIndex by remember { mutableIntStateOf(0) }
+    val navBgColor = colorResource(R.color.black)
+    val iconActiveColor = colorResource(R.color.indicator_location)
+    val iconNormalColor = colorResource(R.color.white)
+    val labelNormalColor = colorResource(R.color.text_muted_light)
 
-    val configuration = LocalConfiguration.current
-    val density = LocalDensity.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val itemWidthPx = with(density) { (screenWidth / items.size).toPx() }
-
-    // Animate vị trí ngang của quả bóng và lỗ lõm
-    val animX by animateFloatAsState(
-        targetValue = selectedIndex * itemWidthPx + itemWidthPx / 2,
-        animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
-        label = "ball_x"
-    )
-
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp) // Tăng nhẹ chiều cao để quả bóng có không gian bay
+            .wrapContentHeight()
     ) {
-        // --- Lớp 1: Nền Liquid màu Đen ---
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .align(Alignment.BottomCenter)
-                .background(Color.Black, shape = getLiquidShape(animX, 75f))
+        val dims = rememberNavDimensions(maxWidth = this.maxWidth)
+        val density = LocalDensity.current
+        // Tính toán tọa độ pixel để vẽ hình dạng chính xác nhất
+        val itemWidthPx = with(density) { (this@BoxWithConstraints.maxWidth / items.size).toPx() }
+        val dipDepthPx = with(density) { dims.dipDepth.toPx() }
+        val radiusPx = with(density) { dims.ballSize.toPx() / 2f * 1.1f }
+
+        // Tạo hiệu ứng di chuyển mượt khi chuyển đổi mục chọn
+        val animX by animateFloatAsState(
+            targetValue = selectedIndex * itemWidthPx + itemWidthPx / 2,
+            animationSpec = spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessLow),
+            label = "ball_x"
         )
+        val animXDp = with(density) { animX.toDp() }
 
-        // --- Lớp 2: Quả bóng duy nhất (The Floating Ball) ---
         Box(
             modifier = Modifier
-                .size(55.dp)
-                .offset(
-                    x = with(density) { (animX).toDp() } - 27.5.dp, // Căn giữa ball
-                    y = 5.dp // Vị trí quả bóng bay phía trên
-                )
-                .background(Color.Black, CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            // Icon trên quả bóng (thay đổi theo selectedIndex)
-            // Trigger animation mỗi lần đổi tab
-            var trigger by remember { mutableStateOf(false) }
-
-            LaunchedEffect(selectedIndex) {
-                trigger = false
-                trigger = true
-            }
-
-// Transition animation
-            val transition = updateTransition(targetState = trigger, label = "icon_anim")
-
-// Scale: nhỏ -> to
-            val iconScale by transition.animateFloat(
-                transitionSpec = {
-                    tween(durationMillis = 400)
-                },
-                label = "scale"
-            ) { state ->
-                if (state) 1.2f else 0.6f
-            }
-
-// Color: trắng -> vàng
-            val iconColor by transition.animateColor(
-                transitionSpec = {
-                    tween(durationMillis = 400)
-                },
-                label = "color"
-            ) { state ->
-                if (state) Color.Yellow else Color.White
-            }
-
-// Icon (đã animate)
-            Icon(
-                painter = painterResource(id = items[selectedIndex].icon),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(26.dp)
-                    .graphicsLayer {
-                        scaleX = iconScale
-                        scaleY = iconScale
-                    },
-                tint = iconColor
-            )
-        }
-
-        // --- Lớp 3: Các Icon bên dưới (Ẩn khi được chọn) ---
-        Row(
-            modifier = Modifier
                 .fillMaxWidth()
-                .height(70.dp)
-                .align(Alignment.BottomCenter)
+                .height(dims.containerHeight)
         ) {
-            items.forEachIndexed { index, item ->
-                val isSelected = selectedIndex == index
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dims.barHeight)
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        color = navBgColor,
+                        shape = getLiquidShape(animX, radiusPx, dipDepthPx)
+                    )
+            )
 
-                // Hiệu ứng ẩn/hiện và dịch chuyển icon bên dưới
-                val iconAlpha by animateFloatAsState(targetValue = if (isSelected) 0f else 1f)
-                val iconOffset by animateDpAsState(targetValue = if (isSelected) (-20).dp else 0.dp)
-
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) {
-                            selectedIndex = index
-                            onItemSelected(item.id)
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    if (!isSelected) { // Tối ưu: Chỉ vẽ icon nếu nó không bị ẩn hoàn toàn
-                        Icon(
-                            painter = painterResource(id = item.icon),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .offset(y = iconOffset),
-                            tint = Color.White.copy(alpha = iconAlpha)
+            Box(
+                modifier = Modifier
+                    .size(dims.ballSize)
+                    .offset(
+                        x = animXDp - dims.ballRadius,
+                        // coerceAtLeast đảm bảo bóng không văng ra ngoài khung hình
+                        y = (dims.containerHeight - dims.barHeight - dims.ballSize * 0.55f).coerceAtLeast(
+                            0.dp
                         )
+                    )
+                    .background(navBgColor, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                // Tự động khởi chạy lại hiệu ứng mỗi khi thay đổi tab
+                var trigger by remember { mutableStateOf(false) }
+                LaunchedEffect(selectedIndex) { trigger = false; trigger = true }
+
+                val transition = updateTransition(targetState = trigger, label = "icon_anim")
+                val iconScale by transition.animateFloat(
+                    transitionSpec = { tween(400) }, label = "scale"
+                ) { if (it) 1.2f else 0.6f }
+
+                val iconColor by transition.animateColor(
+                    transitionSpec = { tween(400) }, label = "color"
+                ) { if (it) iconActiveColor else iconNormalColor }
+
+                Icon(
+                    painter = painterResource(id = items[selectedIndex].icon),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(dims.iconActiveSize)
+                        // Biến đổi kích thước icon để tạo cảm giác sinh động
+                        .graphicsLayer { scaleX = iconScale; scaleY = iconScale },
+                    tint = iconColor
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dims.barHeight)
+                    .align(Alignment.BottomCenter)
+            ) {
+                items.forEachIndexed { index, item ->
+                    val isSelected = selectedIndex == index
+                    val label = stringResource(id = item.labelRes)
+                    val showLabel = label != stringResource(R.string.placeholder_none)
+
+                    val iconAlpha by animateFloatAsState(
+                        targetValue = if (isSelected) 0f else 1f,
+                        label = "icon_alpha"
+                    )
+                    val iconOffsetY by animateDpAsState(
+                        targetValue = if (isSelected) (-14 * dims.scaleFactor).dp else 0.dp,
+                        label = "icon_offset"
+                    )
+                    val labelAlpha by animateFloatAsState(
+                        targetValue = if (isSelected) 0f else 1f,
+                        label = "label_alpha"
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            // Loại bỏ hiệu ứng gợn nước mặc định khi nhấn tab
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                selectedIndex = index
+                                onItemSelected(item.id)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (!isSelected) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center,
+                                modifier = Modifier.offset(y = iconOffsetY)
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = item.icon),
+                                    contentDescription = label,
+                                    modifier = Modifier.size(dims.iconNormalSize),
+                                    tint = iconNormalColor.copy(alpha = iconAlpha)
+                                )
+                                if (showLabel) {
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = label,
+                                        color = labelNormalColor.copy(alpha = labelAlpha),
+                                        fontSize = dims.labelSizeSp.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }

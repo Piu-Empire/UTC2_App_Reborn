@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_icon_yellow.xml
+    Nền vàng nhạt bo góc dùng cho container icon tính năng.
+    Đặt tại: res/drawable/bg_icon_yellow.xml
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Vàng nhạt — đủ nhẹ để icon vẫn nổi bật -->
+    <solid android:color="#FFF3CD" />
+
+    <!-- Bo góc 10dp — khớp với bo góc card (12dp) -->
+    <corners android:radius="10dp" />
+
+</shape>

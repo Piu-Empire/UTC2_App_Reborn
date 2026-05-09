@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutDateHeaderRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp">
+
+    <View
+        android:id="@+id/viewTodayDot"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/bg_dot_today"
+        android:backgroundTint="@color/today_dot_indicator"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tvHeaderDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="@color/text_secondary"
+        android:fontFamily="sans-serif-medium" />
+
+    <TextView
+        android:id="@+id/tvTodayBadge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/today_upper"
+        android:textSize="10sp"
+        android:textStyle="bold"
+        android:textColor="@color/today_accent"
+        android:background="@drawable/bg_badge_today"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp"
+        android:visibility="gone" />
+
+</LinearLayout>

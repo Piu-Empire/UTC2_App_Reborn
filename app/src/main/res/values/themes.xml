@@ -1,29 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Base.Theme.UTC2AppReborn" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- ===================================== -->
+    <!-- BASE THEME -->
+    <!-- ===================================== -->
+
+    <style name="Base.Theme.UTC2AppReborn"
+        parent="Theme.Material3.DayNight.NoActionBar">
+
+        <!-- từ file 1 -->
         <!-- Edge-to-edge: status bar transparent -->
+
+        <!-- từ file 2 -->
+        <item name="colorPrimary">@color/primary</item>
+
+        <!-- TEXT CHÍNH -->
+        <item name="colorOnSurface">#000000</item>
+
+        <!-- TEXT TRÊN PRIMARY -->
+        <item name="colorOnPrimary">#000000</item>
+
+        <!-- TEXT TRÊN BACKGROUND -->
+        <item name="colorOnBackground">#000000</item>
+
     </style>
 
-    <style name="Theme.UTC2AppReborn" parent="Base.Theme.UTC2AppReborn"/>
+    <!-- có ở cả 2, giống nhau => giữ 1 -->
+    <style name="Theme.UTC2AppReborn"
+        parent="Base.Theme.UTC2AppReborn" />
+
+    <!-- ===================================== -->
+    <!-- TAB TEXT -->
+    <!-- ===================================== -->
 
     <!--
         TabTextAppearance — dùng cho TabLayout nếu vẫn cần ở nơi khác
     -->
-    <style name="TabTextAppearance" parent="TextAppearance.Design.Tab">
+    <style name="TabTextAppearance"
+        parent="TextAppearance.Design.Tab">
+
         <item name="android:textSize">13sp</item>
-        <item name="android:fontFamily">sans-serif-medium</item>
+
+        <item name="android:fontFamily">
+            sans-serif-medium
+        </item>
+
         <item name="textAllCaps">false</item>
+
     </style>
 
+    <!-- ===================================== -->
+    <!-- FILTER CHIP -->
+    <!-- ===================================== -->
+
     <!--
-        Chip text color: trắng khi selected, đen khi unselected.
-        Áp dụng qua app:textColor trên từng Chip nếu cần override.
+        Chip text color:
+        trắng khi selected,
+        đen khi unselected.
+
+        Áp dụng qua
+        app:textColor
+        trên từng Chip nếu cần override.
     -->
-    <style name="FilterChipStyle" parent="Widget.Material3.Chip.Filter">
+    <style name="FilterChipStyle"
+        parent="Widget.Material3.Chip.Filter">
+
         <item name="android:textSize">13sp</item>
+
         <item name="android:minHeight">48dp</item>
-        <item name="chipBackgroundColor">@color/chip_background_selector</item>
-        <item name="android:textColor">@color/chip_text_selector</item>
+
+        <item name="chipBackgroundColor">
+            @color/chip_background_selector
+        </item>
+
+        <item name="android:textColor">
+            @color/chip_text_selector
+        </item>
+
     </style>
 
 </resources>

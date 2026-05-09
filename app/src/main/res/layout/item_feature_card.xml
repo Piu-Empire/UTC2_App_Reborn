@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_feature_card.xml — UPDATED
+    ──────────────────────────────────────────────────────────────
+    Thay đổi so với bản trước:
+      • Icon thu nhỏ từ 46dp → 30dp (cân đối trong card 110dp)
+      • Bọc icon trong FrameLayout 52dp với nền vàng nhạt bo góc
+        (bg_icon_yellow.xml = #FFF3CD, radius 10dp)
+      • KHÔNG thay đổi hình dạng icon drawable
+      • KHÔNG thay đổi hình dạng card
+      • IDs giữ nguyên: iv_feature_icon, tv_feature_title
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:layout_margin="6dp"
+    android:clickable="true"
+    android:focusable="true"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"
+    app:rippleColor="@color/accent_yellow_light">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!--
+            Container nền vàng nhạt bo góc.
+            52dp × 52dp → icon 30dp bên trong → padding thực tế 11dp mỗi chiều
+            → icon trông cân đối, thoáng, không bị chật.
+        -->
+        <FrameLayout
+            android:layout_width="52dp"
+            android:layout_height="52dp"
+            android:background="@drawable/bg_icon_yellow">
+
+            <ImageView
+                android:id="@+id/iv_feature_icon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:scaleType="fitCenter"
+                android:contentDescription="" />
+
+        </FrameLayout>
+
+        <!-- Feature label -->
+        <TextView
+            android:id="@+id/tv_feature_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="7dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.1"
+            android:maxLines="2"
+            android:textColor="#333333"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

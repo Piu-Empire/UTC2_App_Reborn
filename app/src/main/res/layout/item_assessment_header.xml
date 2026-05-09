@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_assessment_header.xml
+    Tiêu đề nhóm tiêu chí, ví dụ:
+      "1. Đánh giá về ý thức tham gia học tập (Tối đa: 20 điểm)"
+    Màu chữ: xanh #0057A8 (RLSV) hoặc đỏ #CC0000 (section trừ điểm)
+    – được set từ Adapter dựa vào nội dung.
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="6dp"
+    android:gravity="center_vertical"
+    android:background="#FAFAFA">
+
+    <View
+        android:id="@+id/viewAccent"
+        android:layout_width="3dp"
+        android:layout_height="14dp"
+        android:layout_marginEnd="8dp"
+        android:background="#0057A8"/>
+
+    <TextView
+        android:id="@+id/tvSectionTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:textColor="#0057A8"
+        android:lineSpacingExtra="2dp"/>
+
+</LinearLayout>

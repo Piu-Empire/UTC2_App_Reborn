@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
 import com.utc2.appreborn.data.local.entity.UserEntity;
 
 /**
@@ -24,51 +25,82 @@ import com.utc2.appreborn.data.local.entity.UserEntity;
 @Dao
 public interface UserDao {
 
-    // ══════════════════════════════════════════════════════════
-    //  CREATE
+// ══════════════════════════════════════════════════════════
+    // INSERT
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Chèn user mới. Nếu user_id đã tồn tại → REPLACE (upsert).
-     * @return row ID vừa insert (= user_id)
+     * Chèn user mới.
+     * Nếu đã tồn tại → REPLACE (upsert).
+     *
+     * @return rowId vừa insert
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertUser(UserEntity user);
 
+    /**
+     * Insert student profile.
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertStudentProfile(StudentProfileEntity profile);
+
     // ══════════════════════════════════════════════════════════
-    //  READ
+    // READ — USER
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Lấy user theo ID — trả LiveData để Fragment/ViewModel observe.
+     * Lấy user theo ID — LiveData.
      */
     @Query("SELECT * FROM user_profile WHERE user_id = :userId LIMIT 1")
     LiveData<UserEntity> getUserById(long userId);
 
     /**
-     * Lấy user theo email — dùng khi login bằng email/password.
+     * Lấy user theo email — LiveData.
      */
     @Query("SELECT * FROM user_profile WHERE email = :email LIMIT 1")
     LiveData<UserEntity> getUserByEmail(String email);
 
     /**
-     * Phiên bản đồng bộ (không LiveData) — dùng trong background thread.
+     * Query sync theo userId.
      */
     @Query("SELECT * FROM user_profile WHERE user_id = :userId LIMIT 1")
     UserEntity getUserByIdSync(long userId);
 
     /**
-     * Đếm số user — dùng để kiểm tra DB có dữ liệu chưa.
+     * Query sync theo email.
+     */
+    @Query("SELECT * FROM user_profile WHERE email = :email LIMIT 1")
+    UserEntity getUserByEmailSync(String email);
+
+    /**
+     * Đếm tổng user.
      */
     @Query("SELECT COUNT(*) FROM user_profile")
     int countUsers();
 
     // ══════════════════════════════════════════════════════════
-    //  UPDATE
+    // READ — STUDENT PROFILE
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Cập nhật toàn bộ thông tin user.
+     * Lấy student profile theo userId.
+     */
+    @Query("SELECT * FROM student_profile WHERE user_id = :userId LIMIT 1")
+    StudentProfileEntity getStudentProfileByUserId(long userId);
+
+    /**
+     * Lấy student profile theo MSSV.
+     */
+    @Query("SELECT * FROM student_profile WHERE student_code = :studentCode LIMIT 1")
+    StudentProfileEntity getStudentProfileByCode(String studentCode);
+
+    // ══════════════════════════════════════════════════════════
+    // UPDATE
+    // ══════════════════════════════════════════════════════════
+
+    /**
+     * Update toàn bộ user.
+     *
      * @return số row bị ảnh hưởng
      */
     @Update
@@ -77,28 +109,48 @@ public interface UserDao {
     /**
      * Cập nhật chỉ tên hiển thị — dùng khi user đổi tên.
      */
-    @Query("UPDATE user_profile SET full_name = :fullName, updated_at = :updatedAt "
-            + "WHERE user_id = :userId")
-    void updateFullName(long userId, String fullName, String updatedAt);
+    @Query(
+            "UPDATE user_profile " +
+                    "SET full_name = :fullName, updated_at = :updatedAt " +
+                    "WHERE user_id = :userId"
+    )
+    void updateFullName(
+            long userId,
+            String fullName,
+            String updatedAt
+    );
 
     /**
      * Cập nhật avatar URL sau khi upload ảnh.
      */
-    @Query("UPDATE user_profile SET avatar_url = :url WHERE user_id = :userId")
-    void updateAvatarUrl(long userId, String url);
+    @Query(
+            "UPDATE user_profile " +
+                    "SET avatar_url = :url " +
+                    "WHERE user_id = :userId"
+    )
+    void updateAvatarUrl(
+            long userId,
+            String url
+    );
 
     // ══════════════════════════════════════════════════════════
-    //  DELETE
+    // DELETE
     // ══════════════════════════════════════════════════════════
 
     /**
-     * Xoá một user (và cascade xoá StudentEntity liên quan).
+     * Xóa user object.
      */
     @Delete
     void deleteUser(UserEntity user);
 
     /**
-     * Xoá tất cả dữ liệu — dùng khi logout để clear local cache.
+     * Xóa theo userId.
+     */
+    @Query("DELETE FROM user_profile WHERE user_id = :userId")
+    void deleteUserById(long userId);
+
+    /**
+     * Xóa toàn bộ user.
      */
     @Query("DELETE FROM user_profile")
     void deleteAllUsers();

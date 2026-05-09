@@ -2,19 +2,27 @@ package com.utc2.appreborn.data.local;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
+// ── DAO Imports ─────────────────────────────────────────────
 import com.utc2.appreborn.data.local.dao.AcademicWarningDao;
+import com.utc2.appreborn.data.local.dao.AdvisorDao;
 import com.utc2.appreborn.data.local.dao.CourseDao;
+import com.utc2.appreborn.data.local.dao.ScheduleDao;
 import com.utc2.appreborn.data.local.dao.SemesterDao;
 import com.utc2.appreborn.data.local.dao.StudentDao;
 import com.utc2.appreborn.data.local.dao.UserDao;
+
+// ── Entity Imports ──────────────────────────────────────────
 import com.utc2.appreborn.data.local.entity.AcademicWarningEntity;
+import com.utc2.appreborn.data.local.entity.AdvisorEntity;
 import com.utc2.appreborn.data.local.entity.CourseEntity;
+import com.utc2.appreborn.data.local.entity.ScheduleEntity;
 import com.utc2.appreborn.data.local.entity.SemesterEntity;
-import com.utc2.appreborn.data.local.entity.StudentEntity;
+import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
 import com.utc2.appreborn.data.local.entity.UserEntity;
 
 /**
@@ -33,33 +41,43 @@ import com.utc2.appreborn.data.local.entity.UserEntity;
  */
 @Database(
         entities = {
-                // ── Đã có từ version 1 ─────────────────
+                // ── User / Student ───────────────────────
                 UserEntity.class,
-                StudentEntity.class,
+                StudentProfileEntity.class,
 
-                // ── Thêm mới ở version 2 ───────────────
+                // ── Semester / Course / Schedule ────────
                 SemesterEntity.class,
                 CourseEntity.class,
-                AcademicWarningEntity.class
+                ScheduleEntity.class,
+
+                // ── Warning / Advisor ───────────────────
+                AcademicWarningEntity.class,
+                AdvisorEntity.class
         },
-        version = 2,
-        exportSchema = true   // Xuất schema JSON vào app/schemas/ để tracking migration
+        version = 3,
+        exportSchema = false
 )
 public abstract class AppDatabase extends RoomDatabase {
 
-    // ─── Tên file database trên thiết bị ────────────────────────────────────────
-    private static final String DB_NAME = "utc2_app_db";
+    // ── Constants ────────────────────────────────────────────
 
-    // ─── Singleton instance (volatile đảm bảo thread-safety trên multi-core) ────
-    private static volatile AppDatabase INSTANCE;
+    private static final String DB_NAME = "utc2_app.db";
 
-    // ─── Abstract DAO methods — Room tự generate implementation ─────────────────
+    // ── Singleton Instance ───────────────────────────────────
+
+    private static volatile AppDatabase instance;
+
+    // ── DAO Methods ──────────────────────────────────────────
+
+    public abstract ScheduleDao scheduleDao();
 
     /** DAO cho bảng user_profile (đã có từ v1) */
     public abstract UserDao userDao();
 
     /** DAO cho bảng student_profile (đã có từ v1) */
     public abstract StudentDao studentDao();
+
+    public abstract AdvisorDao advisorDao();
 
     /** DAO cho bảng semester (thêm ở v2) */
     public abstract SemesterDao semesterDao();
@@ -80,41 +98,50 @@ public abstract class AppDatabase extends RoomDatabase {
      * @return AppDatabase instance
      */
     public static AppDatabase getInstance(Context context) {
-        if (INSTANCE == null) {
+
+        if (instance == null) {
+
             synchronized (AppDatabase.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(
+
+                if (instance == null) {
+
+                    instance = Room.databaseBuilder(
                                     context.getApplicationContext(),
                                     AppDatabase.class,
                                     DB_NAME
                             )
-                            // ── Migration từ version 1 → 2 ───────────────────
-                            // Thêm 3 bảng mới, không xoá dữ liệu user/student cũ
+                            // ── Migration từ v1 → v2 ───────────────
                             .addMigrations(MIGRATION_1_2)
+
+                            // ── Nếu schema khác lớn → recreate DB ──
+                            .fallbackToDestructiveMigration()
+
                             .build();
                 }
             }
         }
-        return INSTANCE;
-    }
 
-    // ─── Migrations ──────────────────────────────────────────────────────────────
+        return instance;
+    }
+    // ─────────────────────────────────────────────────────────
+    // MIGRATIONS
+    // ─────────────────────────────────────────────────────────
 
     /**
-     * Migration v1 → v2: Tạo thêm 3 bảng mới.
-     *
-     * Quy tắc viết Migration:
-     *  - Không DROP bảng cũ (giữ nguyên dữ liệu user/student)
-     *  - Chỉ CREATE TABLE mới
-     *  - SQL phải KHỚP CHÍNH XÁC với schema mà Room generate (kiểm tra qua exportSchema)
+     * Migration v1 → v2:
+     *  - thêm semester
+     *  - thêm course
+     *  - thêm academic_warning
      */
     static final androidx.room.migration.Migration MIGRATION_1_2 =
             new androidx.room.migration.Migration(1, 2) {
+
                 @Override
-                public void migrate(@androidx.annotation.NonNull
+                public void migrate(@NonNull
                                     androidx.sqlite.db.SupportSQLiteDatabase database) {
 
-                    // Bảng semester
+                    // ── semester ─────────────────────────
+
                     database.execSQL(
                             "CREATE TABLE IF NOT EXISTS `semester` (" +
                                     "`semester_id` INTEGER NOT NULL, " +
@@ -130,7 +157,8 @@ public abstract class AppDatabase extends RoomDatabase {
                                     "PRIMARY KEY(`semester_id`))"
                     );
 
-                    // Bảng course (có unique index trên course_code)
+                    // ── course ───────────────────────────
+
                     database.execSQL(
                             "CREATE TABLE IF NOT EXISTS `course` (" +
                                     "`course_id` INTEGER NOT NULL, " +
@@ -143,12 +171,14 @@ public abstract class AppDatabase extends RoomDatabase {
                                     "`description` TEXT, " +
                                     "PRIMARY KEY(`course_id`))"
                     );
+
                     database.execSQL(
                             "CREATE UNIQUE INDEX IF NOT EXISTS `index_course_course_code` " +
                                     "ON `course` (`course_code`)"
                     );
 
-                    // Bảng academic_warning (có index trên user_id và semester_id)
+                    // ── academic_warning ────────────────
+
                     database.execSQL(
                             "CREATE TABLE IF NOT EXISTS `academic_warning` (" +
                                     "`warning_id` INTEGER NOT NULL, " +
@@ -163,10 +193,12 @@ public abstract class AppDatabase extends RoomDatabase {
                                     "FOREIGN KEY(`semester_id`) REFERENCES `semester`(`semester_id`) " +
                                     "ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)"
                     );
+
                     database.execSQL(
                             "CREATE INDEX IF NOT EXISTS `index_academic_warning_user_id` " +
                                     "ON `academic_warning` (`user_id`)"
                     );
+
                     database.execSQL(
                             "CREATE INDEX IF NOT EXISTS `index_academic_warning_semester_id` " +
                                     "ON `academic_warning` (`semester_id`)"
