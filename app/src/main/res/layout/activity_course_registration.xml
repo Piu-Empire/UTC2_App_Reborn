@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+<<<<<<< HEAD
 
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,6 +31,27 @@
         android:textSize="20sp"
         android:textStyle="bold"
         android:textColor="#000000"/>
+=======
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="←"
+            android:textSize="22sp"
+            android:textColor="#000000"
+            android:padding="4dp"
+            android:layout_marginEnd="10dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng ký học phần"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#000000"/>
+>>>>>>> c48bce4bd92c562902523d93bc66f93c2cb31190
     </LinearLayout>
 
     <!-- ══ TAB BAR ══ -->

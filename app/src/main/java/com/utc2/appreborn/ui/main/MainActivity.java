@@ -12,7 +12,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.components.LiquidBarKt;
+<<<<<<< HEAD
 import com.utc2.appreborn.ui.courseregistration.CourseRegistrationFragment;
+=======
+>>>>>>> c48bce4bd92c562902523d93bc66f93c2cb31190
 import com.utc2.appreborn.ui.home.HomeFragment;
 import com.utc2.appreborn.ui.profile.ProfileFragment;
 import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
@@ -79,7 +82,18 @@ public class MainActivity extends AppCompatActivity {
             switchTab(ScheduleFragment.class, TAG_SCHEDULE);
 
         } else if (id == R.id.nav_register) {
+<<<<<<< HEAD
             switchTab(CourseRegistrationFragment.class, "tag_register");
+=======
+
+            Intent intent = new Intent(
+                    this,
+                    com.utc2.appreborn.ui.courseregistration
+                            .CourseRegistrationActivity.class
+            );
+
+            startActivity(intent);
+>>>>>>> c48bce4bd92c562902523d93bc66f93c2cb31190
 
         } else if (id == R.id.nav_result) {
 
