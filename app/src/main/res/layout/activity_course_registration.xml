@@ -2,7 +2,7 @@
 <!--
     Layout màn hình Đăng ký học phần.
     Cấu trúc:
-      - Header (← + tiêu đề)        : cố định
+      - Header (tiêu đề)             : cố định
       - Tab bar (Đăng ký / Kết quả) : cố định
       - ScrollView chứa nội dung
           + pageDangKy  : danh sách môn học + filter + đã chọn
@@ -23,27 +23,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-<<<<<<< HEAD
-
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Đăng ký học phần"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#000000"/>
-=======
-        <TextView
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="←"
-            android:textSize="22sp"
-            android:textColor="#000000"
-            android:padding="4dp"
-            android:layout_marginEnd="10dp"
-            android:clickable="true"
-            android:focusable="true"/>
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -51,7 +30,6 @@
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#000000"/>
->>>>>>> c48bce4bd92c562902523d93bc66f93c2cb31190
     </LinearLayout>
 
     <!-- ══ TAB BAR ══ -->
@@ -181,7 +159,7 @@
                     android:layout_height="wrap_content"
                     android:nestedScrollingEnabled="false"/>
 
-                <!-- ── Khung "Đã chọn" (giống KTX) ── -->
+                <!-- Khung "Đã chọn" -->
                 <LinearLayout
                     android:id="@+id/layoutSelected"
                     android:orientation="vertical"
@@ -205,7 +183,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
 
-                            <!-- Header "Đã chọn" -->
                             <LinearLayout
                                 android:orientation="horizontal"
                                 android:layout_width="match_parent"
@@ -238,7 +215,6 @@
                                 android:layout_marginHorizontal="16dp"
                                 android:background="#E0E0E0"/>
 
-                            <!-- Danh sách đã chọn -->
                             <LinearLayout
                                 android:id="@+id/layoutSelectedItems"
                                 android:orientation="vertical"
@@ -253,7 +229,6 @@
                                 android:layout_marginHorizontal="16dp"
                                 android:background="#E0E0E0"/>
 
-                            <!-- Tổng tín chỉ -->
                             <TextView
                                 android:id="@+id/txtTongTinChi"
                                 android:layout_width="match_parent"
@@ -269,7 +244,6 @@
                         </LinearLayout>
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Nút Xác nhận đăng ký -->
                     <TextView
                         android:id="@+id/btnConfirm"
                         android:layout_width="match_parent"
@@ -303,20 +277,17 @@
                 android:padding="16dp"
                 android:visibility="gone">
 
-                <!-- Thông báo khi chưa có xác nhận nào -->
                 <TextView
                     android:id="@+id/txtKetQuaTrong"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Bạn chưa xác nhận đăng ký môn học nào.
-Hãy chọn môn và bấm Xác nhận đăng ký."
+                    android:text="Bạn chưa xác nhận đăng ký môn học nào.\nHãy chọn môn và bấm Xác nhận đăng ký."
                     android:textSize="14sp"
                     android:textColor="#888888"
                     android:gravity="center"
                     android:layout_marginTop="40dp"
                     android:visibility="visible"/>
 
-                <!-- Tổng tín chỉ (ẩn khi chưa có dữ liệu) -->
                 <TextView
                     android:id="@+id/txtKetQuaTongTinChi"
                     android:layout_width="match_parent"
@@ -328,7 +299,6 @@ Hãy chọn môn và bấm Xác nhận đăng ký."
                     android:layout_marginBottom="12dp"
                     android:visibility="gone"/>
 
-                <!-- Danh sách môn đã xác nhận (dynamic) -->
                 <LinearLayout
                     android:id="@+id/layoutKetQuaItems"
                     android:layout_width="match_parent"
