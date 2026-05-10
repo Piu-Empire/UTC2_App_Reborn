@@ -12,12 +12,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.components.LiquidBarKt;
+import com.utc2.appreborn.ui.courseregistration.CourseRegistrationFragment;
 import com.utc2.appreborn.ui.home.HomeFragment;
 import com.utc2.appreborn.ui.profile.ProfileFragment;
 import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.results.AcademicResultsFragment;
 import com.utc2.appreborn.ui.schedule.ScheduleFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
+
 public class MainActivity extends AppCompatActivity {
 
     // Tags để quản lý Fragment, tránh tạo mới liên tục gây tốn RAM
@@ -79,13 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (id == R.id.nav_register) {
 
-            Intent intent = new Intent(
-                    this,
-                    com.utc2.appreborn.ui.courseregistration
-                            .CourseRegistrationActivity.class
-            );
-
-            startActivity(intent);
+            switchTab(CourseRegistrationFragment.class, "tag_register");
 
         } else if (id == R.id.nav_result) {
 
