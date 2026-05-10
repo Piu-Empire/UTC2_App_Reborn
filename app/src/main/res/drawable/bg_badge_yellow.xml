@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/drawable/bg_badge_yellow.xml
+    ──────────────────────────────────────────────────────────────
+    Nền Badge màu vàng bo góc dùng cho TextView hiển thị MSSV
+    trong fragment_qr.xml.
+
+    Đặt tại: res/drawable/bg_badge_yellow.xml
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Nền vàng #FFC107 -->
+    <solid android:color="#FFC107" />
+
+    <!-- Bo góc 12dp để tạo hình pill nhỏ -->
+    <corners android:radius="12dp" />
+
+</shape>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/xml/network_security_config.xml
+    ──────────────────────────────────────────────────────────────
+    Cấu hình bảo mật mạng cho Android 7.0+ (API 24+).
+
+    Mục đích:
+      - Tin tưởng hệ thống CA certificates cho utc2.edu.vn
+      - Cho phép debug logging traffic trong debug builds
+      - Ngăn chặn cleartext (HTTP) trên tất cả domain khác
+
+    Thêm vào AndroidManifest.xml trong thẻ <application>:
+      android:networkSecurityConfig="@xml/network_security_config"
+-->
+<network-security-config>
+
+    <!-- Cấu hình mặc định: chỉ cho phép HTTPS -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <!-- Tin tưởng system CA (bao gồm cả Let's Encrypt, DigiCert...) -->
+            <certificates src="system" />
+            <!-- Tin tưởng user-installed CA (hữu ích khi test với proxy) -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+
+    <!-- Cấu hình riêng cho domain trường UTC2 -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">utc2.edu.vn</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+
+    <!-- Debug: cho phép xem toàn bộ traffic khi chạy debug build -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+
+</network-security-config>

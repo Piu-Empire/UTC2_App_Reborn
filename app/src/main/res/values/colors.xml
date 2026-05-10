@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- BASE -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+
+    <color name="transparent">#00000000</color>
+
+
+    <color name="primary">#1565C0</color>
+
+
+    <color name="accent">#FF4081</color>
+
+
+    <color name="nav_item_color">#FF4081</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- NAVIGATION / TOOLBAR -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="nav_bar_bg">#C6F135</color>
+    <color name="toolbar_collapsed_bg">#1E1E1E</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- NEUTRAL / GRAY -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <!-- từ file 1 -->
+    <color name="gray_100">#F5F5F5</color>
+    <color name="gray_200">#EEEEEE</color>
+    <color name="gray_400">#BDBDBD</color>
+    <color name="gray_600">#757575</color>
+    <color name="gray_800">#424242</color>
+
+    <!-- từ file 2 -->
+    <color name="grey_light">#E0E0E0</color>
+
+    <color name="gray">#E0E0E0</color>
+    <color name="gray1">#F1F3F4</color>
+    <color name="gray2">#DADCE0</color>
+
+    <color name="light_gray">#F5F5F5</color>
+
+    <color name="divider_gray">#EEEEEE</color>
+    <color name="border_gray">#DDDDDD</color>
+
+    <color name="search_gray">#F1F3F4</color>
+
+    <color name="table_divider">#CCCCCC</color>
+    <color name="color_divider">#BDBDBD</color>
+
+    <color name="card_gray_light">#E0E0E0</color>
+
+    <color name="instruction_gray">#757575</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- YELLOW / ACCENT -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="accent_yellow">#FFC107</color>
+    <color name="accent_yellow_dark">#F9A825</color>
+    <color name="accent_yellow_light">#FFF8E1</color>
+    <color name="accent_yellow_ripple">#FFCA28</color>
+
+    <color name="on_accent">#1A1A1A</color>
+
+    <color name="qr_btn_primary">#FFC107</color>
+    <color name="qr_btn_primary_text">#1A1A1A</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- TEXT -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="text_primary">#1E293B</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="text_header_dark">#0F172A</color>
+
+    <color name="text_muted">#808080</color>
+    <color name="text_muted_light">#94A3B8</color>
+
+    <color name="text_on_colored">#000000</color>
+
+    <color name="text_black">#000000</color>
+    <color name="text_gray">#666666</color>
+    <color name="text_dark_gray">#333333</color>
+    <color name="text_note_gray">#757575</color>
+    <color name="text_hint">#999999</color>
+    <color name="text_blue_light">#D1E9FF</color>
+    <color name="text_sub_gray">#444444</color>
+
+    <color name="gray_text">#666666</color>
+    <color name="card_sub_text">#333333</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- BACKGROUND -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="background_main">#F8FAFC</color>
+    <color name="background_week">#F5F6FA</color>
+
+    <color name="background_gray">#F5F7FA</color>
+
+    <color name="surface_light">#F1F5F9</color>
+
+    <color name="light_blue_bg">#E8EAF6</color>
+
+    <color name="card_bg">#F5F5F5</color>
+    <color name="card_bg_gray">#F5F5F5</color>
+
+    <color name="feature_card_bg">#1A1A1A</color>
+    <color name="subject_card_bg">#F8F9FA</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- GRADE / SCHOLARSHIP / WARNING -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <!-- từ file 1 -->
+    <color name="grade_pass_bg">#388E3C</color>
+    <color name="grade_fail_bg">#C62828</color>
+
+    <color name="status_received_text">#C62828</color>
+    <color name="status_not_received_text">#616161</color>
+
+    <color name="warning_serious_bg">#FFEBEE</color>
+    <color name="warning_serious_text">#C62828</color>
+
+    <color name="warning_normal_bg">#FFFDE7</color>
+    <color name="warning_normal_text">#F57F17</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- CHIP -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="chip_selected_bg">#000000</color>
+    <color name="chip_unselected_bg">#FFFFFF</color>
+
+    <color name="chip_selected_text">#FFFFFF</color>
+    <color name="chip_unselected_text">#000000</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- DIVIDER -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <!-- có ở cả 2, cùng value => giữ 1 -->
+    <color name="divider">#E0E0E0</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- ICON -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="icon_normal">#475569</color>
+    <color name="icon_light">#CBD5E1</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- TODAY / SCHEDULE -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="today_background">#FFD54F</color>
+    <color name="today_accent">#000000</color>
+    <color name="today_dot_indicator">#66BB6A</color>
+
+    <color name="schedule_theory">#5B58FF</color>
+    <color name="schedule_practice">#00C897</color>
+
+    <color name="indicator_location">#FACC15</color>
+    <color name="indicator_time_line">#E2E8F0</color>
+
+    <color name="time_morning">#FF9800</color>
+    <color name="time_afternoon">#2196F3</color>
+    <color name="time_evening">#9C27B0</color>
+
+    <color name="canvas_grid_line">#BFC7CF</color>
+    <color name="canvas_now_line">#FF5252</color>
+
+    <color name="date_selected_bg">#FFFACD</color>
+
+    <color name="bg_time_cell_border">#E0E0E0</color>
+    <color name="bg_time_cell_fill">#FFFFFF</color>
+
+    <color name="bg_dot_red">#EF4444</color>
+
+    <color name="schedule_text_white">#FFFFFF</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- ASSESSMENT -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="assessment_tab_selected">#FFC107</color>
+    <color name="assessment_tab_unselected">#DDDDDD</color>
+
+    <color name="assessment_header_blue">#0057A8</color>
+
+    <color name="assessment_deduction_red">#CC0000</color>
+
+    <color name="assessment_score_border">#BBBBBB</color>
+
+    <color name="assessment_readonly_bg">#F0F0F0</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- LEGACY SCHEDULE -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="legacy_schedule_grid">#EEEEEE</color>
+    <color name="schedule_grid">#EEEEEE</color>
+
+    <color name="time">#FF000000</color>
+    <color name="time_default">#FF000000</color>
+
+    <color name="color_semester_header">#444444</color>
+    <color name="color_semester_text">#F8F9FA</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- PAYMENT / TUITION -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="primary_blue">#1F3A68</color>
+    <color name="secondary_blue">#3F51B5</color>
+
+    <color name="blue_pay">#0046A0</color>
+
+    <color name="light_blue">#2196F3</color>
+
+    <color name="score_orange">#FF9800</color>
+
+    <color name="amount_red">#FF0000</color>
+
+    <color name="subject_amount">#0046A0</color>
+
+    <color name="dialog_title_blue">#0046A0</color>
+
+    <color name="status_paid_text">#4CAF50</color>
+    <color name="status_unpaid_text">#F44336</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- DORM -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="dorm_card_bg">#F0F7FF</color>
+
+    <color name="dorm_text_title">#0046A0</color>
+
+    <color name="dorm_text_amount">#1976D2</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- INVOICE -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="invoice_card_bg">#F1F8E9</color>
+
+    <color name="invoice_text_id">#2E7D32</color>
+
+    <color name="invoice_text_amount">#1B5E20</color>
+
+    <color name="invoice_divider">#C8E6C9</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- STATUS -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="green_success">#4CAF50</color>
+    <color name="success_green">#4CAF50</color>
+
+    <color name="red">#FF0000</color>
+    <color name="red_danger">#F44336</color>
+    <color name="error_red">#D32F2F</color>
+
+    <color name="green">#00C853</color>
+
+    <!-- ═══════════════════════════════════════ -->
+    <!-- OTHER -->
+    <!-- ═══════════════════════════════════════ -->
+
+    <color name="star_yellow">#FFD700</color>
+
+    <color name="profile_name_bg">#DADADB</color>
+
+</resources>

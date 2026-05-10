@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <!-- Status bar spacer -->
+    <View
+        android:id="@+id/statusBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@android:color/white"/>
+
+    <!-- HEADER CHUNG: ← Đánh giá -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="2dp"
+        android:paddingEnd="16dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_chevron_left"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/desc_prev"
+            app:tint="@android:color/black"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/assessment_title"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="#E0E0E0"/>
+
+    <!-- 2 NÚT TAB — 64dp -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTabRlsv"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/assessment_tab_student"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:layout_marginEnd="5dp"
+            app:cornerRadius="8dp"
+            app:elevation="0dp"
+            app:strokeWidth="0dp"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnTabCvht"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/assessment_tab_advisor"
+            android:textSize="14sp"
+            android:textAllCaps="false"
+            android:layout_marginStart="5dp"
+            app:cornerRadius="8dp"
+            app:elevation="0dp"
+            app:strokeWidth="0dp"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+    </LinearLayout>
+
+    <!-- ══ HEADER RLSV — đẹp như CVHT: 2 cột (Sinh viên | Thông tin) ════
+         FIX: bố cục 2 cột giống header CVHT, có label xám nhỏ trên -->
+    <LinearLayout
+        android:id="@+id/layoutHeaderRlsv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="#FAFAFA"
+        android:visibility="visible">
+
+        <!-- Cột trái: Tên SV -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sinh viên"
+                android:textSize="11sp"
+                android:textColor="#888"/>
+
+            <TextView
+                android:id="@+id/tvStudentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_placeholder_dash"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#111"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+        </LinearLayout>
+
+        <!-- Cột phải: MSSV + Lớp (2 dòng) -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- MSSV -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/assessment_label_student_code"
+                    android:textSize="11sp"
+                    android:textColor="#888"/>
+
+                <TextView
+                    android:id="@+id/tvStudentCode"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/assessment_placeholder_dash"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#111"
+                    android:layout_marginStart="3dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+            </LinearLayout>
+
+            <!-- Lớp -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginTop="2dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/assessment_label_class"
+                    android:textSize="11sp"
+                    android:textColor="#888"/>
+
+                <TextView
+                    android:id="@+id/tvStudentClass"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/assessment_placeholder_dash"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textColor="#111"
+                    android:layout_marginStart="3dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- HEADER CVHT: Tên SV | Tên CVHT -->
+    <LinearLayout
+        android:id="@+id/layoutHeaderCvht"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:background="#FAFAFA"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="8dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sinh viên"
+                android:textSize="11sp"
+                android:textColor="#888"/>
+
+            <TextView
+                android:id="@+id/tvCvhtStudentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_placeholder_dash"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#111"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_label_advisor"
+                android:textSize="11sp"
+                android:textColor="#888"/>
+
+            <TextView
+                android:id="@+id/tvAdvisorName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_placeholder_dash"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:textColor="#111"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="0.5dp"
+        android:background="#E0E0E0"/>
+
+    <!-- PERIOD SELECTOR
+         FIX: nút Chọn chỉ load data khi bấm (không auto-load khi chọn item) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/assessment_hint_period"
+            android:textSize="11sp"
+            android:textColor="#888"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="3dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <AutoCompleteTextView
+                android:id="@+id/actvPeriod"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_period_dropdown"
+                android:drawableEnd="@drawable/ic_chevron_down"
+                android:drawablePadding="6dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="36dp"
+                android:gravity="center_vertical"
+                android:inputType="none"
+                android:textSize="14sp"
+                android:textColor="#111111"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:layout_marginEnd="8dp"
+                android:focusable="true"
+                android:focusableInTouchMode="false"
+                android:cursorVisible="false"/>
+
+            <!-- FIX: nút Chọn mới kích hoạt load data, thêm ripple rõ hơn -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnChoose"
+                android:layout_width="80dp"
+                android:layout_height="44dp"
+                android:text="@string/assessment_btn_choose"
+                android:textSize="14sp"
+                android:textAllCaps="false"
+                android:textColor="@android:color/white"
+                app:backgroundTint="@android:color/black"
+                app:rippleColor="#888888"
+                app:cornerRadius="6dp"
+                app:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- COLUMN HEADER
+         FIX: "SV đánh giá" căn giữa cột điểm (gravity="center") -->
+    <LinearLayout
+        android:id="@+id/layoutColumnHeader"
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:background="#F0F0F0"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/assessment_col_content"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#555555"/>
+
+        <!-- Dropdown chọn cột — chỉ RLSV -->
+        <AutoCompleteTextView
+            android:id="@+id/actvColumnMode"
+            android:layout_width="140dp"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_score_box"
+            android:drawableEnd="@drawable/ic_chevron_down"
+            android:drawablePadding="4dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="28dp"
+            android:gravity="center_vertical"
+            android:inputType="none"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:textColor="#111111"
+            android:maxLines="1"
+            android:focusable="true"
+            android:focusableInTouchMode="false"
+            android:cursorVisible="false"
+            android:visibility="visible"/>
+
+        <!-- FIX: label CVHT căn giữa, đồng nhất với cột điểm bên dưới -->
+        <TextView
+            android:id="@+id/tvColHeaderFixed"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:text="@string/assessment_col_sv_score"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:textColor="#555555"
+            android:gravity="center"
+            android:textAlignment="center"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <View android:layout_width="match_parent" android:layout_height="0.5dp"
+        android:background="#E0E0E0"/>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:indeterminateTint="@android:color/black"
+        android:visibility="gone"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCriteria"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="4dp"/>
+
+    <View android:layout_width="match_parent" android:layout_height="1dp"
+        android:background="#DDDDDD"/>
+
+    <!-- STICKY BOTTOM — RLSV: Tổng điểm + Xếp loại + Lưu + In -->
+    <LinearLayout
+        android:id="@+id/layoutBottomRlsv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:visibility="visible">
+
+        <!-- Tổng điểm | Xếp loại -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_label_total_score"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#111"/>
+
+            <TextView
+                android:id="@+id/tvTotalScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_default_score"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#111"
+                android:layout_marginStart="6dp"/>
+
+            <View android:layout_width="0dp" android:layout_height="1dp"
+                android:layout_weight="1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_label_classification"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#111"/>
+
+            <TextView
+                android:id="@+id/tvClassification"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/assessment_default_classification"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#111"
+                android:layout_marginStart="6dp"/>
+        </LinearLayout>
+
+        <!-- Lưu + In -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="54dp"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSave"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="6dp"
+                android:text="@string/assessment_btn_save"
+                android:textSize="14sp"
+                android:textAllCaps="false"
+                android:textColor="@android:color/black"
+                app:backgroundTint="@color/accent_yellow"
+                app:rippleColor="#FFCA28"
+                app:cornerRadius="8dp"
+                app:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+
+            <!-- FIX: bỏ icon, chỉ text → chữ căn giữa hoàn toàn -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPrint"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="@string/assessment_btn_print"
+                android:textSize="14sp"
+                android:textAllCaps="false"
+                android:textColor="@color/accent_yellow"
+                android:gravity="center"
+                android:textAlignment="center"
+                app:backgroundTint="@android:color/black"
+                app:rippleColor="#444444"
+                app:cornerRadius="8dp"
+                app:elevation="0dp"
+                style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- STICKY BOTTOM — CVHT: nút Nộp đánh giá -->
+    <LinearLayout
+        android:id="@+id/layoutBottomCvht"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:gravity="center_vertical"
+        android:background="@android:color/white"
+        android:visibility="gone">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSubmitCvht"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:text="@string/assessment_btn_submit_cvht"
+            android:textSize="15sp"
+            android:textAllCaps="false"
+            android:textColor="@android:color/black"
+            app:backgroundTint="@color/accent_yellow"
+            app:rippleColor="#FFCA28"
+            app:cornerRadius="8dp"
+            app:elevation="0dp"
+            style="@style/Widget.MaterialComponents.Button.UnelevatedButton"/>
+    </LinearLayout>
+
+
+    <!-- navBarSpacer giữ lại để binding hợp lệ, height cố định 0dp -->
+    <View
+        android:id="@+id/navBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
+
+</LinearLayout>

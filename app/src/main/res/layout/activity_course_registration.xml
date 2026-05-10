@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Layout màn hình Đăng ký học phần.
+    Cấu trúc:
+      - Header (← + tiêu đề)        : cố định
+      - Tab bar (Đăng ký / Kết quả) : cố định
+      - ScrollView chứa nội dung
+          + pageDangKy  : danh sách môn học + filter + đã chọn
+          + pageKetQua  : placeholder kết quả
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:background="#F1F5F9"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- ══ HEADER ══ -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đăng ký học phần"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#000000"/>
+    </LinearLayout>
+
+    <!-- ══ TAB BAR ══ -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:background="@drawable/bg_tab_container"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="8dp"
+        android:padding="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tabDangKy"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Đăng ký"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_tab_selected"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:id="@+id/tabKetQua"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Kết quả"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textColor="#000000"
+            android:clickable="true"
+            android:focusable="true"/>
+    </LinearLayout>
+
+    <!-- ══ CONTENT AREA ══ -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- ══════════════════════════════════════
+                 PAGE 1: ĐĂNG KÝ
+                 ══════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/pageDangKy"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="visible">
+
+                <!-- Thanh tìm kiếm -->
+                <EditText
+                    android:id="@+id/searchBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Tìm môn học..."
+                    android:textColor="#000000"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/bg_search"
+                    android:padding="12dp"
+                    android:drawableStart="@drawable/ic_search"
+                    android:drawablePadding="8dp"
+                    android:inputType="text"/>
+
+                <!-- Filter: Học kỳ / Khoa / Ngành -->
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_margin="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/btnHocKy"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Học kỳ ▾"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:background="@drawable/bg_search"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/btnKhoa"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Khóa học ▾"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:layout_marginHorizontal="8dp"
+                        android:background="@drawable/bg_search"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                    <TextView
+                        android:id="@+id/btnNganh"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:text="Ngành ▾"
+                        android:textColor="#000000"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:padding="10dp"
+                        android:background="@drawable/bg_search"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </LinearLayout>
+
+                <!-- Danh sách học phần -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvCourses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"/>
+
+                <!-- ── Khung "Đã chọn" (giống KTX) ── -->
+                <LinearLayout
+                    android:id="@+id/layoutSelected"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="16dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="0dp"
+                        app:strokeColor="#000000"
+                        app:strokeWidth="2dp"
+                        app:cardBackgroundColor="#FFFFFF">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <!-- Header "Đã chọn" -->
+                            <LinearLayout
+                                android:orientation="horizontal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="16dp"
+                                android:paddingTop="16dp"
+                                android:paddingBottom="14dp"
+                                android:gravity="center_vertical">
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_weight="1"
+                                    android:layout_height="wrap_content"
+                                    android:text="Đã chọn:"
+                                    android:textColor="#E53935"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"/>
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_arrow_down"
+                                    android:tint="#666666"
+                                    android:scaleType="centerInside"/>
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="#E0E0E0"/>
+
+                            <!-- Danh sách đã chọn -->
+                            <LinearLayout
+                                android:id="@+id/layoutSelectedItems"
+                                android:orientation="vertical"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="16dp"
+                                android:paddingTop="12dp"/>
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="1dp"
+                                android:layout_marginHorizontal="16dp"
+                                android:background="#E0E0E0"/>
+
+                            <!-- Tổng tín chỉ -->
+                            <TextView
+                                android:id="@+id/txtTongTinChi"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:paddingHorizontal="16dp"
+                                android:paddingTop="10dp"
+                                android:paddingBottom="16dp"
+                                android:text="Tổng số tín chỉ: 0"
+                                android:textColor="#555555"
+                                android:textSize="14sp"
+                                android:textStyle="bold"/>
+
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Nút Xác nhận đăng ký -->
+                    <TextView
+                        android:id="@+id/btnConfirm"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginHorizontal="16dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="Xác nhận đăng ký"
+                        android:background="@drawable/bg_button_black"
+                        android:textColor="#FFFFFF"
+                        android:textAllCaps="false"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+            <!-- END pageDangKy -->
+
+            <!-- ══════════════════════════════════════
+                 PAGE 2: KẾT QUẢ
+                 ══════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/pageKetQua"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:visibility="gone">
+
+                <!-- Thông báo khi chưa có xác nhận nào -->
+                <TextView
+                    android:id="@+id/txtKetQuaTrong"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bạn chưa xác nhận đăng ký môn học nào.
+Hãy chọn môn và bấm Xác nhận đăng ký."
+                    android:textSize="14sp"
+                    android:textColor="#888888"
+                    android:gravity="center"
+                    android:layout_marginTop="40dp"
+                    android:visibility="visible"/>
+
+                <!-- Tổng tín chỉ (ẩn khi chưa có dữ liệu) -->
+                <TextView
+                    android:id="@+id/txtKetQuaTongTinChi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tổng số tín chỉ đã đăng ký: 0"
+                    android:textSize="15sp"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:visibility="gone"/>
+
+                <!-- Danh sách môn đã xác nhận (dynamic) -->
+                <LinearLayout
+                    android:id="@+id/layoutKetQuaItems"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+            </LinearLayout>
+            <!-- END pageKetQua -->
+
+        </FrameLayout>
+    </ScrollView>
+
+</LinearLayout>

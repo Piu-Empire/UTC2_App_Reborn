@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    res/xml/file_provider_paths.xml
+    ──────────────────────────────────────────────────────────────
+    Required by FileProvider used in QrFragment.shareQrBitmap().
+
+
+    The <cache-path> tag grants FileProvider access to
+    getCacheDir()/images/ — the folder where the QR PNG is
+    temporarily saved before sharing.
+-->
+<paths>
+    <cache-path
+        name="images"
+        path="images/" />
+</paths>
