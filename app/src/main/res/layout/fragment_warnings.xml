@@ -70,7 +70,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/label_serious_upper"
                     android:textSize="9sp"
-                    android:textColor="#FF8A80"
+                    android:textColor="#FFC107"
                     android:textAllCaps="true"/>
 
                 <TextView
@@ -103,7 +103,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/label_total_upper"
                     android:textSize="9sp"
-                    android:textColor="#B0B0B0"
+                    android:textColor="#FFC107"
                     android:textAllCaps="true"/>
 
                 <TextView

@@ -117,7 +117,7 @@
                 android:gravity="center"
                 android:layout_marginTop="3dp"
                 android:background="@drawable/bg_grade_pass"
-                android:textColor="#FFFFFF"/>
+                android:textColor="#FFC107"/>
 
         </LinearLayout>
 

@@ -109,7 +109,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_rank_short"
                         android:textSize="9sp"
-                        android:textColor="#B0B0B0"
+                        android:textColor="#FFC107"
                         android:textAllCaps="true"/>
 
                     <TextView
@@ -144,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_avg_score_short"
                         android:textSize="9sp"
-                        android:textColor="#B0B0B0"
+                        android:textColor="#FFC107"
                         android:textAllCaps="true"/>
 
                     <TextView
@@ -179,7 +179,7 @@
                         android:layout_height="wrap_content"
                         android:text="@string/label_top_percent"
                         android:textSize="9sp"
-                        android:textColor="#B0B0B0"
+                        android:textColor="#FFC107"
                         android:textAllCaps="true"/>
 
                     <TextView

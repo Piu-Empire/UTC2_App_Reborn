@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_home.xml — FINAL FIX
+    ──────────────────────────────────────────────────────────────
+    Nguyên lý hoạt động:
 
+    1. NestedScrollView layout_marginTop="-20dp":
+       Card nội dung đè lên 20dp cuối của header ảnh.
+       Vì NestedScrollView vẽ SAU AppBarLayout trong cùng parent
+       → z-order cao hơn → card nằm TRÊN ảnh ở vùng 20dp đó.
+       Góc bo tròn (transparent) show ảnh phía sau = tự nhiên,
+       KHÔNG cần nền đen, không bị thừa góc đen kỳ.
 
+    2. app:liftOnScroll="true" trên AppBarLayout:
+       Khi user scroll lên, AppBarLayout TỰ ĐỘNG tăng elevation
+       → vượt qua NestedScrollView (elevation=0) → toolbar
+       luôn nằm trên content khi scroll, KHÔNG bị che.
+
+    3. Dải bg_top_shadow bên trong content:
+       Tạo hiệu ứng bóng nhẹ ở đỉnh card mà không cần elevation.
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,28 +27,30 @@
     android:orientation="vertical"
     android:background="@color/white">
 
-    <!-- Status bar spacer -->
     <View
         android:id="@+id/status_bar_spacer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:background="@color/toolbar_collapsed_bg" />
 
-    <!-- Main Content -->
+    <!-- CoordinatorLayout: KHÔNG set background → trong suốt
+         Góc bo của NestedScrollView show ảnh phía sau (tự nhiên) -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- ════════════════════════════════════════════════ -->
-        <!-- APP BAR -->
-        <!-- ════════════════════════════════════════════════ -->
-
+        <!-- ══════════════════════════════════════════════
+             APP BAR
+             liftOnScroll="true" → tự tăng elevation khi
+             user scroll → toolbar luôn nằm trên content
+             ══════════════════════════════════════════════ -->
         <com.google.android.material.appbar.AppBarLayout
             android:id="@+id/app_bar_layout"
             android:layout_width="match_parent"
             android:layout_height="220dp"
+            app:liftOnScroll="true"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -43,7 +63,6 @@
                 app:contentScrim="@color/toolbar_collapsed_bg"
                 app:statusBarScrim="@color/toolbar_collapsed_bg">
 
-                <!-- Header image -->
                 <ImageView
                     android:id="@+id/iv_header"
                     android:layout_width="match_parent"
@@ -54,7 +73,6 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
 
-                <!-- Gradient overlay -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -62,12 +80,10 @@
                     app:layout_collapseMode="parallax"
                     app:layout_collapseParallaxMultiplier="0.5" />
 
-                <!-- Toolbar -->
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:elevation="8dp"
                     android:paddingStart="8dp"
                     android:paddingEnd="4dp"
                     app:layout_collapseMode="pin"
@@ -80,7 +96,6 @@
                         android:orientation="horizontal"
                         android:gravity="center_vertical">
 
-                        <!-- LEFT -->
                         <LinearLayout
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -88,7 +103,6 @@
                             android:orientation="horizontal"
                             android:gravity="center_vertical">
 
-                            <!-- Avatar -->
                             <FrameLayout
                                 android:id="@+id/iv_avatar"
                                 android:layout_width="44dp"
@@ -97,7 +111,6 @@
                                 android:clickable="true"
                                 android:focusable="true"
                                 android:foreground="?attr/selectableItemBackgroundBorderless">
-
                                 <ImageView
                                     android:layout_width="26dp"
                                     android:layout_height="30dp"
@@ -106,7 +119,6 @@
                                     android:contentDescription="@string/cd_avatar" />
                             </FrameLayout>
 
-                            <!-- Greeting -->
                             <LinearLayout
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
@@ -133,13 +145,9 @@
                                     android:maxLines="1"
                                     android:ellipsize="end"
                                     android:maxWidth="150dp" />
-
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- RIGHT BUTTONS -->
-
-                        <!-- QR -->
                         <ImageButton
                             android:id="@+id/btn_qr"
                             android:layout_width="44dp"
@@ -151,7 +159,6 @@
                             android:contentDescription="Mã QR sinh viên"
                             app:tint="#FFFFFF" />
 
-                        <!-- Search -->
                         <ImageButton
                             android:id="@+id/btn_search"
                             android:layout_width="44dp"
@@ -163,7 +170,6 @@
                             android:contentDescription="Tìm kiếm"
                             app:tint="#FFFFFF" />
 
-                        <!-- Notification -->
                         <ImageButton
                             android:id="@+id/btn_notification"
                             android:layout_width="44dp"
@@ -176,21 +182,27 @@
                             app:tint="#FFFFFF" />
 
                     </LinearLayout>
-
                 </androidx.appcompat.widget.Toolbar>
 
             </com.google.android.material.appbar.CollapsingToolbarLayout>
-
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- ════════════════════════════════════════════════ -->
-        <!-- SCROLL CONTENT -->
-        <!-- ════════════════════════════════════════════════ -->
+        <!-- ══════════════════════════════════════════════
+             SCROLL CONTENT
 
+             layout_marginTop="-20dp":
+               Card đè lên 20dp cuối ảnh header.
+               Góc bo tròn show ảnh phía sau = tự nhiên,
+               KHÔNG bị thừa góc đen.
+
+             liftOnScroll trên AppBar đảm bảo toolbar
+             luôn nằm trên khi scroll.
+             ══════════════════════════════════════════════ -->
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:layout_marginTop="-20dp"
+            android:background="@drawable/bg_content_rounded_top"
             android:fillViewport="true"
             android:overScrollMode="never"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -202,7 +214,6 @@
                 android:paddingBottom="16dp">
 
                 <!-- Features -->
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -211,7 +222,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="12dp"
                     android:layout_marginBottom="10dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -224,8 +235,7 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never" />
 
-                <!-- Banner -->
-
+                <!-- Campus banner -->
                 <ImageView
                     android:id="@+id/iv_campus_banner"
                     android:layout_width="match_parent"
@@ -236,7 +246,6 @@
                     android:contentDescription="@string/cd_campus_banner" />
 
                 <!-- News -->
-
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -258,8 +267,6 @@
                     android:nestedScrollingEnabled="false"
                     android:overScrollMode="never" />
 
-                <!-- View All News -->
-
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_view_all_news"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -279,9 +286,7 @@
                     app:backgroundTint="@color/white" />
 
             </LinearLayout>
-
         </androidx.core.widget.NestedScrollView>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
 </LinearLayout>
