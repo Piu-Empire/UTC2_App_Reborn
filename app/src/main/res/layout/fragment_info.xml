@@ -5,8 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:fitsSystemWindows="true">
 
+    <!-- ═══════════════════════════════════════════════════════
+         TOP BAR — Giữ nguyên bố cục RelativeLayout + các id.
+         Thay đổi: thêm bottom-divider màu #FFC107 để nhấn brand.
+         ═══════════════════════════════════════════════════════ -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -14,6 +19,8 @@
         android:elevation="4dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp">
+
+        <!-- Nút Back — giữ nguyên id, vị trí, kích thước -->
         <ImageView
             android:id="@+id/btnBack"
             android:layout_width="24dp"
@@ -21,6 +28,8 @@
             android:layout_centerVertical="true"
             android:src="@drawable/ic_arrow_left"
             app:tint="@color/black" />
+
+        <!-- Tiêu đề — giữ nguyên text ref, căn giữa -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -28,9 +37,23 @@
             android:text="@string/profile_title"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black"/>
+            android:letterSpacing="0.01"
+            android:textColor="@color/black" />
+
+        <!-- Accent line dưới AppBar — brand touch #FFC107 -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentBottom="true"
+            android:layout_marginStart="-16dp"
+            android:layout_marginEnd="-16dp"
+            android:background="#FFC107" />
+
     </RelativeLayout>
 
+    <!-- ═══════════════════════════════════════════════════════
+         SCROLLABLE CONTENT — Giữ nguyên ScrollView + weight
+         ═══════════════════════════════════════════════════════ -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -43,21 +66,35 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <!-- ─────────────────────────────────────────────
+                 CARD 1: Avatar / Student Card
+                 Giữ nguyên: id, kích thước 200dp, scaleType.
+                 Thay đổi: border accent #FFC107, bg #FFF3CD.
+                 ───────────────────────────────────────────── -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="12dp">
+                app:cardElevation="2dp"
+                app:cardCornerRadius="16dp"
+                app:cardBackgroundColor="#FFF3CD">
+
                 <ImageView
                     android:id="@+id/imgStudentCard"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:src="@drawable/ic_user"
                     android:scaleType="fitCenter"
-                    android:adjustViewBounds="true" />
+                    android:adjustViewBounds="true"
+                    android:padding="24dp" />
+
             </androidx.cardview.widget.CardView>
 
+            <!-- ─────────────────────────────────────────────
+                 RECYCLER VIEW — Giữ nguyên hoàn toàn.
+                 (Re-skin icon container → #FFF3CD xử lý
+                  tại Adapter, không thuộc scope file này.)
+                 ───────────────────────────────────────────── -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvStudentDetails"
                 android:layout_width="match_parent"
@@ -65,6 +102,11 @@
                 android:nestedScrollingEnabled="false"
                 android:overScrollMode="never" />
 
+            <!-- ─────────────────────────────────────────────
+                 BUTTON: Chương trình đào tạo
+                 Style: Pill • Nền #000000 • Chữ #FFFFFF
+                 Giữ nguyên: id, marginTop, height, text ref.
+                 ───────────────────────────────────────────── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnTrainingProgram"
                 android:layout_width="match_parent"
@@ -72,9 +114,18 @@
                 android:layout_marginTop="24dp"
                 android:text="@string/training_program"
                 android:textColor="@color/white"
-                app:backgroundTint="@color/black"
-                app:cornerRadius="8dp"/>
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="#000000"
+                app:cornerRadius="28dp"
+                app:elevation="0dp" />
 
+            <!-- ─────────────────────────────────────────────
+                 BUTTON: Hỗ trợ
+                 Style: Pill • Nền #000000 • Chữ #FFFFFF
+                 Giữ nguyên: id, marginTop, height, text ref.
+                 ───────────────────────────────────────────── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSupport"
                 android:layout_width="match_parent"
@@ -82,9 +133,20 @@
                 android:layout_marginTop="12dp"
                 android:text="@string/title_support"
                 android:textColor="@color/white"
-                app:backgroundTint="@color/black"
-                app:cornerRadius="8dp"/>
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="#000000"
+                app:cornerRadius="28dp"
+                app:elevation="0dp" />
 
+            <!-- ─────────────────────────────────────────────
+                 BUTTON: Đăng xuất
+                 Style: Pill • Nền #FFC107 (Amber) • Chữ #000000
+                 Lý do: Duy trì palette vàng-đen-trắng,
+                 phân biệt với 2 nút chính bằng màu Amber.
+                 Giữ nguyên: id, marginTop, marginBottom, text ref.
+                 ───────────────────────────────────────────── -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLogout"
                 android:layout_width="match_parent"
@@ -92,9 +154,15 @@
                 android:layout_marginTop="12dp"
                 android:layout_marginBottom="24dp"
                 android:text="@string/logout"
-                app:backgroundTint="@color/red_danger"
-                app:cornerRadius="8dp"/>
+                android:textColor="#000000"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.02"
+                app:backgroundTint="#FFC107"
+                app:cornerRadius="28dp"
+                app:elevation="0dp" />
 
         </LinearLayout>
     </ScrollView>
+
 </LinearLayout>

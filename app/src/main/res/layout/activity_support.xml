@@ -171,7 +171,7 @@
                 android:layout_height="50dp"
                 android:text="@string/send_report"
                 android:layout_marginTop="16dp"
-                app:backgroundTint="@color/success_green"
+                app:backgroundTint="#000000 "
                 android:textColor="@color/white"
                 android:textStyle="bold" />
 

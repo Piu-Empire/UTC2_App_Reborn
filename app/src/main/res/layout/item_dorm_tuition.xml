@@ -9,7 +9,7 @@
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"
-    app:cardBackgroundColor="@color/dorm_card_bg"
+    app:cardBackgroundColor="#FBF7EB"
     app:cardCornerRadius="15dp"
     app:cardElevation="0dp">
 
@@ -22,7 +22,7 @@
             android:id="@+id/tvRoomName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/dorm_text_title"
+            android:textColor="#000000"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/ivStatus"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:textColor="@color/text_gray"
+            android:textColor="#757575"
             android:textSize="13sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvRoomName"
@@ -46,7 +46,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@color/dorm_text_amount"
+            android:textColor="#000000"
             android:textSize="15sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +62,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/success_green"
+            app:tint="#FFC107"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

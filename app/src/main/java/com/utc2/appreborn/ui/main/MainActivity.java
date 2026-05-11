@@ -15,6 +15,7 @@ import com.utc2.appreborn.ui.home.HomeFragment;
 import com.utc2.appreborn.ui.profile.ProfileFragment;
 import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.schedule.ScheduleFragment;
+import com.utc2.appreborn.ui.results.AcademicResultsFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
 import com.utc2.appreborn.utils.LocaleHelper;
 
@@ -25,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG_SERVICES = "tag_services";
     public static final String TAG_TUITION  = "tag_tuition";
     public static final String TAG_PROFILE  = "tag_profile";
+
+    public static final String TAG_RESULT  = "tag_result";
 
     // ── Áp locale trước khi Activity inflate layout ───────────
     @Override
@@ -72,7 +75,7 @@ public class MainActivity extends AppCompatActivity {
             );
             startActivity(intent);
         } else if (id == R.id.nav_result) {
-            // switchTab(ResultFragment.class, TAG_RESULT);
+            switchTab(AcademicResultsFragment.class, TAG_RESULT);
         } else if (id == R.id.nav_profile) {
             switchTab(ProfileFragment.class, TAG_PROFILE);
         } else {

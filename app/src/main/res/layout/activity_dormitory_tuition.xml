@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/layoutHeader"
@@ -22,7 +23,8 @@
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/back_button_desc"
-            android:src="@drawable/ic_arrow_left" />
+            android:src="@drawable/ic_arrow_left"
+            app:tint="#000000" />
 
         <TextView
             android:id="@+id/tvHeaderTitle"
@@ -30,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:text="@string/title_dorm_tuition"
-            android:textColor="@color/text_black"
+            android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -66,6 +68,7 @@
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <!-- Total amount: amber instead of red -->
         <TextView
             android:id="@+id/tvTotalDormAmount"
             android:layout_width="match_parent"
@@ -73,19 +76,21 @@
             android:gravity="end"
             android:layout_marginBottom="8dp"
             android:text="@string/label_total_format"
-            android:textColor="@color/error_red"
+            android:textColor="#FFC107"
             android:textSize="20sp"
             android:textStyle="bold"
             tools:text="Tổng: 1,500,000 VND" />
 
+        <!-- Pay button: Pill shape, black background, white text -->
         <Button
             android:id="@+id/btnPayDorm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/blue_pay"
+            android:backgroundTint="#000000"
             android:text="@string/btn_pay_dorm"
             android:textColor="@color/white"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            app:cornerRadius="100dp" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
