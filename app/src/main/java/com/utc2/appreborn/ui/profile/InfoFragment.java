@@ -116,20 +116,27 @@ public class InfoFragment extends Fragment {
 
         SessionManager sessionManager = SessionManager.getInstance(getActivity());
 
-        if ("google".equals(sessionManager.getLoginType())) {
-            // Sign out khỏi Google SDK để lần sau bấm login GG hiện lại màn hình chọn tài khoản
+        // Bug fix: "GOOGLE" uppercase để match với giá trị lưu trong SessionManager
+        if ("GOOGLE".equals(sessionManager.getLoginType())) {
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestEmail()
                     .requestIdToken(getString(R.string.default_web_client_id))
                     .build();
             GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
-            googleSignInClient.signOut();
+
+            // Bug fix: chờ signOut xong mới xóa session và chuyển màn hình
+            googleSignInClient.signOut().addOnCompleteListener(task -> {
+                sessionManager.logout();
+                navigateToLogin();
+            });
+        } else {
+            sessionManager.logout();
+            navigateToLogin();
         }
+    }
 
-        // Xóa session local
-        sessionManager.logout();
-
-        // Về LoginActivity, xóa sạch back stack
+    private void navigateToLogin() {
+        if (getActivity() == null) return;
         Intent intent = new Intent(getActivity(), LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
