@@ -22,7 +22,7 @@
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:padding="12dp"
+            android:padding="10dp"
             android:src="@drawable/ic_arrow_back"
             android:contentDescription="@string/back_button_desc"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -95,52 +95,61 @@
                     android:orientation="vertical"
                     android:padding="4dp">
 
-                    <LinearLayout
-                        android:id="@+id/btnLangVi"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardLangVi"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?attr/selectableItemBackground">
-
-                        <TextView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:gravity="center"
-                            android:text="🇻🇳"
-                            android:textSize="22sp" />
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/lang_vietnamese"
-                                android:textColor="@color/text_primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:gravity="center"
+                                android:text="@string/VN"
+                                android:textSize="22sp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lang_vietnamese_sub"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLangVi"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/lang_vietnamese"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/lang_vietnamese_sub"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/dotVi"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_dot_today"
+                                android:visibility="gone" />
                         </LinearLayout>
-
-                        <View
-                            android:id="@+id/dotVi"
-                            android:layout_width="10dp"
-                            android:layout_height="10dp"
-                            android:background="@drawable/bg_dot_today" />
-                    </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
                     <View
                         android:layout_width="match_parent"
@@ -148,46 +157,62 @@
                         android:layout_marginHorizontal="16dp"
                         android:background="@color/divider" />
 
-                    <LinearLayout
-                        android:id="@+id/btnLangEn"
+                    <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardLangEn"
                         android:layout_width="match_parent"
-                        android:layout_height="64dp"
-                        android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="4dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:background="?attr/selectableItemBackground">
-
-                        <TextView
-                            android:layout_width="36dp"
-                            android:layout_height="36dp"
-                            android:gravity="center"
-                            android:text="🇬🇧"
-                            android:textSize="22sp" />
+                        app:cardCornerRadius="12dp"
+                        app:cardElevation="0dp">
 
                         <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:orientation="vertical">
+                            android:layout_width="match_parent"
+                            android:layout_height="64dp"
+                            android:gravity="center_vertical"
+                            android:paddingHorizontal="16dp"
+                            android:orientation="horizontal">
 
                             <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="@string/lang_english"
-                                android:textColor="@color/text_primary"
-                                android:textSize="15sp"
-                                android:textStyle="bold" />
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:gravity="center"
+                                android:text="@string/GB"
+                                android:textSize="22sp" />
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:text="@string/lang_english_sub"
-                                android:textColor="@color/text_secondary"
-                                android:textSize="12sp" />
+                                android:layout_weight="1"
+                                android:layout_marginStart="12dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLangEn"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/lang_english"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/lang_english_sub"
+                                    android:textColor="@color/text_secondary"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/dotEn"
+                                android:layout_width="10dp"
+                                android:layout_height="10dp"
+                                android:background="@drawable/bg_dot_today"
+                                android:visibility="gone" />
                         </LinearLayout>
-                    </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
@@ -220,7 +245,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:layout_width="20dp"
@@ -240,7 +266,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="1.0.0"
+                            android:text="@string/App_vers"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />
                     </LinearLayout>
@@ -255,7 +281,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:gravity="center_vertical"
-                        android:paddingHorizontal="16dp">
+                        android:paddingHorizontal="16dp"
+                        android:orientation="horizontal">
 
                         <ImageView
                             android:layout_width="20dp"
@@ -275,7 +302,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="UTC2 Team"
+                            android:text="@string/GroubName"
                             android:textColor="@color/text_muted"
                             android:textSize="13sp" />
                     </LinearLayout>
