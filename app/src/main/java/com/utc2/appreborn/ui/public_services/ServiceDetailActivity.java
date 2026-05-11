@@ -31,9 +31,8 @@ public class ServiceDetailActivity extends AppCompatActivity {
         try {
             initViews();
 
-            // Kiểm tra mạng nhanh khi vừa mở trang chi tiết dịch vụ
             if (!NetworkUtils.isNetworkAvailable(this)) {
-                showToast("Thông tin đang hiển thị ngoại tuyến.");
+                showToast(getString(R.string.offline_message));
             }
 
             BaseService service = (BaseService) getIntent().getSerializableExtra("SERVICE_DATA");
@@ -43,14 +42,14 @@ public class ServiceDetailActivity extends AppCompatActivity {
 
             findViewById(R.id.btnBack).setOnClickListener(v -> finish());
         } catch (Exception e) {
-            Log.e("ServiceDetail", "Lỗi khởi tạo: " + e.getMessage());
+            Log.e("ServiceDetail", "Loi khoi tao: " + e.getMessage());
         }
     }
 
     private void initViews() {
-        tvTitle = findViewById(R.id.tvDetailTitle);
-        tvStatus = findViewById(R.id.tvStatusBadge);
-        tvTime = findViewById(R.id.tvTime);
+        tvTitle             = findViewById(R.id.tvDetailTitle);
+        tvStatus            = findViewById(R.id.tvStatusBadge);
+        tvTime              = findViewById(R.id.tvTime);
         layoutDynamicContent = findViewById(R.id.layoutDynamicContent);
     }
 
@@ -58,46 +57,49 @@ public class ServiceDetailActivity extends AppCompatActivity {
         tvTitle.setText(service.getTitle());
         tvTime.setText(getString(R.string.date_placeholder, service.getDate()));
 
-        // Thiết lập Badge trạng thái dịch vụ công
-        if (service.getStatus() == 1) {
+        String status = service.getStatus();
+        if (BaseService.STATUS_COMPLETED.equals(status)) {      // FIX: STATUS_DONE → STATUS_COMPLETED
             tvStatus.setText(R.string.status_approved);
             tvStatus.setBackgroundResource(R.drawable.bg_status_done);
+        } else if (BaseService.STATUS_REJECTED.equals(status)) {
+            tvStatus.setText(R.string.status_rejected);
+            tvStatus.setBackgroundResource(R.drawable.bg_status_rejected);
         } else {
+            // STATUS_PENDING hoac STATUS_PROCESSING
             tvStatus.setText(R.string.status_pending);
             tvStatus.setBackgroundResource(R.drawable.bg_status_pending);
         }
 
         layoutDynamicContent.removeAllViews();
 
-        // Xử lý hiển thị thông tin chi tiết dựa trên từng loại dịch vụ[cite: 2]
         if (service instanceof CardReissueService) {
             CardReissueService s = (CardReissueService) service;
-            addInfoRow(getString(R.string.name_title), s.getStudentName());
-            addInfoRow(getString(R.string.id_title), s.getStudentId());
+            addInfoRow(getString(R.string.name_title),  s.getStudentName());
+            addInfoRow(getString(R.string.id_title),    s.getStudentCode());
             addInfoRow(getString(R.string.class_title), s.getClassName());
-            addInfoRow("Lý do", s.getDescription());
-        }
-        else if (service instanceof LoanSupportService) {
+            addInfoRow(getString(R.string.reason_title), s.getDescription());
+
+        } else if (service instanceof LoanSupportService) {
             LoanSupportService s = (LoanSupportService) service;
-            addInfoRow(getString(R.string.loan_amount), s.getLoanAmount());
+            addInfoRow(getString(R.string.loan_amount),          s.getLoanAmount());
             addInfoRow(getString(R.string.contact_number_title), s.getPhoneNumber());
-            addInfoRow("Ghi chú", s.getDescription());
-        }
-        else if (service instanceof TranscriptService) {
+            addInfoRow(getString(R.string.note_title),           s.getDescription());
+
+        } else if (service instanceof TranscriptService) {
             TranscriptService s = (TranscriptService) service;
-            addInfoRow(getString(R.string.name_title), s.getStudentName());
-            addInfoRow(getString(R.string.id_title), s.getStudentId());
-            addInfoRow(getString(R.string.class_title), s.getClassName());
+            addInfoRow(getString(R.string.name_title),               s.getStudentName());
+            addInfoRow(getString(R.string.id_title),                 s.getStudentCode());
+            addInfoRow(getString(R.string.class_title),              s.getClassName());
             addInfoRow(getString(R.string.transcript_academic_year), s.getAcademicYear());
-            addInfoRow(getString(R.string.transcript_semester), s.getSemester());
-            addInfoRow(getString(R.string.transcript_quantity), s.getQuantity());
-        }
-        else if (service instanceof StudentConfirmationService) {
+            addInfoRow(getString(R.string.transcript_semester),      s.getSemester());
+            addInfoRow(getString(R.string.transcript_quantity),      String.valueOf(s.getQuantity())); // FIX: int → String
+
+        } else if (service instanceof StudentConfirmationService) {
             StudentConfirmationService s = (StudentConfirmationService) service;
-            addInfoRow(getString(R.string.name_title), s.getStudentName());
-            addInfoRow(getString(R.string.id_title), s.getStudentId());
-            addInfoRow(getString(R.string.class_title), s.getClassName());
-            addInfoRow("Lý do xác nhận", s.getDescription());
+            addInfoRow(getString(R.string.name_title),         s.getStudentName());
+            addInfoRow(getString(R.string.id_title),           s.getStudentCode());
+            addInfoRow(getString(R.string.class_title),        s.getClassName());
+            addInfoRow(getString(R.string.reason_title),       s.getDescription());
         }
     }
 

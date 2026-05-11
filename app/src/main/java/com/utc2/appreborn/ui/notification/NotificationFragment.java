@@ -22,7 +22,6 @@ import com.utc2.appreborn.databinding.FragmentNotificationBinding;
 import com.utc2.appreborn.ui.main.MainActivity;
 import com.utc2.appreborn.utils.MockHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -123,7 +122,7 @@ public class NotificationFragment extends Fragment {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
             } else {
-                requireActivity().onBackPressed();
+                requireActivity().getOnBackPressedDispatcher().onBackPressed();
             }
         });
 
@@ -205,56 +204,15 @@ public class NotificationFragment extends Fragment {
     }
 
     private void loadMockNotifications() {
-        // tạo dữ liệu ảo hiển thị khi chưa có kết nối
-        List<NotificationItem> mockList = new ArrayList<>();
-        mockList.add(new NotificationItem(
-                "Phòng Đào Tạo",
-                "Thông báo lịch thi học kỳ 2 năm học 2024–2025",
-                "Sinh viên xem lịch thi chi tiết tại cổng thông tin UTC2. Phòng thi sẽ được công bố trước 3 ngày.",
-                "10:30",
-                false
-        ));
-
-        mockList.add(new NotificationItem(
-                "Phòng Công tác SV",
-                "Xét học bổng khuyến khích học tập HK2",
-                "Sinh viên có điểm TB tích lũy ≥ 3.2 nộp hồ sơ trước ngày 15/5/2025.",
-                "Hôm qua",
-                true
-        ));
-
-        mockList.add(new NotificationItem(
-                "Ban Giám hiệu",
-                "Thông báo nghỉ lễ 30/4 và 1/5",
-                "Nhà trường thông báo lịch nghỉ lễ theo quy định của Nhà nước.",
-                "28/04",
-                true
-        ));
-
-
-        mockList.add(new NotificationItem(
-                "Phòng QLSV",
-                "Nộp bản sao học bạ THPT cho sinh viên năm nhất",
-                "Các bạn sinh viên K2024 chưa nộp học bạ THPT vui lòng đến Phòng QLSV trước 20/5.",
-                "25/04",
-                true
-        ));
-
-        mockList.add(new NotificationItem(
-                "Thư viện UTC2",
-                "Gia hạn thẻ thư viện học kỳ 2",
-                "Thẻ thư viện học kỳ 1 sẽ hết hạn vào cuối tháng 4. Gia hạn tại quầy thư viện hoặc online.",
-                "20/04",
-                true
-        ));
+        // Lấy mock data từ MockHelper — tập trung, dễ bảo trì
+        List<NotificationItem> mockList = MockHelper.getMockNotificationList();
 
         if (mockList.isEmpty()) {
-            showEmptyState("Chưa có thông báo nào");
+            showEmptyState(getString(R.string.notification_empty));
         } else {
             binding.layoutEmptyState.setVisibility(View.GONE);
             adapter.submitList(mockList);
         }
-
     }
 
     private void fetchGmailData(GoogleSignInAccount account) {

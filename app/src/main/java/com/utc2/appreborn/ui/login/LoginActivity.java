@@ -165,7 +165,9 @@ public class LoginActivity extends AppCompatActivity {
 
         setLoading(true);
         if (inputMssv.equals(getString(R.string.default_mssv)) && inputPass.equals("123456")) {
-            sessionManager.createLoginSession("MANUAL_TOKEN", "mssv", inputMssv);
+            // Mapping: USER.auth_provider = "EMAIL", STUDENT_PROFILE.student_code = inputMssv
+            // userId = -1 vì chưa có DB thực — sẽ thay bằng ID thật sau khi có API
+            sessionManager.createLoginSession("MANUAL_TOKEN", "EMAIL", inputMssv, -1L, inputMssv);
             setLoading(false);
             navigateToMain();
         } else {
@@ -191,7 +193,10 @@ public class LoginActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account != null) {
-                sessionManager.createLoginSession(account.getIdToken(), "google", account.getEmail());
+                // Mapping: USER.auth_provider = "GOOGLE", USER.email = account.getEmail()
+                // userId = -1 tạm thời — thay bằng user_id từ backend sau khi có API
+                sessionManager.createLoginSession(account.getIdToken(), "GOOGLE",
+                        account.getEmail(), -1L, null);
                 navigateToMain();
             }
         } catch (ApiException e) {

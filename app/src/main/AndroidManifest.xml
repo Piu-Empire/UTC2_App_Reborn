@@ -134,5 +134,10 @@
             android:label="Đăng ký học phần"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- SETTINGS -->
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:exported="false"
+            android:label="Cài đặt" />
     </application>
 </manifest>

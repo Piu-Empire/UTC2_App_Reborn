@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.tuition.adapter.DormAdapter;
 import com.utc2.appreborn.ui.tuition.model.DormTuition;
+import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,16 +83,18 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private void loadDormData() {
         dormList = new ArrayList<>();
-        dormList.add(new DormTuition("Phòng 402 - Dãy B", "Tháng 03/2026 - Điện nước", 650000, 0));
-        dormList.add(new DormTuition("Phòng 402 - Dãy B", "Tháng 02/2026 - Điện nước", 720000, 0));
-        dormList.add(new DormTuition("Phòng 402 - Dãy B", "Học kỳ 2 - Tiền phòng", 1500000, 1));
+        // dormRegId, roomName, details, totalFee, status — dùng hằng Tuition.STATUS_*
+        // Mapping: DORMITORY_REGISTRATION.dorm_reg_id, DORMITORY_ROOM.room_code
+        dormList.add(new DormTuition(1, "Phòng 402 - Dãy B", "Tháng 03/2026 - Điện nước", 650000, Tuition.STATUS_UNPAID));
+        dormList.add(new DormTuition(2, "Phòng 402 - Dãy B", "Tháng 02/2026 - Điện nước", 720000, Tuition.STATUS_UNPAID));
+        dormList.add(new DormTuition(3, "Phòng 402 - Dãy B", "Học kỳ 2 - Tiền phòng",    1500000, Tuition.STATUS_PAID));
     }
 
     private void calculateTotal() {
         totalAmount = 0;
         for (DormTuition item : dormList) {
-            // Chỉ tính những khoản chưa thanh toán (status = 0)
-            if (item.getStatus() == 0) {
+            // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
+            if (!item.isPaid()) {
                 totalAmount += item.getAmount();
             }
         }

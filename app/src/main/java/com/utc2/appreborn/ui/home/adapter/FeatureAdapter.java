@@ -14,12 +14,16 @@ import java.util.List;
 /**
  * FeatureAdapter
  * ──────────────────────────────────────────────────────────────
- * RecyclerView adapter for the 3×2 feature grid on the
- * Home screen.
+ * RecyclerView adapter for the 3×2 feature grid on the Home screen.
  *
- * Uses View Binding (ItemFeatureCardBinding).
+ * Thay đổi so với bản cũ:
+ *   b.tvFeatureTitle.setText(item.getTitle())
+ *   → b.tvFeatureTitle.setText(item.getTitleRes())
  *
- * Package: com.utc2.appreborn.ui.home.adapter
+ * Lý do: item.getTitleRes() trả về R.string.xxx
+ * TextView.setText(@StringRes int) tự gọi context.getString()
+ * → Android tự chọn values-en/strings.xml khi locale = "en"
+ * → Chuyển ngôn ngữ trong Settings sẽ đổi text feature grid ngay.
  */
 public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHolder> {
 
@@ -74,7 +78,10 @@ public class FeatureAdapter extends RecyclerView.Adapter<FeatureAdapter.ViewHold
 
         void bind(@NonNull FeatureItem item) {
             b.ivFeatureIcon.setImageResource(item.getIconRes());
-            b.tvFeatureTitle.setText(item.getTitle());
+
+            // Dùng @StringRes — TextView tự resolve theo locale hiện tại
+            b.tvFeatureTitle.setText(item.getTitleRes());
+
             b.getRoot().setOnClickListener(v -> listener.onFeatureClick(item.getId()));
         }
     }

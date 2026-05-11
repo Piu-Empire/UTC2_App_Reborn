@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.tuition.adapter.SubjectTuitionAdapter;
 import com.utc2.appreborn.ui.tuition.model.SubjectTuition;
+import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -84,15 +85,16 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
     private void loadData() {
         subjectList = new ArrayList<>();
-        subjectList.add(new SubjectTuition(1, "Lập trình Android", "3 tín chỉ", 1250000, 0));
-        subjectList.add(new SubjectTuition(2, "Cấu trúc dữ liệu", "4 tín chỉ", 1600000, 0));
-        subjectList.add(new SubjectTuition(3, "Anh văn chuyên ngành", "2 tín chỉ", 850000, 0));
+        subjectList.add(new SubjectTuition(1, "Lập trình Android", "3 tín chỉ", 1250000, Tuition.STATUS_UNPAID));
+        subjectList.add(new SubjectTuition(2, "Cấu trúc dữ liệu", "4 tín chỉ", 1600000, Tuition.STATUS_UNPAID));
+        subjectList.add(new SubjectTuition(3, "Anh văn chuyên ngành", "2 tín chỉ", 850000, Tuition.STATUS_UNPAID));
     }
 
     private void calculateTotal() {
         totalAmount = 0;
         for (SubjectTuition subject : subjectList) {
-            if (subject.getStatus() == 0) {
+            // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
+            if (!subject.isPaid()) {
                 totalAmount += subject.getAmount();
             }
         }

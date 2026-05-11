@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.utc2.appreborn.R;
+import com.utc2.appreborn.ui.public_services.model.BaseService;
 import com.utc2.appreborn.ui.public_services.model.LoanSupportService;
 import com.utc2.appreborn.utils.NetworkUtils;
 
@@ -31,11 +32,11 @@ public class LoanSupportActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        btnBack = findViewById(R.id.btnBack);
+        btnBack    = findViewById(R.id.btnBack);
         btnConfirm = findViewById(R.id.btnConfirmLoan);
-        edtAmount = findViewById(R.id.edtAmount);
-        edtReason = findViewById(R.id.edtReason);
-        edtPhone = findViewById(R.id.edtPhone);
+        edtAmount  = findViewById(R.id.edtAmount);
+        edtReason  = findViewById(R.id.edtReason);
+        edtPhone   = findViewById(R.id.edtPhone);
     }
 
     private void setupEvents() {
@@ -44,7 +45,6 @@ public class LoanSupportActivity extends AppCompatActivity {
     }
 
     private void handleLoanRegistration() {
-        // Kiểm tra mạng trước khi gửi dữ liệu[cite: 5]
         if (!NetworkUtils.isNetworkAvailable(this)) {
             Toast.makeText(this, "Không có kết nối mạng. Không thể gửi đơn lúc này!", Toast.LENGTH_SHORT).show();
             return;
@@ -52,7 +52,7 @@ public class LoanSupportActivity extends AppCompatActivity {
 
         String amount = edtAmount.getText().toString().trim();
         String reason = edtReason.getText().toString().trim();
-        String phone = edtPhone.getText().toString().trim();
+        String phone  = edtPhone.getText().toString().trim();
 
         if (amount.isEmpty() || reason.isEmpty() || phone.isEmpty()) {
             Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
@@ -65,18 +65,22 @@ public class LoanSupportActivity extends AppCompatActivity {
         }
 
         try {
+            // Mapping TABLE SERVICE_REQUEST:
+            //   service_type = BaseService.TYPE_LOAN_SUPPORT  ("vay vốn")
+            //   status       = BaseService.STATUS_PENDING      ("chờ xử lý")
+            //   submitted_at = System.currentTimeMillis()
             LoanSupportService request = new LoanSupportService(
                     getString(R.string.loan_support_title),
                     reason,
                     System.currentTimeMillis(),
-                    0,
-                    "LOAN_SUPPORT",
+                    BaseService.STATUS_PENDING,       // "chờ xử lý" — khớp SERVICE_REQUEST.status
+                    BaseService.TYPE_LOAN_SUPPORT,    // "vay vốn"   — khớp SERVICE_REQUEST.service_type
                     amount,
                     reason,
                     phone
             );
 
-            // API call here
+            // TODO: gửi `request` lên API / lưu vào Room
             Toast.makeText(this, "Đăng ký thành công. Nhà trường sẽ liên hệ qua SĐT của bạn!", Toast.LENGTH_LONG).show();
             finish();
 

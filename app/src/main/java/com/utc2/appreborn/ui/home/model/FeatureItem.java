@@ -1,17 +1,37 @@
 package com.utc2.appreborn.ui.home.model;
 
-public class FeatureItem {
-    private final String id;
-    private final int    iconRes;
-    private final String title;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.StringRes;
 
-    public FeatureItem(String id, int iconRes, String title) {
-        this.id      = id;
-        this.iconRes = iconRes;
-        this.title   = title;
+/**
+ * FeatureItem
+ * ──────────────────────────────────────────────────────────────
+ * Dùng @StringRes thay vì String title để locale tự đổi
+ * khi người dùng chuyển ngôn ngữ trong Settings.
+ *
+ * FeatureAdapter sẽ gọi context.getString(item.getTitleRes())
+ * — Android tự chọn values-en/strings.xml hay values/strings.xml
+ * tuỳ theo locale hiện tại.
+ */
+public class FeatureItem {
+
+    private final String id;
+
+    @DrawableRes
+    private final int iconRes;
+
+    @StringRes
+    private final int titleRes; // R.string.xxx — KHÔNG dùng String cứng
+
+    public FeatureItem(String id, @DrawableRes int iconRes, @StringRes int titleRes) {
+        this.id       = id;
+        this.iconRes  = iconRes;
+        this.titleRes = titleRes;
     }
 
-    public String getId()      { return id; }
-    public int    getIconRes() { return iconRes; }
-    public String getTitle()   { return title; }
+    public String getId()       { return id; }
+    public int    getIconRes()  { return iconRes; }
+
+    /** @StringRes ID — adapter dùng context.getString(item.getTitleRes()) */
+    public int    getTitleRes() { return titleRes; }
 }

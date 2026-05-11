@@ -12,6 +12,7 @@ import com.utc2.appreborn.ui.tuition.model.DormTuition;
 import com.utc2.appreborn.ui.tuition.adapter.InvoiceAdapter;
 import com.utc2.appreborn.ui.tuition.model.Invoice;
 import com.utc2.appreborn.ui.tuition.model.SubjectTuition;
+import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
 
 import java.util.ArrayList;
@@ -82,14 +83,14 @@ public class InvoiceActivity extends AppCompatActivity {
 
         // Giả lập dữ liệu hóa đơn bao gồm cả học phí môn học và phí ký túc xá (Tính đa hình)[cite: 13].
         try {
-            SubjectTuition monHoc = new SubjectTuition(1, "Lập trình Android", "Học kỳ 2", 2500000, 1);
-            DormTuition tienPhong = new DormTuition("Phòng 403", "Tháng 03/2026", 1250000, 1);
-            SubjectTuition monHoc2 = new SubjectTuition(2, "Cấu trúc dữ liệu", "Học kỳ 1", 650000, 1);
+            SubjectTuition monHoc = new SubjectTuition(1, "Lập trình Android", "Học kỳ 2", 2500000, Tuition.STATUS_PAID);
+            DormTuition tienPhong = new DormTuition(1, "Phòng 403", "Tháng 03/2026", 1250000, Tuition.STATUS_PAID);
+            SubjectTuition monHoc2 = new SubjectTuition(2, "Cấu trúc dữ liệu", "Học kỳ 1", 650000, Tuition.STATUS_PAID);
 
-            // Thêm các đối tượng vào danh sách hiển thị[cite: 13].
-            invoiceList.add(new Invoice("UTC2_2026_001", "10/04/2026", monHoc));
-            invoiceList.add(new Invoice("UTC2_2026_002", "15/03/2026", tienPhong));
-            invoiceList.add(new Invoice("UTC2_2026_003", "05/02/2026", monHoc2));
+            // FEE.fee_id, FEE.semester_id, FEE.paid_at, FEE.payment_method
+            invoiceList.add(new Invoice("UTC2_2026_001", 1L, 3L, "10/04/2026", "QR Code", monHoc));
+            invoiceList.add(new Invoice("UTC2_2026_002", 2L, 3L, "15/03/2026", "Chuyển khoản", tienPhong));
+            invoiceList.add(new Invoice("UTC2_2026_003", 3L, 2L, "05/02/2026", "QR Code", monHoc2));
         } catch (Exception e) {
             Log.e("InvoiceData", "Lỗi tạo dữ liệu mẫu: " + e.getMessage());
         }

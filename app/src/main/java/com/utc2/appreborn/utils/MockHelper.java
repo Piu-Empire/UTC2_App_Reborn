@@ -3,6 +3,7 @@ package com.utc2.appreborn.utils;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.home.model.FeatureItem;
 import com.utc2.appreborn.ui.home.model.NewsItem;
+import com.utc2.appreborn.ui.notification.NotificationItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,20 +27,62 @@ public final class MockHelper {
     private MockHelper() { /* utility class — no instances */ }
 
     // ═══════════════════════════════════════════════════════
-    //  Student / User
+    //  Student / User  — mapping TABLE USER_PROFILE + STUDENT_PROFILE
     // ═══════════════════════════════════════════════════════
 
-    /** Full name shown in the Home header and on the QR card. */
+    /** USER_PROFILE.full_name */
     public static String getMockFullName() {
-        return "Nguyễn Văn An";
+        return "Nguyễn Minh Phúc";
     }
 
-    /**
-     * Student code (MSSV) encoded in the QR bitmap.
-     * Replace with real Firestore / SQLite read once DB is wired.
-     */
+    /** STUDENT_PROFILE.student_code (MSSV) */
     public static String getMockStudentCode() {
-        return "SV2024789456";
+        return "2251050001";
+    }
+
+    /** USER_PROFILE.phone_number */
+    public static String getMockPhone() {
+        return "0123 456 789";
+    }
+
+    /** USER_PROFILE.date_of_birth — "dd/MM/yyyy" */
+    public static String getMockDateOfBirth() {
+        return "01/01/2004";
+    }
+
+    /** USER_PROFILE.gender */
+    public static String getMockGender() {
+        return "Nam";
+    }
+
+    /** STUDENT_PROFILE.faculty */
+    public static String getMockFaculty() {
+        return "Công nghệ Thông tin";
+    }
+
+    /** STUDENT_PROFILE.major */
+    public static String getMockMajor() {
+        return "Công nghệ Thông tin";
+    }
+
+    /** STUDENT_PROFILE.academic_year */
+    public static String getMockAcademicYear() {
+        return "K65 (2024–2029)";
+    }
+
+    /** STUDENT_PROFILE.class_name */
+    public static String getMockClassName() {
+        return "CQ.65.CNTT";
+    }
+
+    /** STUDENT_PROFILE.status */
+    public static String getMockStatus() {
+        return "Đang học";
+    }
+
+    /** ADVISOR.full_name — lấy qua STUDENT_PROFILE.advisor_id */
+    public static String getMockAdvisorName() {
+        return "KS. Trần Quốc Khánh";
     }
 
     // ═══════════════════════════════════════════════════════
@@ -55,18 +98,71 @@ public final class MockHelper {
      */
     public static List<FeatureItem> getFeatureList() {
         List<FeatureItem> list = new ArrayList<>(6);
-        list.add(new FeatureItem("hoc_phi",       R.drawable.ic_hoc_phi,       "Học phí"));
-        list.add(new FeatureItem("dich_vu_cong",  R.drawable.ic_dich_vu_cong,  "Dịch vụ công"));
-        list.add(new FeatureItem("danh_gia",      R.drawable.ic_danh_gia,      "Đánh giá"));
-        list.add(new FeatureItem("ki_tuc_xa",     R.drawable.ic_ki_tuc_xa,     "Kí túc xá"));
-        list.add(new FeatureItem("ho_tro",        R.drawable.ic_ho_tro,        "Hỗ trợ 24/7"));
-        list.add(new FeatureItem("danh_muc_khac", R.drawable.ic_danh_muc_khac, "Danh mục khác"));
+        // Tham số thứ 3 giờ là R.string.xxx thay vì "Chuỗi văn bản"
+        list.add(new FeatureItem("hoc_phi",       R.drawable.ic_hoc_phi,       R.string.feature_hoc_phi));
+        list.add(new FeatureItem("dich_vu_cong",  R.drawable.ic_dich_vu_cong,  R.string.feature_dich_vu_cong));
+        list.add(new FeatureItem("danh_gia",      R.drawable.ic_danh_gia,      R.string.feature_danh_gia));
+        list.add(new FeatureItem("ki_tuc_xa",     R.drawable.ic_ki_tuc_xa,     R.string.feature_ki_tuc_xa));
+        list.add(new FeatureItem("ho_tro",        R.drawable.ic_ho_tro,        R.string.feature_ho_tro));
+        list.add(new FeatureItem("danh_muc_khac", R.drawable.ic_danh_muc_khac, R.string.feature_danh_muc_khac));
         return list;
     }
 
     // ═══════════════════════════════════════════════════════
-    //  News Feed  (5 placeholder items)
+    //  Notification — mapping TABLE NOTIFICATION
     // ═══════════════════════════════════════════════════════
+
+    /**
+     * Mock data cho danh sách thông báo — mapping TABLE NOTIFICATION:
+     *   senderName ↔ (nguồn gửi — thể hiện qua NOTIFICATION.type)
+     *   subject    ↔ NOTIFICATION.title
+     *   preview    ↔ NOTIFICATION.body  (rút gọn)
+     *   timeLabel  ↔ NOTIFICATION.sent_at  (định dạng hiển thị)
+     *   isRead     ↔ NOTIFICATION.is_read
+     *
+     * Dùng khi chưa đăng nhập Google hoặc chưa có API thật.
+     */
+    public static List<NotificationItem> getMockNotificationList() {
+        List<NotificationItem> list = new ArrayList<>();
+
+        list.add(new NotificationItem(
+                "Phòng Đào Tạo",
+                "Thông báo lịch thi học kỳ 2 năm học 2024–2025",
+                "Sinh viên xem lịch thi chi tiết tại cổng thông tin UTC2. Phòng thi sẽ được công bố trước 3 ngày.",
+                "10:30",
+                false
+        ));
+        list.add(new NotificationItem(
+                "Phòng Công tác SV",
+                "Xét học bổng khuyến khích học tập HK2",
+                "Sinh viên có điểm TB tích lũy ≥ 3.2 nộp hồ sơ trước ngày 15/5/2025.",
+                "Hôm qua",
+                true
+        ));
+        list.add(new NotificationItem(
+                "Ban Giám hiệu",
+                "Thông báo nghỉ lễ 30/4 và 1/5",
+                "Nhà trường thông báo lịch nghỉ lễ theo quy định của Nhà nước.",
+                "28/04",
+                true
+        ));
+        list.add(new NotificationItem(
+                "Phòng QLSV",
+                "Nộp bản sao học bạ THPT cho sinh viên năm nhất",
+                "Các bạn sinh viên K2024 chưa nộp học bạ THPT vui lòng đến Phòng QLSV trước 20/5.",
+                "25/04",
+                true
+        ));
+        list.add(new NotificationItem(
+                "Thư viện UTC2",
+                "Gia hạn thẻ thư viện học kỳ 2",
+                "Thẻ thư viện học kỳ 1 sẽ hết hạn vào cuối tháng 4. Gia hạn tại quầy thư viện hoặc online.",
+                "20/04",
+                true
+        ));
+
+        return list;
+    }
 
     /**
      * Returns 5 mock {@link NewsItem}s.

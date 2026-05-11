@@ -44,7 +44,6 @@ public class PublicServiceFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Nạp layout fragment_public_service
         return inflater.inflate(R.layout.fragment_public_service, container, false);
     }
 
@@ -56,20 +55,18 @@ public class PublicServiceFragment extends Fragment {
             initViews(view);
             setupRecyclerView();
             setupEvents(view);
-
-            // Mặc định hiển thị tab Dịch vụ khi vừa vào
             showTabDichVu();
         } catch (Exception e) {
-            Log.e("PublicServiceFragment", "Lỗi khởi tạo: " + e.getMessage());
+            Log.e("PublicServiceFragment", "Loi khoi tao: " + e.getMessage());
         }
     }
 
     private void initViews(View view) {
         layoutDichVuMenu = view.findViewById(R.id.layoutDichVuMenu);
-        rvKetQua = view.findViewById(R.id.rvKetQua);
-        btnDichVu = view.findViewById(R.id.btnDichVu);
-        btnKetQua = view.findViewById(R.id.btnKetQua);
-        txtSectionTitle = view.findViewById(R.id.sectionTitle);
+        rvKetQua         = view.findViewById(R.id.rvKetQua);
+        btnDichVu        = view.findViewById(R.id.btnDichVu);
+        btnKetQua        = view.findViewById(R.id.btnKetQua);
+        txtSectionTitle  = view.findViewById(R.id.sectionTitle);
     }
 
     private void setupRecyclerView() {
@@ -80,14 +77,12 @@ public class PublicServiceFragment extends Fragment {
         btnDichVu.setOnClickListener(v -> showTabDichVu());
         btnKetQua.setOnClickListener(v -> showTabKetQua());
 
-        // Nút Back để quay lại trang trước đó
         view.findViewById(R.id.btnBack).setOnClickListener(v -> {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
             }
         });
 
-        // Xử lý click các dịch vụ (Có kiểm tra mạng tức thời)
         view.findViewById(R.id.btnCardReissueMenu).setOnClickListener(v -> checkNetAndNavigate(CardReissueActivity.class));
         view.findViewById(R.id.btnLoanSupportMenu).setOnClickListener(v -> checkNetAndNavigate(LoanSupportActivity.class));
         view.findViewById(R.id.btnTranscriptMenu).setOnClickListener(v -> checkNetAndNavigate(TranscriptRegistrationActivity.class));
@@ -95,11 +90,10 @@ public class PublicServiceFragment extends Fragment {
     }
 
     private void checkNetAndNavigate(Class<?> destination) {
-        // Sử dụng phương thức tĩnh để kiểm tra mạng giúp tiết kiệm RAM
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             startActivity(new Intent(requireContext(), destination));
         } else {
-            Toast.makeText(requireContext(), "Cần kết nối mạng để thực hiện thủ tục đăng ký!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), getString(R.string.error_connect_network), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -124,7 +118,6 @@ public class PublicServiceFragment extends Fragment {
             txtSectionTitle.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_scroll_text, 0, 0, 0);
         }
 
-        // Tải dữ liệu lịch sử ngay khi chuyển sang tab Kết quả
         loadHistoryData();
     }
 
@@ -132,11 +125,48 @@ public class PublicServiceFragment extends Fragment {
         historyList.clear();
         long now = System.currentTimeMillis();
 
-        // Giả lập dữ liệu cho sinh viên Nguyễn Minh Phúc
-        historyList.add(new CardReissueService(getString(R.string.reissue_card_title), "Lý do: Thẻ bị hỏng chip", now, 1, "CARD_REISSUE", getString(R.string.default_name), getString(R.string.default_mssv), getString(R.string.default_class)));
-        historyList.add(new TranscriptService(getString(R.string.transcript_registration_title), "Số lượng: 03 bản", now - 3600000, 0, "TRANSCRIPT_REG", getString(R.string.default_name), getString(R.string.default_mssv), getString(R.string.default_class), "2023 - 2024", "Học kỳ 2", "03"));
-        historyList.add(new StudentConfirmationService(getString(R.string.student_confirmation_title), "Lý do: Làm hồ sơ thực tập", now - 86400000, 1, "STUDENT_CONFIRM", getString(R.string.default_name), getString(R.string.default_mssv), getString(R.string.default_class)));
-        historyList.add(new LoanSupportService(getString(R.string.loan_support_title), "Số tiền: 10.000.000đ", now - 172800000, 0, "LOAN_SUPPORT", "10000000", "Học kỳ 1", getString(R.string.default_phone)));
+        historyList.add(new CardReissueService(
+                getString(R.string.reissue_card_title),
+                "Ly do: The bi hong chip",
+                now,
+                BaseService.STATUS_COMPLETED,   // FIX: STATUS_DONE → STATUS_COMPLETED
+                BaseService.TYPE_CARD_REISSUE,
+                getString(R.string.default_name),
+                getString(R.string.default_mssv),
+                getString(R.string.default_class)));
+
+        historyList.add(new TranscriptService(
+                getString(R.string.transcript_registration_title),
+                "So luong: 03 ban",
+                now - 3_600_000L,
+                BaseService.STATUS_PENDING,
+                BaseService.TYPE_TRANSCRIPT,
+                getString(R.string.default_name),
+                getString(R.string.default_mssv),
+                getString(R.string.default_class),
+                "2023 - 2024",
+                "Hoc ky 2",
+                "03"));
+
+        historyList.add(new StudentConfirmationService(
+                getString(R.string.student_confirmation_title),
+                "Ly do: Lam ho so thuc tap",
+                now - 86_400_000L,
+                BaseService.STATUS_COMPLETED,   // FIX: STATUS_DONE → STATUS_COMPLETED
+                BaseService.TYPE_CONFIRMATION,
+                getString(R.string.default_name),
+                getString(R.string.default_mssv),
+                getString(R.string.default_class)));
+
+        historyList.add(new LoanSupportService(
+                getString(R.string.loan_support_title),
+                "So tien: 10.000.000d",
+                now - 172_800_000L,
+                BaseService.STATUS_PROCESSING,
+                BaseService.TYPE_LOAN_SUPPORT,
+                "10000000",
+                "Hoc ky 1",
+                getString(R.string.default_phone)));
 
         adapter = new PublicServiceAdapter(historyList, true);
         rvKetQua.setAdapter(adapter);

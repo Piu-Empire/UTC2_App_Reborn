@@ -18,13 +18,14 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.profile.TrainingProgram.TrainingProgramActivity;
+import com.utc2.appreborn.ui.settings.SettingsActivity;
 import com.utc2.appreborn.utils.NetworkUtils;
 
 public class ProfileFragment extends Fragment {
 
     private LinearLayout layoutSubjectList, layoutGraduationReq;
     private AppCompatButton btnInfo, btnChangePassword;
-    private ImageView btnNotification;
+    private ImageView btnSettings;
     private TextView tvStudentName, tvStudentId;
 
     @Nullable
@@ -48,7 +49,7 @@ public class ProfileFragment extends Fragment {
         layoutGraduationReq = view.findViewById(R.id.layoutGraduationReq);
         btnInfo = view.findViewById(R.id.btnProfileInfo);
         btnChangePassword = view.findViewById(R.id.btnChangePassword);
-        btnNotification = view.findViewById(R.id.btnNotification);
+        btnSettings = view.findViewById(R.id.btnNotification);
         tvStudentName = view.findViewById(R.id.tvStudentName);
         tvStudentId = view.findViewById(R.id.tvStudentId);
     }
@@ -93,7 +94,10 @@ public class ProfileFragment extends Fragment {
             startActivity(new Intent(requireContext(), GraduationRequirementsActivity.class));
         });
 
-        btnNotification.setOnClickListener(v -> showToast("Không có thông báo mới"));
+        btnSettings.setOnClickListener(v -> {
+            // Lưu ý: Đảm bảo bạn đã tạo GraduationRequirementsActivity
+            startActivity(new Intent(requireContext(), SettingsActivity.class));
+        });
     }
 
     private void showToast(String msg) {

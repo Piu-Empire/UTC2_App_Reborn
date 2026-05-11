@@ -35,8 +35,8 @@ public class PublicServiceAdapter extends RecyclerView.Adapter<PublicServiceAdap
     private static final String TAG = "PublicServiceAdapter";
 
     public PublicServiceAdapter(List<BaseService> serviceList, boolean isResultTab) {
-        this.serviceList = serviceList;
-        this.isResultTab = isResultTab;
+        this.serviceList  = serviceList;
+        this.isResultTab  = isResultTab;
     }
 
     @NonNull
@@ -54,7 +54,6 @@ public class PublicServiceAdapter extends RecyclerView.Adapter<PublicServiceAdap
         Context context = holder.itemView.getContext();
 
         try {
-            // 1. Cập nhật Icon dựa trên loại dịch vụ
             if (holder.imgIcon != null) {
                 if (item instanceof CardReissueService) {
                     holder.imgIcon.setImageResource(R.drawable.ic_id_card);
@@ -67,35 +66,26 @@ public class PublicServiceAdapter extends RecyclerView.Adapter<PublicServiceAdap
                 }
             }
 
-            // 2. Gán dữ liệu cơ bản
             holder.txtTitle.setText(item.getTitle());
             holder.txtDate.setText(item.getDate());
 
             if (isResultTab) {
-                // --- TAB KẾT QUẢ ---
                 setupStatusView(holder, item, context);
 
                 View.OnClickListener openDetail = v -> {
                     try {
                         Intent intent = new Intent(context, ServiceDetailActivity.class);
-                        if (item instanceof Serializable) {
-                            intent.putExtra("SERVICE_DATA", (Serializable) item);
-                            context.startActivity(intent);
-                        } else {
-                            Log.e(TAG, "Dữ liệu không hỗ trợ Serializable!");
-                        }
+                        intent.putExtra("SERVICE_DATA", (Serializable) item);
+                        context.startActivity(intent);
                     } catch (Exception e) {
-                        Log.e(TAG, "Lỗi mở chi tiết: " + e.getMessage());
+                        Log.e(TAG, "Loi mo chi tiet: " + e.getMessage());
                     }
                 };
 
-                if (holder.btnDetail != null) {
-                    holder.btnDetail.setOnClickListener(openDetail);
-                }
+                if (holder.btnDetail != null) holder.btnDetail.setOnClickListener(openDetail);
                 holder.itemView.setOnClickListener(openDetail);
 
             } else {
-                // --- TAB DANH SÁCH DỊCH VỤ ---
                 holder.itemView.setOnClickListener(v -> {
                     try {
                         Intent intent = null;
@@ -108,27 +98,31 @@ public class PublicServiceAdapter extends RecyclerView.Adapter<PublicServiceAdap
                         } else if (item instanceof StudentConfirmationService) {
                             intent = new Intent(context, StudentConfirmationActivity.class);
                         }
-
                         if (intent != null) context.startActivity(intent);
                     } catch (Exception e) {
-                        Log.e(TAG, "Lỗi mở trang đăng ký: " + e.getMessage());
+                        Log.e(TAG, "Loi mo trang dang ky: " + e.getMessage());
                     }
                 });
             }
         } catch (Exception e) {
-            Log.e(TAG, "Lỗi hiển thị tại vị trí: " + position, e);
+            Log.e(TAG, "Loi hien thi tai vi tri: " + position, e);
         }
     }
 
     private void setupStatusView(ViewHolder holder, BaseService item, Context context) {
-        if (holder.txtStatus != null) {
-            if (item.getStatus() == 1) {
-                holder.txtStatus.setText(R.string.status_approved);
-                holder.txtStatus.setTextColor(ContextCompat.getColor(context, R.color.green_success));
-            } else {
-                holder.txtStatus.setText(R.string.status_pending);
-                holder.txtStatus.setTextColor(ContextCompat.getColor(context, R.color.text_muted_light));
-            }
+        if (holder.txtStatus == null) return;
+
+        String status = item.getStatus();
+        if (BaseService.STATUS_COMPLETED.equals(status)) {          // FIX: STATUS_DONE → STATUS_COMPLETED
+            holder.txtStatus.setText(R.string.status_approved);
+            holder.txtStatus.setTextColor(ContextCompat.getColor(context, R.color.green_success));
+        } else if (BaseService.STATUS_REJECTED.equals(status)) {
+            holder.txtStatus.setText(R.string.status_rejected);
+            holder.txtStatus.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark));
+        } else {
+            // STATUS_PENDING hoac STATUS_PROCESSING
+            holder.txtStatus.setText(R.string.status_pending);
+            holder.txtStatus.setTextColor(ContextCompat.getColor(context, R.color.text_muted_light));
         }
     }
 
@@ -138,14 +132,14 @@ public class PublicServiceAdapter extends RecyclerView.Adapter<PublicServiceAdap
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTitle, txtDate, txtStatus, btnDetail;
+        TextView  txtTitle, txtDate, txtStatus, btnDetail;
         ImageView imgIcon;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            imgIcon = itemView.findViewById(R.id.imgIcon);
-            txtTitle = itemView.findViewById(R.id.txtTitle);
-            txtDate = itemView.findViewById(R.id.txtDate);
+            imgIcon   = itemView.findViewById(R.id.imgIcon);
+            txtTitle  = itemView.findViewById(R.id.txtTitle);
+            txtDate   = itemView.findViewById(R.id.txtDate);
             txtStatus = itemView.findViewById(R.id.txtStatus);
             btnDetail = itemView.findViewById(R.id.btnDetail);
         }

@@ -157,6 +157,7 @@
     <!-- Warnings -->
     <string name="tab_warnings">Cảnh báo</string>
 
+    <string name="offline_message">Không có kết nối mạng!</string>
     <string name="label_serious_upper">NGHIÊM TRỌNG</string>
     <string name="label_total_upper">TỔNG CỘNG</string>
     <string name="label_serious">Nghiêm trọng</string>
@@ -395,8 +396,10 @@
 
     <string name="status_approved">Đã duyệt</string>
     <string name="status_pending">Đang xử lý</string>
-
+    <string name="status_rejected">Từ chối</string>
     <string name="view_detail">Xem chi tiết</string>
+    <string name="reason_title">Lý do</string>
+    <string name="note_title">Ghi chú</string>
 
     <string name="confirm_card_reissue">Xác nhận đăng ký</string>
 
@@ -648,4 +651,16 @@
     </string>
 
     <string name="sample_amount">0 VND</string>
+
+    <!--SETTINGS-->
+    <string name="settings_section_language">Ngôn ngữ</string>
+    <string name="settings_section_about">Về ứng dụng</string>
+    <string name="settings_version">Phiên bản</string>
+    <string name="settings_developer">Nhà phát triển</string>
+    <string name="lang_vietnamese">Tiếng Việt</string>
+    <string name="lang_vietnamese_sub">Vietnamese</string>
+    <string name="lang_english">English</string>
+    <string name="lang_english_sub">English language</string>
+    <string name="notification_empty">ko có thông báo</string>
+
 </resources>

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.tuition.model.SubjectTuition;
+import com.utc2.appreborn.ui.tuition.model.Tuition;
 
 import java.util.List;
 import java.util.Locale; // Import thêm cái này
@@ -42,12 +43,12 @@ public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAd
         // Định dạng tiền tệ từ kiểu long của lớp cha
         holder.tvAmount.setText(String.format(Locale.getDefault(), "%,d VND", item.getAmount()));
 
-        // Xử lý hiển thị trạng thái
-        if (item.getStatus() == 0) {
+        // Xử lý hiển thị trạng thái — mapping FEE.status (String)
+        if (Tuition.STATUS_UNPAID.equals(item.getStatus()) || Tuition.STATUS_PARTIAL.equals(item.getStatus())) {
             holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.status_unpaid));
             holder.tvStatus.setTextColor(Color.RED);
         } else {
-            holder.tvStatus.setText("Đã thanh toán");
+            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.status_paid));
             holder.tvStatus.setTextColor(Color.GREEN);
         }
     }
