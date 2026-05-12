@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.dormitory;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -85,6 +86,12 @@ public class DormitoryActivity extends AppCompatActivity {
     private String selectedBuilding = null;
 
     // ─────────────────────────────────────────────────────────────────────────
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -146,6 +146,20 @@
     <string name="back_profile">Back</string>
     <string name="mssv_title">Student ID</string>
 
+    <!-- Info Fragment labels -->
+    <string name="info_label_fullname">Full Name</string>
+    <string name="info_label_mssv">Student ID</string>
+    <string name="info_label_class">Class</string>
+    <string name="info_label_major">Major</string>
+    <string name="info_label_faculty">Faculty</string>
+    <string name="info_label_course">Course</string>
+    <string name="info_label_training_type">Training Type</string>
+    <string name="info_label_dob">Date of Birth</string>
+    <string name="info_label_gender">Gender</string>
+    <string name="info_label_email">Email</string>
+    <string name="info_label_phone">Phone Number</string>
+    <string name="info_label_advisor">Academic Advisor</string>
+
     <string name="title_change_password">Change Password</string>
     <string name="msg_password_requirement">Please enter a new password. Password must be at least 6 characters long.</string>
     <string name="label_new_password">New password</string>
@@ -361,7 +375,16 @@
     <string name="lang_vietnamese_sub">Vietnamese</string>
     <string name="lang_english">English</string>
     <string name="lang_english_sub">English language</string>
+    <string name="notification_title">Email Notifications</string>
+    <string name="notification_email_student">UTC2 Student Email</string>
+    <string name="notification_status_active">• Active</string>
+    <string name="notification_open_gmail_desc">Tap the button below to open Gmail and view all notifications sent by the school to your student inbox.</string>
+    <string name="notification_btn_open_gmail">Open Student Gmail Inbox</string>
+    <string name="notification_recent">Recent Notifications</string>
+    <string name="notification_cd_empty">No notifications</string>
+    <string name="notification_empty_text">No notifications yet</string>
     <string name="notification_empty">No notifications yet</string>
+    <string name="error_open_gmail">Cannot open Gmail. Please check and try again.</string>
 
     <string name="logo_desc">UTC2 Logo</string>
     <string name="cd_campus_header">Campus photo</string>
@@ -384,4 +407,9 @@
     <string name="GroubName">New_Empire</string>
     <string name="VN">🇻🇳</string>
     <string name="GB">🇬🇧</string>
+    <string name="FindingError">"Finding Error: "</string>
+    <string name="ScrollingError">"Scrolling Error:"</string>
+    <string name="sem_1">Semester 1</string>
+    <string name="sem_2">Semester 2</string>
+    <string name="App_vers">1.0.0</string>
 </resources>

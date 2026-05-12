@@ -41,7 +41,7 @@ public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAd
         holder.tvDetails.setText(item.getDetails());
 
         // Định dạng tiền tệ từ kiểu long của lớp cha
-        holder.tvAmount.setText(String.format(Locale.getDefault(), "%,d VND", item.getAmount()));
+        holder.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", item.getAmount()));
 
         // Xử lý hiển thị trạng thái — mapping FEE.status (String)
         if (Tuition.STATUS_UNPAID.equals(item.getStatus()) || Tuition.STATUS_PARTIAL.equals(item.getStatus())) {

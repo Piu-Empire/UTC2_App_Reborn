@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.public_services.LoanSupportService;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,6 +18,12 @@ public class LoanSupportActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private TextView btnConfirm;
     private EditText edtAmount, edtReason, edtPhone;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

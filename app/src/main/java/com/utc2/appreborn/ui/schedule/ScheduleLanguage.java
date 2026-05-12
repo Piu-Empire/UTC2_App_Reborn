@@ -3,6 +3,7 @@ package com.utc2.appreborn.ui.schedule;
 import android.content.Context;
 
 import com.utc2.appreborn.R;
+import com.utc2.appreborn.utils.LocaleHelper;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -15,12 +16,24 @@ public final class ScheduleLanguage {
     }
 
     public static final class Lang {
-        // khởi tạo ngôn ngữ tiếng việt chuẩn cho toàn ứng dụng
+        // trả về locale hiện tại của app (vi hoặc en) thay vì hardcode vi-VN
+        public static Locale schedule(Context c) {
+            String lang = LocaleHelper.getSavedLanguage(c);
+            if ("en".equals(lang)) return Locale.ENGLISH;
+            return Locale.forLanguageTag("vi-VN");
+        }
+
+        // giữ overload không có context để tương thích ngược (mặc định vi-VN)
         public static Locale schedule() {
             return Locale.forLanguageTag("vi-VN");
         }
 
-        // chuyển đổi ngày sang chuỗi văn bản theo mẫu yêu cầu
+        // chuyển đổi ngày sang chuỗi văn bản theo locale hiện tại của app
+        public static String format(Context c, Calendar cal, String pattern) {
+            return new SimpleDateFormat(pattern, schedule(c)).format(cal.getTime());
+        }
+
+        // overload cũ giữ lại để không break code hiện tại
         public static String format(Calendar cal, String pattern) {
             return new SimpleDateFormat(pattern, schedule()).format(cal.getTime());
         }
@@ -113,12 +126,22 @@ public final class ScheduleLanguage {
             return start + " \u2014 " + end;
         }
 
-        // tạo tiêu đề ngày tháng đầy đủ cho danh sách dọc
+        // tạo tiêu đề ngày tháng đầy đủ cho danh sách dọc — dùng locale app
+        public static String fullDateHeader(Context c, Calendar cal) {
+            return Lang.format(c, cal, "EEEE, dd/MM/yyyy");
+        }
+
+        // overload cũ giữ lại để không break code hiện tại
         public static String fullDateHeader(Calendar cal) {
             return Lang.format(cal, "EEEE, dd/MM/yyyy");
         }
 
-        // lấy tên thứ ở dạng viết tắt ba ký tự đầu
+        // lấy tên thứ ở dạng viết tắt theo locale app
+        public static String shortDayName(Context c, Calendar cal) {
+            return Lang.format(c, cal, "EEE");
+        }
+
+        // overload cũ giữ lại để không break code hiện tại
         public static String shortDayName(Calendar cal) {
             return Lang.format(cal, "EEE");
         }

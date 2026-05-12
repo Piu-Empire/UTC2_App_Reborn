@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.public_services.TranscriptService;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -19,6 +20,12 @@ public class TranscriptRegistrationActivity extends AppCompatActivity {
     private TextView txtName, txtMSSV, txtClass, btnConfirm;
     private AutoCompleteTextView dropAcademicYear, dropSemester;
     private EditText edtQuantity, edtNote;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

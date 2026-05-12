@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.public_services.CardReissueService;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,6 +21,12 @@ public class CardReissueActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private TextView btnConfirm, txtName, txtMSSV, txtClass;
     private EditText edtReason;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

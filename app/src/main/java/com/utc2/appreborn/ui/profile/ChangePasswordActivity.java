@@ -3,6 +3,7 @@ package com.utc2.appreborn.ui.profile;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -17,6 +18,12 @@ import com.utc2.appreborn.utils.NetworkUtils;
 public class ChangePasswordActivity extends AppCompatActivity {
 
     private AppCompatButton btnUpdate;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

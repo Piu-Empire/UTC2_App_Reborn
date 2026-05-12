@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -31,8 +32,14 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private RecyclerView rvDormTuition;
     private List<DormTuition> dormList;
     private Button btnPayDorm;
-    private long totalAmount = 0;
+    private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +98,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     }
 
     private void calculateTotal() {
-        totalAmount = 0;
+        totalAmount = 0.0;
         for (DormTuition item : dormList) {
             // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!item.isPaid()) {
@@ -125,7 +132,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
 
-        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,d VND", totalAmount));
+        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
         String bankId = "ICB";
         String accountNo = "102882730986";
@@ -134,7 +141,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         String description = "AppReborn%20Tien%20KTX";
 
         String qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png"
-                + "?amount=" + totalAmount
+                + "?amount=" + (long) totalAmount
                 + "&addInfo=" + description
                 + "&accountName=" + accountName;
 

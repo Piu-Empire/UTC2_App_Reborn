@@ -10,6 +10,7 @@ import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.tuition.model.Invoice;
 
 import java.util.List;
+import java.util.Locale;
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {
     private List<Invoice> invoiceList;
@@ -35,8 +36,8 @@ public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHold
 
         // Lấy số tiền từ đối tượng Tuition bên trong Invoice
         // Sau này khi có MySQL, bạn có thể format số này thành "2.500.000 VND"
-        long amount = item.getTuition().getAmount();
-        holder.tvAmount.setText(String.format("%,d VND", amount));
+        double amount = item.getTuition().getAmount();
+        holder.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", amount));
     }
 
     @Override

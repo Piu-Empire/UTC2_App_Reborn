@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.login;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,6 +14,12 @@ import com.utc2.appreborn.R;
 import com.utc2.appreborn.utils.NetworkUtils;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

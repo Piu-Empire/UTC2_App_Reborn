@@ -204,6 +204,20 @@
     <string name="back_profile">Quay lại</string>
     <string name="mssv_title">Mã số sinh viên</string>
 
+    <!-- Info Fragment labels -->
+    <string name="info_label_fullname">Họ và Tên</string>
+    <string name="info_label_mssv">Mã số sinh viên</string>
+    <string name="info_label_class">Lớp</string>
+    <string name="info_label_major">Ngành</string>
+    <string name="info_label_faculty">Khoa</string>
+    <string name="info_label_course">Khóa</string>
+    <string name="info_label_training_type">Hệ đào tạo</string>
+    <string name="info_label_dob">Ngày sinh</string>
+    <string name="info_label_gender">Giới tính</string>
+    <string name="info_label_email">Email</string>
+    <string name="info_label_phone">Số điện thoại</string>
+    <string name="info_label_advisor">Cố vấn học tập</string>
+
     <!-- Change password -->
     <string name="title_change_password">Đổi mật khẩu</string>
 
@@ -661,10 +675,23 @@
     <string name="lang_vietnamese_sub">Vietnamese</string>
     <string name="lang_english">English</string>
     <string name="lang_english_sub">English language</string>
+    <string name="notification_title">Thông báo Email</string>
+    <string name="notification_email_student">Email sinh viên UTC2</string>
+    <string name="notification_status_active">• Hoạt động</string>
+    <string name="notification_open_gmail_desc">Nhấn nút bên dưới để mở Gmail và xem toàn bộ thông báo từ nhà trường gửi đến hộp thư sinh viên của bạn.</string>
+    <string name="notification_btn_open_gmail">Mở hộp thư Gmail sinh viên</string>
+    <string name="notification_recent">Thông báo gần đây</string>
+    <string name="notification_cd_empty">Không có thông báo</string>
+    <string name="notification_empty_text">Chưa có thông báo nào</string>
     <string name="notification_empty">ko có thông báo</string>
+    <string name="error_open_gmail">Không thể mở Gmail. Vui lòng kiểm tra lại.</string>
     <string name="GroubName">New_Empire</string>
     <string name="VN">🇻🇳</string>
     <string name="GB">🇬🇧</string>
     <string name="App_vers">1.0.0</string>
+    <string name="FindingError">"Lỗi khi tìm kiếm: "</string>
+    <string name="ScrollingError">"Lỗi khi cuộn trang: "</string>
+    <string name="sem_1">KỲ HỌC 1</string>
+    <string name="sem_2">KỲ HỌC 2</string>
 
 </resources>

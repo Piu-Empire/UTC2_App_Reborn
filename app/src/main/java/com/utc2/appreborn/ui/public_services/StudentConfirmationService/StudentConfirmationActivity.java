@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.public_services.StudentConfirmationService;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -16,6 +17,12 @@ public class StudentConfirmationActivity extends AppCompatActivity {
     private ImageButton btnBack;
     private TextView txtName, txtMSSV, txtClass, btnConfirm;
     private EditText edtReason;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

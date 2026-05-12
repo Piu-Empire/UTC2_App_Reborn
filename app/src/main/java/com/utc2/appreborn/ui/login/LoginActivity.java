@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -58,6 +59,12 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
     );
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

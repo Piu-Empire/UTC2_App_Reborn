@@ -6,25 +6,27 @@ package com.utc2.appreborn.ui.tuition.model;
  * Đại diện hóa đơn sau khi thanh toán — mapping với TABLE FEE.
  *
  * MySQL schema (TABLE FEE):
- *   fee_id         BIGINT PK
- *   user_id        BIGINT FK → USER
- *   semester_id    BIGINT FK → SEMESTER
- *   total_amount   DECIMAL(15,2)
- *   paid_amount    DECIMAL(15,2)
+ *   fee_id           BIGINT PK
+ *   user_id          BIGINT FK → USER
+ *   semester_id      BIGINT FK → SEMESTER
+ *   total_amount     DECIMAL(15,2)
+ *   paid_amount      DECIMAL(15,2)
  *   remaining_amount DECIMAL(15,2)
- *   due_date       DATE
- *   status         VARCHAR(50)  "chưa đóng" | "đóng một phần" | "đã đóng đủ"
- *   payment_method VARCHAR(50)  "QR Code" | "Chuyển khoản" | "Tiền mặt"
- *   paid_at        TIMESTAMP
+ *   due_date         DATE
+ *   status           VARCHAR(50)
+ *   payment_method   VARCHAR(50)
+ *   paid_at          TIMESTAMP
+ *
+ * FIX: getPaidAmount() / getTotalAmount() đổi sang double để khớp Tuition.
  */
 public class Invoice {
 
-    private String invoiceCode;   // mã hiển thị cho người dùng (VD: "UTC2_2026_001")
-    private long   feeId;         // FEE.fee_id — PK
-    private long   semesterId;    // FEE.semester_id
-    private String paidAt;        // FEE.paid_at  "dd/MM/yyyy HH:mm"
-    private String paymentMethod; // FEE.payment_method
-    private Tuition tuition;      // đối tượng học phí được thanh toán (đa hình)
+    private String  invoiceCode;   // mã hiển thị (VD: "UTC2_2026_001") — không phải PK DB
+    private long    feeId;         // FEE.fee_id — PK
+    private long    semesterId;    // FEE.semester_id
+    private String  paidAt;        // FEE.paid_at  "dd/MM/yyyy HH:mm"
+    private String  paymentMethod; // FEE.payment_method
+    private Tuition tuition;       // đối tượng học phí được thanh toán (đa hình)
 
     /**
      * Constructor đầy đủ.
@@ -77,9 +79,9 @@ public class Invoice {
     /** Đối tượng học phí (SubjectTuition hoặc DormTuition) */
     public Tuition getTuition()      { return tuition; }
 
-    /** Lấy số tiền đã đóng từ Tuition */
-    public long getPaidAmount()      { return tuition.getPaidAmount(); }
+    /** FEE.paid_amount — lấy từ Tuition */
+    public double getPaidAmount()    { return tuition.getPaidAmount(); }
 
-    /** Lấy tổng tiền từ Tuition */
-    public long getTotalAmount()     { return tuition.getTotalAmount(); }
+    /** FEE.total_amount — lấy từ Tuition */
+    public double getTotalAmount()   { return tuition.getTotalAmount(); }
 }
