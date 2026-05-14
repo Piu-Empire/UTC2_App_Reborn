@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Nền tím nhạt giống mô tả -->
+    <solid android:color="@color/today_background"/>
+
+    <!-- Bo tròn để thành dạng pill -->
+    <corners android:radius="50dp"/>
+
+</shape>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="true"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- ── Header ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_back_arrow"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/cd_back"
+                app:tint="#000000" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/tab_grades"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                android:layout_marginStart="4dp"/>
+
+            <!-- Dropdown semester -->
+            <LinearLayout
+                android:id="@+id/btn_semester_filter"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_filter_button"
+                android:paddingStart="12dp"
+                android:paddingEnd="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/tv_selected_semester"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_all"
+                    android:textSize="13sp"
+                    android:textColor="#000000"
+                    android:maxLines="1"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dropdown_arrow"
+                    android:textSize="12sp"
+                    android:textColor="#757575"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ── Summary — khung đen, 3 cột đều nhau ── -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="#000000"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:baselineAligned="false">
+
+                <!-- GPA -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_current_gpa"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="3.20"
+                        android:text=""
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_gpa_semester"
+                        android:textSize="10sp"
+                        android:textColor="#FFC107"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#444444"/>
+
+                <!-- Tín chỉ -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_total_credits"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="17"
+                        android:text=""
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_credits_short"
+                        android:textSize="10sp"
+                        android:textColor="#FFC107"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"
+                    android:background="#444444"/>
+
+                <!-- Môn qua -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal">
+
+                    <TextView
+                        android:id="@+id/tv_passed_subjects"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        tools:text="4/6"
+                        android:text=""
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_passed_subjects"
+                        android:textSize="10sp"
+                        android:textColor="#FFC107"
+                        android:layout_marginTop="2dp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ── Table Header ── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:background="#FEF3D7"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:text="@string/header_subject"
+                android:textSize="11sp"
+                android:textColor="#757575"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/header_midterm"
+                android:textSize="11sp"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/header_final"
+                android:textSize="11sp"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/header_score"
+                android:textSize="11sp"
+                android:textColor="#757575"
+                android:textStyle="bold"
+                android:gravity="center"/>
+
+        </LinearLayout>
+
+        <!-- ── RecyclerView ── -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_grades"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"/>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

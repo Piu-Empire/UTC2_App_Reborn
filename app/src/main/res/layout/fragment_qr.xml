@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    fragment_qr.xml — YELLOW THEME + REDESIGNED HEADER
+    ──────────────────────────────────────────────────────────────
+    View Binding class: FragmentQrBinding
+
+    Thay đổi:
+      1. Màu chủ đạo: Tím → Vàng (#FFC107)
+      2. Header mới:
+           • CardView bao quanh name + badge MSSV
+           • Tên: Bold, 20sp, đen
+           • MSSV: Badge vàng, chữ đen, bo góc 12dp
+      3. Button "Sao chép": filled vàng, chữ đen
+      4. Button "Lưu" / "Chia sẻ": outlined, stroke vàng, text đen
+-->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
+
+    <!-- ══════════════════════════════════════
+         TOOLBAR
+         ══════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="16dp"
+        android:background="@color/white">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_arrow_back"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:contentDescription="Quay lại" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Mã QR Sinh viên"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Scrollable body -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="40dp">
+
+            <!-- ══════════════════════════════════
+                 HEADER CARD  (Name + Badge MSSV)
+                 ══════════════════════════════════ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="24dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingTop="20dp"
+                    android:paddingBottom="20dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp">
+
+                    <!-- Tên sinh viên -->
+                    <TextView
+                        android:id="@+id/tv_qr_student_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/text_primary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.01"
+                        android:gravity="center" />
+
+                    <!-- Badge MSSV: nền vàng, chữ đen, bo góc -->
+                    <TextView
+                        android:id="@+id/tv_qr_student_code"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        android:textColor="@color/on_accent"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:background="@drawable/bg_badge_yellow"
+                        android:gravity="center" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- ══════════════════════════════════
+                 QR CODE CARD
+                 ══════════════════════════════════ -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="280dp"
+                android:layout_height="280dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:cardBackgroundColor="@color/white">
+
+                <ImageView
+                    android:id="@+id/iv_qr_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="20dp"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="Mã QR sinh viên" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- ══════════════════════════════════
+                 ACTION BUTTONS
+                 ══════════════════════════════════ -->
+
+            <!-- Sao chép — filled vàng, chữ đen -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_copy_code"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="28dp"
+                android:text="Sao chép mã số sinh viên"
+                android:textColor="@color/on_accent"
+                android:textSize="15sp"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                app:backgroundTint="@color/accent_yellow"
+                app:cornerRadius="26dp"
+                app:icon="@drawable/ic_copy"
+                app:iconTint="@color/on_accent"
+                app:iconGravity="textStart" />
+
+            <!-- Lưu ảnh — outlined vàng -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_save_qr"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="12dp"
+                android:text="LƯU ẢNH MÃ QR"
+                android:textColor="@color/accent_yellow_dark"
+                android:textSize="13sp"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true"
+                app:strokeColor="@color/accent_yellow"
+                app:strokeWidth="2dp"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="26dp"
+                app:icon="@drawable/ic_download"
+                app:iconTint="@color/accent_yellow_dark"
+                app:iconGravity="textStart" />
+
+            <!-- Chia sẻ — outlined vàng -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_share_qr"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginStart="24dp"
+                android:layout_marginEnd="24dp"
+                android:layout_marginTop="8dp"
+                android:text="CHIA SẺ"
+                android:textColor="@color/accent_yellow_dark"
+                android:textSize="13sp"
+                android:letterSpacing="0.08"
+                android:textAllCaps="true"
+                app:strokeColor="@color/accent_yellow"
+                app:strokeWidth="2dp"
+                app:backgroundTint="@color/white"
+                app:cornerRadius="26dp"
+                app:icon="@drawable/ic_share"
+                app:iconTint="@color/accent_yellow_dark"
+                app:iconGravity="textStart" />
+
+            <!-- Caption -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:text="Quét mã QR này để xác thực thông tin sinh viên"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

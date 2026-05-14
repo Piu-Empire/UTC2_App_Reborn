@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+  <!-- Rect (copy layer) -->
+  <path
+      android:fillColor="@android:color/transparent"
+      android:pathData="M10,8 h10 a2,2 0 0 1 2,2 v10 a2,2 0 0 1 -2,2 h-10 a2,2 0 0 1 -2,-2 v-10 a2,2 0 0 1 2,-2 z"
+      android:strokeColor="#000000"
+      android:strokeWidth="2"/>
+
+  <!-- Back shape -->
+  <path
+      android:fillColor="@android:color/transparent"
+      android:pathData="M4,16c-1.1,0 -2,-0.9 -2,-2 V4c0,-1.1 0.9,-2 2,-2 h10c1.1,0 2,0.9 2,2"
+      android:strokeColor="#000000"
+      android:strokeWidth="2"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
+
+</vector>

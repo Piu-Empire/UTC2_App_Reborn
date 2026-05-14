@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_content_rounded_top.xml
+    Nền trắng chỉ bo 2 góc trên, dùng cho phần nội dung
+    trang Home để tạo hiệu ứng "card nổi lên trên header ảnh".
+    Đặt tại: res/drawable/bg_content_rounded_top.xml
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#FFFFFF" />
+
+    <!-- Chỉ bo 2 góc trên, 2 góc dưới giữ thẳng -->
+    <corners
+        android:topLeftRadius="20dp"
+        android:topRightRadius="20dp"
+        android:bottomLeftRadius="0dp"
+        android:bottomRightRadius="0dp" />
+
+</shape>

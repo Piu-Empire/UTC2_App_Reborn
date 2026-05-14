@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_week">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <include
+                android:id="@+id/timeColumn"
+                layout="@layout/item_timecolumn_schedule"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content" />
+
+            <HorizontalScrollView
+                android:id="@+id/headerScroll"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:id="@+id/weekHeaderContainer"
+                        android:layout_width="700dp"
+                        android:layout_height="60dp"
+                        android:background="@color/white"
+                        android:elevation="2dp"
+                        android:orientation="horizontal" />
+
+                    <com.utc2.appreborn.ui.schedule.ScheduleCanvasView
+                        android:id="@+id/scheduleCanvasView"
+                        android:layout_width="700dp"
+                        android:layout_height="1200dp" />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/floatingHeaderRoot"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="60dp"
+            android:layout_height="match_parent" />
+
+        <HorizontalScrollView
+            android:id="@+id/floatingHeaderScroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/floatingHeaderContainer"
+                android:layout_width="700dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" />
+
+        </HorizontalScrollView>
+    </LinearLayout>
+</FrameLayout>

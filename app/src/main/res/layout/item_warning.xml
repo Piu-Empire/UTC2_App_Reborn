@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_warning.xml
+    Dùng MaterialCardView để strokeColor hoạt động (CardView cũ không hỗ trợ).
+    - NGHIÊM TRỌNG : nền đỏ nhạt (#FFEBEE), stroke đỏ, badge ⚠ góc trên phải
+    - Thường        : nền trắng, stroke xám nhạt, không badge
+    Màu và strokeWidth được set bằng Java trong WarningAdapter.
+-->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_warning_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#E0E0E0"
+    app:strokeWidth="1dp">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:id="@+id/tv_warning_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:paddingEnd="30dp"
+                android:maxLines="2"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tv_warning_subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="12sp"
+                android:textColor="#757575"
+                android:layout_marginTop="3dp"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/tv_warning_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="11sp"
+                android:textColor="#9E9E9E"
+                android:layout_marginTop="6dp"/>
+
+        </LinearLayout>
+
+        <!-- Badge ⚠ — chỉ NGHIÊM TRỌNG -->
+        <ImageView
+            android:id="@+id/iv_serious_badge"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_warning_triangle"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="14dp"
+            android:visibility="gone"
+            android:contentDescription="Nghiêm trọng"/>
+
+    </FrameLayout>
+</com.google.android.material.card.MaterialCardView>

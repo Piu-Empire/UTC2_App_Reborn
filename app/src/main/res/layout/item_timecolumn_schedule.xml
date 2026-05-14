@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="45dp"
+    android:layout_height="wrap_content"
+    android:paddingBottom="24dp"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tv07"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="07:00" />
+
+    <TextView
+        android:id="@+id/tv08"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="08:00" />
+
+    <TextView
+        android:id="@+id/tv09"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="09:00" />
+
+    <TextView
+        android:id="@+id/tv10"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="10:00" />
+
+    <TextView
+        android:id="@+id/tv11"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="11:00" />
+
+    <TextView
+        android:id="@+id/tv12"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="12:00" />
+
+    <TextView
+        android:id="@+id/tv13"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="13:00" />
+
+    <TextView
+        android:id="@+id/tv14"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="14:00" />
+
+    <TextView
+        android:id="@+id/tv15"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="15:00" />
+
+    <TextView
+        android:id="@+id/tv16"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="16:00" />
+
+    <TextView
+        android:id="@+id/tv17"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="17:00" />
+
+    <TextView
+        android:id="@+id/tv18"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="18:00" />
+
+    <TextView
+        android:id="@+id/tv19"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="19:00" />
+
+    <TextView
+        android:id="@+id/tv20"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="20:00" />
+
+    <TextView
+        android:id="@+id/tv21"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="21:00" />
+
+    <TextView
+        android:id="@+id/tv22"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="22:00" />
+
+    <TextView
+        android:id="@+id/tv23"
+        style="@style/ScheduleTimeCellStyle"
+        android:textColor="@color/time"
+        android:text="23:00" />
+
+    <TextView
+        android:id="@+id/tvCurrentTimeLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="2dp"
+        android:background="@drawable/bg_current_time"
+        android:textColor="@color/white"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:paddingVertical="2dp"
+        android:elevation="4dp"
+        android:text="14:20"
+        android:visibility="invisible" />
+</RelativeLayout>
