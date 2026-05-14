@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.profile;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -14,6 +15,12 @@ public class GraduationRequirementsActivity extends AppCompatActivity {
 
     private static final String TAG = "GraduationReq";
     private TextView tvRequirementsContent;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

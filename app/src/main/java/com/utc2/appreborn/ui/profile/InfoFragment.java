@@ -52,42 +52,36 @@ public class InfoFragment extends Fragment {
     }
 
     private void setupRecyclerView(RecyclerView recyclerView) {
-        // ── Lấy dữ liệu từ SessionManager + MockHelper ────────────────
-        // Khi có DB/API: thay bằng Room query hoặc Retrofit call
-        // theo TABLE USER_PROFILE và TABLE STUDENT_PROFILE
         SessionManager session = SessionManager.getInstance(getContext());
 
-        // TABLE USER_PROFILE
-        String fullName   = MockHelper.getMockFullName();     // USER_PROFILE.full_name
-        String phone      = MockHelper.getMockPhone();         // USER_PROFILE.phone_number
-        String dob        = MockHelper.getMockDateOfBirth();   // USER_PROFILE.date_of_birth
-        String gender     = MockHelper.getMockGender();        // USER_PROFILE.gender
-        String email      = session.getEmail();                // USER.email
+        String fullName   = MockHelper.getMockFullName();
+        String phone      = MockHelper.getMockPhone();
+        String dob        = MockHelper.getMockDateOfBirth();
+        String gender     = MockHelper.getMockGender();
+        String email      = session.getEmail();
 
-        // TABLE STUDENT_PROFILE
-        String studentCode   = MockHelper.getMockStudentCode(); // student_code (MSSV)
-        String faculty       = MockHelper.getMockFaculty();     // faculty
-        String major         = MockHelper.getMockMajor();       // major
-        String academicYear  = MockHelper.getMockAcademicYear();// academic_year
-        String className     = MockHelper.getMockClassName();   // class_name
-        String status        = MockHelper.getMockStatus();      // status
+        String studentCode   = MockHelper.getMockStudentCode();
+        String faculty       = MockHelper.getMockFaculty();
+        String major         = MockHelper.getMockMajor();
+        String academicYear  = MockHelper.getMockAcademicYear();
+        String className     = MockHelper.getMockClassName();
+        String status        = MockHelper.getMockStatus();
 
-        // TABLE ADVISOR (via STUDENT_PROFILE.advisor_id)
-        String advisorName   = MockHelper.getMockAdvisorName(); // ADVISOR.full_name
+        String advisorName   = MockHelper.getMockAdvisorName();
 
         List<StudentInfoItem> infoList = new ArrayList<>();
-        infoList.add(new StudentInfoItem("Họ và Tên",            fullName));
-        infoList.add(new StudentInfoItem("Mã số sinh viên",      studentCode));
-        infoList.add(new StudentInfoItem("Lớp",                  className));
-        infoList.add(new StudentInfoItem("Ngành",                major));
-        infoList.add(new StudentInfoItem("Khoa",                 faculty));
-        infoList.add(new StudentInfoItem("Khóa",                 academicYear));
-        infoList.add(new StudentInfoItem("Hệ đào tạo",           status));
-        infoList.add(new StudentInfoItem("Ngày sinh",            dob));
-        infoList.add(new StudentInfoItem("Giới tính",            gender));
-        infoList.add(new StudentInfoItem("Email",                email.isEmpty() ? "Chưa đăng nhập" : email));
-        infoList.add(new StudentInfoItem("Số điện thoại",        phone));
-        infoList.add(new StudentInfoItem("Cố vấn học tập",       advisorName));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_fullname),     fullName));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_mssv),         studentCode));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_class),        className));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_major),        major));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_faculty),      faculty));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_course),       academicYear));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_training_type), status));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_dob),          dob));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_gender),       gender));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_email),        email.isEmpty() ? getString(R.string.default_email) : email));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_phone),        phone));
+        infoList.add(new StudentInfoItem(getString(R.string.info_label_advisor),      advisorName));
 
         StudentInfoAdapter adapter = new StudentInfoAdapter(infoList);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -108,7 +102,7 @@ public class InfoFragment extends Fragment {
         btnLogout.setOnClickListener(v -> handleLogout());
 
         imgStudentCard.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Chi tiết thẻ sinh viên", Toast.LENGTH_SHORT).show());
+                Toast.makeText(getContext(), getString(R.string.student_card), Toast.LENGTH_SHORT).show());
     }
 
     private void handleLogout() {
@@ -116,7 +110,6 @@ public class InfoFragment extends Fragment {
 
         SessionManager sessionManager = SessionManager.getInstance(getActivity());
 
-        // Bug fix: "GOOGLE" uppercase để match với giá trị lưu trong SessionManager
         if ("GOOGLE".equals(sessionManager.getLoginType())) {
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestEmail()
@@ -124,7 +117,6 @@ public class InfoFragment extends Fragment {
                     .build();
             GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
 
-            // Bug fix: chờ signOut xong mới xóa session và chuyển màn hình
             googleSignInClient.signOut().addOnCompleteListener(task -> {
                 sessionManager.logout();
                 navigateToLogin();

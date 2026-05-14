@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -32,8 +33,14 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     private List<SubjectTuition> subjectList;
     private TextView tvTotalAmount;
     private Button btnPay;
-    private long totalAmount = 0;
+    private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,14 +98,14 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     }
 
     private void calculateTotal() {
-        totalAmount = 0;
+        totalAmount = 0.0;
         for (SubjectTuition subject : subjectList) {
             // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!subject.isPaid()) {
                 totalAmount += subject.getAmount();
             }
         }
-        tvTotalAmount.setText(String.format(Locale.getDefault(), "%,d VND", totalAmount));
+        tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
     }
 
     private void setupRecyclerView() {
@@ -127,7 +134,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
 
-        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,d VND", totalAmount));
+        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
         String bankId = "ICB";
         String accountNo = "102882730986";
@@ -135,7 +142,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         String description = "AppReborn%20Hoc%20phi%20mon%20hoc";
 
         String qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png"
-                + "?amount=" + totalAmount
+                + "?amount=" + (long) totalAmount
                 + "&addInfo=" + description
                 + "&accountName=" + accountName;
 

@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.public_services;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,12 @@ public class ServiceDetailActivity extends AppCompatActivity {
 
     private TextView tvTitle, tvStatus, tvTime;
     private LinearLayout layoutDynamicContent;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

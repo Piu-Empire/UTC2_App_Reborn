@@ -2,6 +2,7 @@ package com.utc2.appreborn.ui.news;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.view.View;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -33,6 +34,12 @@ public class NewsDetailActivity extends AppCompatActivity {
     public static final String EXTRA_CONTENT = "extra_content"; // URL hoặc HTML
 
     private ActivityNewsDetailBinding binding;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

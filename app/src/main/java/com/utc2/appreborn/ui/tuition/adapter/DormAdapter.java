@@ -47,7 +47,7 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
 
         // Hiển thị số tiền (Định dạng kiểu 1,000,000 VND)
         if (holder.tvDormAmount != null) {
-            String formattedAmount = String.format(Locale.getDefault(), "%,d VND", item.getAmount());
+            String formattedAmount = String.format(Locale.getDefault(), "%,.0f VND", item.getAmount());
             holder.tvDormAmount.setText(formattedAmount);
         }
     }

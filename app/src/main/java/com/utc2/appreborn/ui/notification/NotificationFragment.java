@@ -159,7 +159,7 @@ public class NotificationFragment extends Fragment {
             Log.e(TAG, "Cannot open Gmail: " + e.getMessage());
             android.widget.Toast.makeText(
                     requireContext(),
-                    "Không thể mở Gmail. Vui lòng kiểm tra lại.",
+                    getString(R.string.error_open_gmail),
                     android.widget.Toast.LENGTH_SHORT
             ).show();
         }

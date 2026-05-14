@@ -5,98 +5,69 @@ package com.utc2.appreborn.ui.tuition.model;
  * ──────────────────────────────────────────────────────────────
  * Đại diện một khoản học phí học phần.
  *
- * Mapping: TABLE FEE JOIN TABLE ENROLLMENT JOIN TABLE COURSE JOIN TABLE SEMESTER
+ * Mapping: TABLE FEE JOIN ENROLLMENT JOIN COURSE JOIN SEMESTER
  *
- * feeId        ↔ FEE.fee_id          PK
- * courseId     ↔ COURSE.course_id    FK  ← THÊM MỚI
- * courseCode   ↔ COURSE.course_code       ← THÊM MỚI
- * name         ↔ COURSE.course_name
- * credits      ↔ COURSE.credits           ← THÊM MỚI (int, không phải String)
- * courseType   ↔ COURSE.course_type  "THEORY"|"PRACTICE"|"MIXED"  ← THÊM MỚI
- * semesterName ↔ SEMESTER.semester_name   ← THÊM MỚI
- * details      ↔ credits + semesterName  (ghép để hiển thị)
- * totalAmount  ↔ FEE.total_amount
- * status       ↔ FEE.status
+ * Từ COURSE:   course_id, course_code, course_name, credits
+ * Từ SEMESTER: semester_name
+ * Từ FEE:      fee_id, user_id, semester_id, total_amount, paid_amount,
+ *              due_date, status, payment_method, paid_at
+ *
+ * FIX: totalAmount / paidAmount đổi từ long → double để khớp DECIMAL(15,2).
  */
 public class SubjectTuition extends Tuition {
 
-    // ── Hằng course_type ─────────────────────────────────────
-    public static final String COURSE_THEORY   = "THEORY";
-    public static final String COURSE_PRACTICE = "PRACTICE";
-    public static final String COURSE_MIXED    = "MIXED";
-
-    // ── Fields ────────────────────────────────────────────────
-    private long   courseId;     // COURSE.course_id  ← THÊM MỚI
-    private String courseCode;   // COURSE.course_code  ← THÊM MỚI
-    private int    credits;      // COURSE.credits  ← THÊM MỚI
-    private String courseType;   // COURSE.course_type  ← THÊM MỚI
-    private String semesterName; // SEMESTER.semester_name  ← THÊM MỚI
+    // ── Fields từ COURSE + SEMESTER ──────────────────────────
+    private long   courseId;      // COURSE.course_id
+    private String courseCode;    // COURSE.course_code
+    private int    credits;       // COURSE.credits
+    private String semesterName;  // SEMESTER.semester_name
 
     /**
-     * Constructor tối giản — tương thích ngược với code cũ.
-     *
-     * @param feeId       FEE.fee_id
-     * @param name        COURSE.course_name
-     * @param details     số tín chỉ + học kỳ (hiển thị)
-     * @param totalAmount FEE.total_amount
-     * @param status      FEE.status — dùng hằng Tuition.STATUS_*
+     * Constructor tối giản — dùng cho mock data trong Activity.
      */
-    public SubjectTuition(long feeId, String name, String details,
-                          long totalAmount, String status) {
-        super(name, details, totalAmount, status);
-        this.feeId     = feeId;
-        this.feeType   = Tuition.TYPE_TUITION;
-        this.courseType = COURSE_THEORY;
+    public SubjectTuition(long feeId, String courseName, String details,
+                          double totalAmount, String status) {
+        super();
+        this.feeId       = feeId;
+        this.name        = courseName;
+        this.details     = details;
+        this.totalAmount = totalAmount;
+        this.paidAmount  = STATUS_PAID.equals(status) ? totalAmount : 0.0;
+        this.status      = status;
     }
 
     /**
      * Constructor đầy đủ — dùng khi map từ API / Room.
      */
-    public SubjectTuition(long feeId, long userId,
-                          long courseId, String courseCode, String courseName,
-                          int credits, String courseType, String semesterName,
-                          long totalAmount, long paidAmount,
-                          String status, String dueDate,
+    public SubjectTuition(long feeId, long userId, long semesterId,
+                          double totalAmount, double paidAmount,
+                          String dueDate, String status,
                           String paymentMethod, String paidAt,
-                          String receiptNumber, long semesterId) {
-        super(feeId, userId, Tuition.TYPE_TUITION,
-                courseName,
-                credits + " TC — " + semesterName,   // details hiển thị
-                totalAmount, paidAmount,
-                status, dueDate, paymentMethod, paidAt,
-                receiptNumber, semesterId);
-        this.courseId    = courseId;
-        this.courseCode  = courseCode;
-        this.credits     = credits;
-        this.courseType  = courseType;
+                          long courseId, String courseCode,
+                          String courseName, int credits,
+                          String semesterName) {
+        super(feeId, userId, semesterId, totalAmount, paidAmount,
+                dueDate, status, paymentMethod, paidAt);
+        this.name         = courseName;
+        this.details      = credits + " TC — " + semesterName;
+        this.courseId     = courseId;
+        this.courseCode   = courseCode;
+        this.credits      = credits;
         this.semesterName = semesterName;
     }
 
     @Override
-    public String getIdentifier() {
-        return "FEE-" + feeId;
-    }
+    public String getIdentifier() { return "FEE-" + feeId; }
 
     // ── Getters ──────────────────────────────────────────────
-
-    /** FEE.fee_id (PK). */
-    public long   getFeeId()        { return feeId; }
-    /** COURSE.course_id. */
     public long   getCourseId()     { return courseId; }
-    /** COURSE.course_code (VD: "MATH101"). */
     public String getCourseCode()   { return courseCode; }
-    /** COURSE.credits. */
     public int    getCredits()      { return credits; }
-    /** COURSE.course_type — "THEORY" | "PRACTICE" | "MIXED". */
-    public String getCourseType()   { return courseType; }
-    /** SEMESTER.semester_name (VD: "Học kỳ 1 - 2023-2024"). */
     public String getSemesterName() { return semesterName; }
 
     // ── Setters ──────────────────────────────────────────────
-
-    public void setCourseId(long courseId)         { this.courseId = courseId; }
-    public void setCourseCode(String courseCode)   { this.courseCode = courseCode; }
-    public void setCredits(int credits)            { this.credits = credits; }
-    public void setCourseType(String courseType)   { this.courseType = courseType; }
-    public void setSemesterName(String name)       { this.semesterName = name; }
+    public void setCourseId(long v)       { this.courseId = v; }
+    public void setCourseCode(String v)   { this.courseCode = v; }
+    public void setCredits(int v)         { this.credits = v; }
+    public void setSemesterName(String v) { this.semesterName = v; }
 }

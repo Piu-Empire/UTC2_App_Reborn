@@ -1,6 +1,7 @@
 package com.utc2.appreborn.ui.profile.TrainingProgram;
 
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -28,6 +29,12 @@ public class TrainingProgramActivity extends AppCompatActivity {
 
     // Quản lý trạng thái mạng
     private NetworkUtils networkUtils;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,12 +107,12 @@ public class TrainingProgramActivity extends AppCompatActivity {
 
         fullList = new ArrayList<>();
         try {
-            fullList.add(new Subject("", "KỲ HỌC 1", "", "", 1, true));
+            fullList.add(new Subject("", getString(R.string.sem_1), "", "", 1, true));
             fullList.add(new Subject("BS0.001.2", "GIẢI TÍCH 1", "2", "7.80", 1, false));
             fullList.add(new Subject("BS0.101.3", "ĐẠI SỐ TUYẾN TÍNH", "3", "6.0", 1, false));
             fullList.add(new Subject("ANHA1.4", "TIẾNG ANH A1", "4", "Chưa có", 1, false));
 
-            fullList.add(new Subject("", "KỲ HỌC 2", "", "", 2, true));
+            fullList.add(new Subject("", getString(R.string.sem_2), "", "", 2, true));
             fullList.add(new Subject("IT1.002.3", "LẬP TRÌNH C++", "3", "8.5", 2, false));
             fullList.add(new Subject("IT2.005.3", "CẤU TRÚC DỮ LIỆU", "3", "Chưa có", 2, false));
         } catch (Exception e) {
@@ -135,7 +142,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e("TrainingProgram", "Lỗi khi cuộn trang: " + e.getMessage());
+            Log.e("TrainingProgram", getString(R.string.ScrollingError) + e.getMessage());
         }
     }
 
@@ -149,7 +156,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception e) {
-            Log.e("TrainingProgram", "Lỗi khi tìm kiếm: " + e.getMessage());
+            Log.e("TrainingProgram", getString(R.string.FindingError) + e.getMessage());
         } finally {
             if (adapter != null) {
                 adapter.updateList(filteredList);

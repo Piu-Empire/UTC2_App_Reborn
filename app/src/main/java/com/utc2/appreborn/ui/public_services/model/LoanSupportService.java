@@ -8,70 +8,51 @@ package com.utc2.appreborn.ui.public_services.model;
  * Mapping: TABLE SERVICE_REQUEST
  *   service_type = BaseService.TYPE_LOAN_SUPPORT  ("LOAN_SUPPORT")
  *
- * FIX: Cập nhật serviceType sang hằng tiếng Anh.
- * FIX: Thêm idCardNumber và permanentAddress — bắt buộc cho hồ sơ vay vốn.
- *
  * Dữ liệu bổ sung lấy từ:
- *   TABLE USER_PROFILE    → phoneNumber    (phone_number)
- *   TABLE USER_PROFILE    → idCardNumber   (id_card_number)    ← THÊM MỚI
- *   TABLE USER_PROFILE    → permanentAddress (permanent_address) ← THÊM MỚI
- *   TABLE STUDENT_PROFILE → studentCode   (student_code)
+ *   TABLE USER_PROFILE    → phoneNumber  (phone_number)
+ *   TABLE STUDENT_PROFILE → studentCode  (student_code)
+ *
+ * NOTE: idCardNumber và permanentAddress đã bị xóa — cột id_card_number
+ *       và permanent_address không tồn tại trong schema TABLE USER_PROFILE.
  *
  * Lưu ý: loanAmount và loanReason nên lưu trong SERVICE_REQUEST.description
- *        dưới dạng JSON khi gọi API. Ví dụ:
+ *        dưới dạng JSON. Ví dụ:
  *        {"loan_amount": "10000000", "loan_reason": "Khó khăn tài chính"}
  */
 public class LoanSupportService extends BaseService {
 
-    private String studentCode;       // STUDENT_PROFILE.student_code
-    private String loanAmount;        // số tiền vay (lưu trong description/JSON)
-    private String loanReason;        // lý do vay  (lưu trong description/JSON)
-    private String phoneNumber;       // USER_PROFILE.phone_number
-    private String idCardNumber;      // USER_PROFILE.id_card_number  ← THÊM MỚI
-    private String permanentAddress;  // USER_PROFILE.permanent_address  ← THÊM MỚI
+    private String studentCode;  // STUDENT_PROFILE.student_code
+    private String loanAmount;   // lưu trong description JSON
+    private String loanReason;   // lưu trong description JSON
+    private String phoneNumber;  // USER_PROFILE.phone_number
 
     /**
-     * Constructor tương thích ngược.
+     * Constructor duy nhất — 8 tham số.
+     * Tham số thứ 5 là studentCode (thay thế serviceType ở code cũ).
+     * serviceType luôn được gán = TYPE_LOAN_SUPPORT.
      */
     public LoanSupportService(String title, String description,
-                              long submittedAt, String status, String serviceType,
-                              String loanAmount, String loanReason, String phoneNumber) {
-        super(title, description, submittedAt, status, serviceType);
+                              long submittedAt, String status,
+                              String studentCode, String loanAmount,
+                              String loanReason, String phoneNumber) {
+        super(title, description, submittedAt, status, BaseService.TYPE_LOAN_SUPPORT);
+        this.studentCode = studentCode;
         this.loanAmount  = loanAmount;
         this.loanReason  = loanReason;
         this.phoneNumber = phoneNumber;
     }
 
-    /**
-     * Constructor đầy đủ — bao gồm CCCD và địa chỉ thường trú.
-     */
-    public LoanSupportService(String title, String description,
-                              long submittedAt, String status,
-                              String studentCode, String loanAmount, String loanReason,
-                              String phoneNumber, String idCardNumber, String permanentAddress) {
-        super(title, description, submittedAt, status, BaseService.TYPE_LOAN_SUPPORT);
-        this.studentCode      = studentCode;
-        this.loanAmount       = loanAmount;
-        this.loanReason       = loanReason;
-        this.phoneNumber      = phoneNumber;
-        this.idCardNumber     = idCardNumber;
-        this.permanentAddress = permanentAddress;
-    }
-
     // ── Getters ──────────────────────────────────────────────
 
-    public String getStudentCode()      { return studentCode; }
-    public String getLoanAmount()       { return loanAmount; }
-    public String getLoanReason()       { return loanReason; }
-    public String getPhoneNumber()      { return phoneNumber; }
-    /** USER_PROFILE.id_card_number — CCCD/CMND, bắt buộc trong hồ sơ vay vốn. */
-    public String getIdCardNumber()     { return idCardNumber; }
-    /** USER_PROFILE.permanent_address — địa chỉ thường trú. */
-    public String getPermanentAddress() { return permanentAddress; }
+    public String getStudentCode() { return studentCode; }
+    public String getLoanAmount()  { return loanAmount; }
+    public String getLoanReason()  { return loanReason; }
+    public String getPhoneNumber() { return phoneNumber; }
 
     // ── Setters ──────────────────────────────────────────────
 
-    public void setStudentCode(String studentCode)           { this.studentCode = studentCode; }
-    public void setIdCardNumber(String idCardNumber)         { this.idCardNumber = idCardNumber; }
-    public void setPermanentAddress(String permanentAddress) { this.permanentAddress = permanentAddress; }
+    public void setStudentCode(String studentCode) { this.studentCode = studentCode; }
+    public void setLoanAmount(String loanAmount)   { this.loanAmount = loanAmount; }
+    public void setLoanReason(String loanReason)   { this.loanReason = loanReason; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 }

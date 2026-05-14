@@ -3,6 +3,7 @@ package com.utc2.appreborn.ui.profile;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -26,6 +27,12 @@ public class SupportActivity extends AppCompatActivity {
     private ImageButton btnBack;
 
     private final String[] data = {"Lỗi", "Góp ý"};
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

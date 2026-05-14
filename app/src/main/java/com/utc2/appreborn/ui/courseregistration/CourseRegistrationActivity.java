@@ -3,6 +3,7 @@ package com.utc2.appreborn.ui.courseregistration;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -74,6 +75,12 @@ public class CourseRegistrationActivity extends AppCompatActivity {
     private static final String[] NGANH = {
             "Tất cả","CNTT","KTPM","HTTT","MMT","CK","XD","KT","MT","DTVT"
     };
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

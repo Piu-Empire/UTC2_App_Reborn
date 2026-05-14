@@ -31,7 +31,6 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private RecyclerView rvDormTuition;
     private List<DormTuition> dormList;
     private Button btnPayDorm;
-    private long totalAmount = 0;
     private NetworkUtils networkUtils;
 
     @Override
@@ -91,7 +90,6 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     }
 
     private void calculateTotal() {
-        totalAmount = 0;
         for (DormTuition item : dormList) {
             // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!item.isPaid()) {
@@ -125,7 +123,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
 
-        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,d VND", totalAmount));
+        tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
         String bankId = "ICB";
         String accountNo = "102882730986";
@@ -134,7 +132,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         String description = "AppReborn%20Tien%20KTX";
 
         String qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png"
-                + "?amount=" + totalAmount
+                + "?amount=" + (long) totalAmount
                 + "&addInfo=" + description
                 + "&accountName=" + accountName;
 
