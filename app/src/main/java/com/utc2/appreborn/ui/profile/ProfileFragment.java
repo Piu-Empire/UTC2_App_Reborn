@@ -17,9 +17,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.ProfileApiService;
+import com.utc2.appreborn.network.dto.ProfileResponse;
 import com.utc2.appreborn.ui.profile.TrainingProgram.TrainingProgramActivity;
 import com.utc2.appreborn.ui.settings.SettingsActivity;
 import com.utc2.appreborn.utils.NetworkUtils;
+import com.utc2.appreborn.utils.SessionManager;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
@@ -30,8 +39,8 @@ public class ProfileFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Nạp layout fragment_profile
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
@@ -40,64 +49,79 @@ public class ProfileFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initViews(view);
-        setupStudentData();
+        loadProfileData();
         setClickListeners();
     }
 
     private void initViews(View view) {
-        layoutSubjectList = view.findViewById(R.id.layoutSubjectList);
+        layoutSubjectList   = view.findViewById(R.id.layoutSubjectList);
         layoutGraduationReq = view.findViewById(R.id.layoutGraduationReq);
-        btnInfo = view.findViewById(R.id.btnProfileInfo);
-        btnChangePassword = view.findViewById(R.id.btnChangePassword);
-        btnSettings = view.findViewById(R.id.btnNotification);
-        tvStudentName = view.findViewById(R.id.tvStudentName);
-        tvStudentId = view.findViewById(R.id.tvStudentId);
+        btnInfo             = view.findViewById(R.id.btnProfileInfo);
+        btnChangePassword   = view.findViewById(R.id.btnChangePassword);
+        btnSettings         = view.findViewById(R.id.btnNotification);
+        tvStudentName       = view.findViewById(R.id.tvStudentName);
+        tvStudentId         = view.findViewById(R.id.tvStudentId);
     }
 
-    private void setupStudentData() {
-        // Hiển thị dữ liệu mẫu từ strings.xml để app chuyên nghiệp hơn
-        if (isAdded()) {
-            tvStudentName.setText(getString(R.string.default_name)); // Nguyễn Minh Phúc
-            tvStudentId.setText(getString(R.string.default_mssv));  // 2251050001
-        }
+    /** Gọi API lấy profile thực, hiển thị tên + MSSV trên header. */
+    private void loadProfileData() {
+        if (!isAdded()) return;
+
+        String token = SessionManager.getInstance(requireContext()).getAuthToken();
+        ProfileApiService profileApi = ApiClient.getInstance(token).create(ProfileApiService.class);
+
+        profileApi.getMyProfile().enqueue(new Callback<ApiResponse<ProfileResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ProfileResponse>> call,
+                                   Response<ApiResponse<ProfileResponse>> response) {
+                if (!isAdded()) return;
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    ProfileResponse p = response.body().getData();
+                    tvStudentName.setText(p.fullName  != null ? p.fullName  : "");
+                    tvStudentId.setText(p.studentId != null ? p.studentId : "");
+                } else {
+                    // Fallback hiển thị trống — không crash
+                    tvStudentName.setText("");
+                    tvStudentId.setText("");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable t) {
+                if (!isAdded()) return;
+                // Không toast lỗi ở đây để không làm phiền UX; InfoFragment đã xử lý chi tiết
+                tvStudentName.setText("");
+                tvStudentId.setText("");
+            }
+        });
     }
 
     private void setClickListeners() {
-        // Chuyển sang màn hình Thông tin chi tiết
         btnInfo.setOnClickListener(v -> {
             InfoFragment infoFragment = new InfoFragment();
-            FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-            // Đảm bảo R.id.fragment_container khớp với ID trong MainActivity của bạn
-            transaction.replace(R.id.fragment_container, infoFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
+            FragmentTransaction tx = getParentFragmentManager().beginTransaction();
+            tx.replace(R.id.fragment_container, infoFragment);
+            tx.addToBackStack(null);
+            tx.commit();
         });
 
-        // Chuyển sang màn hình Đổi mật khẩu (Chỉ kiểm tra mạng khi nhấn nút - Tối ưu RAM)[cite: 1]
         btnChangePassword.setOnClickListener(v -> {
             if (NetworkUtils.isNetworkAvailable(requireContext())) {
                 startActivity(new Intent(requireContext(), ChangePasswordActivity.class));
             } else {
-                // Sử dụng thông báo lỗi từ resources của bạn[cite: 1]
                 showToast(getString(R.string.error_connect_network));
             }
         });
 
-        // Mở Chương trình đào tạo
-        layoutSubjectList.setOnClickListener(v -> {
-            startActivity(new Intent(requireContext(), TrainingProgramActivity.class));
-        });
+        layoutSubjectList.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), TrainingProgramActivity.class)));
 
-        // Mở Điều kiện tốt nghiệp
-        layoutGraduationReq.setOnClickListener(v -> {
-            // Lưu ý: Đảm bảo bạn đã tạo GraduationRequirementsActivity
-            startActivity(new Intent(requireContext(), GraduationRequirementsActivity.class));
-        });
+        layoutGraduationReq.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), GraduationRequirementsActivity.class)));
 
-        btnSettings.setOnClickListener(v -> {
-            // Lưu ý: Đảm bảo bạn đã tạo GraduationRequirementsActivity
-            startActivity(new Intent(requireContext(), SettingsActivity.class));
-        });
+        btnSettings.setOnClickListener(v ->
+                startActivity(new Intent(requireContext(), SettingsActivity.class)));
     }
 
     private void showToast(String msg) {

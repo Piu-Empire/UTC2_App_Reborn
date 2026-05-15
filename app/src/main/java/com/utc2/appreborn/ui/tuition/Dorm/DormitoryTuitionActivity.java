@@ -115,7 +115,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                                     t.id != null ? t.id.intValue() : 0,
                                     "Học kỳ " + t.semesterId,
                                     t.dueDate != null ? t.dueDate : "",
-                                    t.remainingAmount != null ? t.remainingAmount : 0.0,
+                                    t.getRemainingAmountAsDouble(),
                                     t.status
                             ));
                         }

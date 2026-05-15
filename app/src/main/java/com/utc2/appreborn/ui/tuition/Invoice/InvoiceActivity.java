@@ -99,8 +99,8 @@ public class InvoiceActivity extends AppCompatActivity {
 
                         // FIX NPE: dùng constructor với amount tường minh,
                         // không truyền tuition=null nữa
-                        double totalAmount = t.totalAmount != null ? t.totalAmount : 0.0;
-                        double paidAmount  = t.paidAmount  != null ? t.paidAmount  : 0.0;
+                        double totalAmount = t.getTotalAmountAsDouble();
+                        double paidAmount  = t.getPaidAmountAsDouble();
 
                         invoiceList.add(new Invoice(
                                 "UTC2_" + feeId,

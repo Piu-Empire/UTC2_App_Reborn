@@ -16,6 +16,7 @@
         android:padding="16dp"
         android:background="@color/white">
 
+        <!-- Tên môn học -->
         <TextView
             android:id="@+id/tvName"
             android:layout_width="match_parent"
@@ -25,6 +26,7 @@
             android:textSize="16sp"
             android:textStyle="bold" />
 
+        <!-- Hàng 1: mã môn | tín chỉ | điểm số -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -72,5 +74,37 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
+
+        <!-- Hàng 2: GPA | trạng thái đạt/không đạt (ẩn nếu chưa có điểm) -->
+        <LinearLayout
+            android:id="@+id/layoutGradeDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvGradePoint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_gray"
+                android:textSize="12sp" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
     </LinearLayout>
 </androidx.cardview.widget.CardView>

@@ -118,7 +118,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                                     t.id != null ? t.id.intValue() : 0,
                                     "Học kỳ " + t.semesterId,
                                     "",
-                                    t.remainingAmount != null ? t.remainingAmount : 0.0,
+                                    t.getRemainingAmountAsDouble(),
                                     t.status
                             ));
                         }
