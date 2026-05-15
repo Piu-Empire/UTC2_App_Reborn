@@ -23,6 +23,17 @@ import com.utc2.appreborn.ui.tuition.adapter.DormAdapter;
 import com.utc2.appreborn.ui.tuition.model.DormTuition;
 import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
+import com.utc2.appreborn.utils.SessionManager;
+
+// THÊM MỚI
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.TuitionApiService;
+import com.utc2.appreborn.network.dto.TuitionResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -30,16 +41,15 @@ import java.util.Locale;
 public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private RecyclerView rvDormTuition;
-    private List<DormTuition> dormList;
+    private List<DormTuition> dormList = new ArrayList<>();
     private Button btnPayDorm;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +60,6 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
             initViews();
             setupNetworkMonitoring();
             loadDormData();
-            calculateTotal();
-            setupRecyclerView();
         } catch (Exception e) {
             Log.e("DormTuition", "Lỗi khởi tạo: " + e.getMessage());
         }
@@ -88,19 +96,49 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         networkUtils.register();
     }
 
+    // ĐÃ SỬA: gọi API thay data cứng
     private void loadDormData() {
-        dormList = new ArrayList<>();
-        // dormRegId, roomName, details, totalFee, status — dùng hằng Tuition.STATUS_*
-        // Mapping: DORMITORY_REGISTRATION.dorm_reg_id, DORMITORY_ROOM.room_code
-        dormList.add(new DormTuition(1, "Phòng 402 - Dãy B", "Tháng 03/2026 - Điện nước", 650000, Tuition.STATUS_UNPAID));
-        dormList.add(new DormTuition(2, "Phòng 402 - Dãy B", "Tháng 02/2026 - Điện nước", 720000, Tuition.STATUS_UNPAID));
-        dormList.add(new DormTuition(3, "Phòng 402 - Dãy B", "Học kỳ 2 - Tiền phòng",    1500000, Tuition.STATUS_PAID));
+        String token = SessionManager.getInstance(this).getAuthToken();
+        TuitionApiService tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
+
+        tuitionApi.getSummary().enqueue(new Callback<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> call,
+                                   Response<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    dormList.clear();
+                    List<TuitionResponse> semesters = response.body().getData().semesters;
+                    if (semesters != null) {
+                        for (TuitionResponse t : semesters) {
+                            dormList.add(new DormTuition(
+                                    t.id != null ? t.id.intValue() : 0,
+                                    "Học kỳ " + t.semesterId,
+                                    t.dueDate != null ? t.dueDate : "",
+                                    t.remainingAmount != null ? t.remainingAmount : 0.0,
+                                    t.status
+                            ));
+                        }
+                    }
+                    calculateTotal();
+                    setupRecyclerView();
+                } else {
+                    Toast.makeText(DormitoryTuitionActivity.this,
+                            "Không tải được dữ liệu KTX", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> call, Throwable t) {
+                Toast.makeText(DormitoryTuitionActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void calculateTotal() {
         totalAmount = 0.0;
         for (DormTuition item : dormList) {
-            // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!item.isPaid()) {
                 totalAmount += item.getAmount();
             }
@@ -109,8 +147,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         rvDormTuition.setLayoutManager(new LinearLayoutManager(this));
-        DormAdapter adapter = new DormAdapter(dormList);
-        rvDormTuition.setAdapter(adapter);
+        rvDormTuition.setAdapter(new DormAdapter(dormList));
     }
 
     private void showPaymentDialog() {
@@ -134,21 +171,12 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
         tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
-        String bankId = "ICB";
-        String accountNo = "102882730986";
-        String accountName = "HINH%20VINH%20PHAT";
-        // Đổi description cho KTX
-        String description = "AppReborn%20Tien%20KTX";
-
-        String qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png"
+        String qrUrl = "https://img.vietqr.io/image/ICB-102882730986-compact.png"
                 + "?amount=" + (long) totalAmount
-                + "&addInfo=" + description
-                + "&accountName=" + accountName;
+                + "&addInfo=AppReborn%20Tien%20KTX"
+                + "&accountName=HINH%20VINH%20PHAT";
 
-        Glide.with(this)
-                .load(qrUrl)
-                .placeholder(R.drawable.logo_utc2)
-                .into(imgQr);
+        Glide.with(this).load(qrUrl).placeholder(R.drawable.logo_utc2).into(imgQr);
 
         btnConfirm.setOnClickListener(v -> {
             Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();

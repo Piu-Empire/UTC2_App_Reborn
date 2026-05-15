@@ -5,31 +5,26 @@ package com.utc2.appreborn.ui.tuition.model;
  * ──────────────────────────────────────────────────────────────
  * Đại diện hóa đơn sau khi thanh toán — mapping với TABLE FEE.
  *
- * MySQL schema (TABLE FEE):
- *   fee_id           BIGINT PK
- *   user_id          BIGINT FK → USER
- *   semester_id      BIGINT FK → SEMESTER
- *   total_amount     DECIMAL(15,2)
- *   paid_amount      DECIMAL(15,2)
- *   remaining_amount DECIMAL(15,2)
- *   due_date         DATE
- *   status           VARCHAR(50)
- *   payment_method   VARCHAR(50)
- *   paid_at          TIMESTAMP
- *
- * FIX: getPaidAmount() / getTotalAmount() đổi sang double để khớp Tuition.
+ * FIX NPE: Thêm totalAmount và paidAmount trực tiếp vào Invoice
+ * để InvoiceAdapter không phụ thuộc vào tuition != null.
+ * getTotalAmount() / getPaidAmount() ưu tiên field riêng,
+ * fallback sang tuition nếu có.
  */
 public class Invoice {
 
-    private String  invoiceCode;   // mã hiển thị (VD: "UTC2_2026_001") — không phải PK DB
+    private String  invoiceCode;   // mã hiển thị (VD: "UTC2_2026_001")
     private long    feeId;         // FEE.fee_id — PK
     private long    semesterId;    // FEE.semester_id
-    private String  paidAt;        // FEE.paid_at  "dd/MM/yyyy HH:mm"
+    private String  paidAt;        // FEE.paid_at  "yyyy-MM-dd'T'HH:mm:ss" hoặc ""
     private String  paymentMethod; // FEE.payment_method
-    private Tuition tuition;       // đối tượng học phí được thanh toán (đa hình)
+    private Tuition tuition;       // nullable — đa hình, có thể null khi map từ API
+
+    // FIX: field riêng để adapter hiển thị khi tuition == null
+    private double  totalAmount;
+    private double  paidAmount;
 
     /**
-     * Constructor đầy đủ.
+     * Constructor đầy đủ — dùng khi map từ API (tuition có thể null).
      */
     public Invoice(String invoiceCode, long feeId, long semesterId,
                    String paidAt, String paymentMethod, Tuition tuition) {
@@ -39,12 +34,32 @@ public class Invoice {
         this.paidAt        = paidAt;
         this.paymentMethod = paymentMethod;
         this.tuition       = tuition;
+        // sync amount từ tuition nếu có
+        if (tuition != null) {
+            this.totalAmount = tuition.getTotalAmount();
+            this.paidAmount  = tuition.getPaidAmount();
+        }
     }
 
     /**
-     * Constructor tối giản — tương thích với code cũ dùng (invoiceID, date, tuition).
-     *
-     * @deprecated Dùng constructor đầy đủ để map đúng schema DB.
+     * Constructor với amount tường minh — dùng khi map từ TuitionResponse (tuition = null).
+     */
+    public Invoice(String invoiceCode, long feeId, long semesterId,
+                   String paidAt, String paymentMethod,
+                   double totalAmount, double paidAmount) {
+        this.invoiceCode   = invoiceCode;
+        this.feeId         = feeId;
+        this.semesterId    = semesterId;
+        this.paidAt        = paidAt;
+        this.paymentMethod = paymentMethod;
+        this.tuition       = null;
+        this.totalAmount   = totalAmount;
+        this.paidAmount    = paidAmount;
+    }
+
+    /**
+     * Constructor tối giản — tương thích ngược.
+     * @deprecated Dùng constructor đầy đủ.
      */
     @Deprecated
     public Invoice(String invoiceCode, String paidAt, Tuition tuition) {
@@ -53,35 +68,41 @@ public class Invoice {
 
     // ── Getters ───────────────────────────────────────────────
 
-    /** Mã hóa đơn hiển thị (không phải FEE.fee_id) */
     public String getInvoiceCode()   { return invoiceCode; }
 
     /** @deprecated Dùng {@link #getInvoiceCode()} */
     @Deprecated
     public String getInvoiceID()     { return invoiceCode; }
 
-    /** FEE.fee_id */
-    public long getFeeId()           { return feeId; }
-
-    /** FEE.semester_id */
-    public long getSemesterId()      { return semesterId; }
-
-    /** FEE.paid_at */
+    public long   getFeeId()         { return feeId; }
+    public long   getSemesterId()    { return semesterId; }
     public String getPaidAt()        { return paidAt; }
 
     /** @deprecated Dùng {@link #getPaidAt()} */
     @Deprecated
     public String getDate()          { return paidAt; }
 
-    /** FEE.payment_method */
-    public String getPaymentMethod() { return paymentMethod; }
+    public String  getPaymentMethod() { return paymentMethod; }
 
-    /** Đối tượng học phí (SubjectTuition hoặc DormTuition) */
-    public Tuition getTuition()      { return tuition; }
+    /** Có thể null khi Invoice được tạo từ API response trực tiếp. */
+    public Tuition getTuition()       { return tuition; }
 
-    /** FEE.paid_amount — lấy từ Tuition */
-    public double getPaidAmount()    { return tuition.getPaidAmount(); }
+    /**
+     * FIX: null-safe — trả field riêng nếu tuition == null.
+     */
+    public double getTotalAmount() {
+        return tuition != null ? tuition.getTotalAmount() : totalAmount;
+    }
 
-    /** FEE.total_amount — lấy từ Tuition */
-    public double getTotalAmount()   { return tuition.getTotalAmount(); }
+    /**
+     * FIX: null-safe — trả field riêng nếu tuition == null.
+     */
+    public double getPaidAmount() {
+        return tuition != null ? tuition.getPaidAmount() : paidAmount;
+    }
+
+    // ── Setters ───────────────────────────────────────────────
+
+    public void setTotalAmount(double v) { this.totalAmount = v; }
+    public void setPaidAmount(double v)  { this.paidAmount  = v; }
 }

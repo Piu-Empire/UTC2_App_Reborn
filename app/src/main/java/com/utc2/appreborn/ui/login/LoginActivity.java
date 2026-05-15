@@ -24,8 +24,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-// chưa cần này là dùng scope
-// import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -37,6 +35,17 @@ import com.utc2.appreborn.ui.main.MainActivity;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
 
+// THÊM MỚI
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.AuthApiService;
+import com.utc2.appreborn.network.dto.AuthResponse;
+import com.utc2.appreborn.network.dto.LoginRequest;
+import com.utc2.appreborn.network.dto.GoogleAuthRequest;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class LoginActivity extends AppCompatActivity {
 
     private static final String TAG = "AppReborn_Login";
@@ -44,6 +53,7 @@ public class LoginActivity extends AppCompatActivity {
     private GoogleSignInClient mGoogleSignInClient;
     private SessionManager sessionManager;
     private Dialog loadingDialog;
+    private AuthApiService authApi; // THÊM MỚI
 
     private final ActivityResultLauncher<Intent> googleSignInLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -59,12 +69,11 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
     );
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +81,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sessionManager = SessionManager.getInstance(this);
+        authApi = ApiClient.getPublicInstance().create(AuthApiService.class); // THÊM MỚI
 
         if (sessionManager.isLoggedIn()) {
             navigateToMain();
@@ -141,7 +151,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         };
 
-        // Luu y: Kiem tra lai vi tri index neu ban thay doi text tieng Viet
         ss.setSpan(termsClick, 36, 54, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ss.setSpan(privacyClick, 58, 76, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
 
@@ -154,13 +163,11 @@ public class LoginActivity extends AppCompatActivity {
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .requestIdToken(getString(R.string.default_web_client_id))
-                // quyền đọc Gmail
-                //tạm thời chưa cần quyền đọc Gmail dươis
-                //.requestScopes(new Scope("https://www.googleapis.com/auth/gmail.readonly"))
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
     }
 
+    // ĐÃ SỬA
     private void performManualLogin() {
         String inputMssv = editMssv.getText().toString().trim();
         String inputPass = editPassword.getText().toString().trim();
@@ -171,16 +178,38 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         setLoading(true);
-        if (inputMssv.equals(getString(R.string.default_mssv)) && inputPass.equals("123456")) {
-            // Mapping: USER.auth_provider = "EMAIL", STUDENT_PROFILE.student_code = inputMssv
-            // userId = -1 vì chưa có DB thực — sẽ thay bằng ID thật sau khi có API
-            sessionManager.createLoginSession("MANUAL_TOKEN", "EMAIL", inputMssv, -1L, inputMssv);
-            setLoading(false);
-            navigateToMain();
-        } else {
-            setLoading(false);
-            showToast(getString(R.string.wrong_email_or_pass));
-        }
+
+        authApi.login(new LoginRequest(inputMssv, inputPass))
+                .enqueue(new Callback<ApiResponse<AuthResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<AuthResponse>> call,
+                                           Response<ApiResponse<AuthResponse>> response) {
+                        setLoading(false);
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            AuthResponse auth = response.body().getData();
+                            sessionManager.createLoginSession(
+                                    auth.accessToken,
+                                    "EMAIL",
+                                    auth.username,
+                                    -1L,
+                                    auth.username
+                            );
+                            navigateToMain();
+                        } else {
+                            String msg = response.body() != null
+                                    ? response.body().getMessage()
+                                    : getString(R.string.wrong_email_or_pass);
+                            showToast(msg);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<AuthResponse>> call, Throwable t) {
+                        setLoading(false);
+                        showToast("Lỗi kết nối: " + t.getMessage());
+                    }
+                });
     }
 
     private void performSkipLogin() {
@@ -196,16 +225,43 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInLauncher.launch(mGoogleSignInClient.getSignInIntent());
     }
 
+    // ĐÃ SỬA
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            if (account != null) {
-                // Mapping: USER.auth_provider = "GOOGLE", USER.email = account.getEmail()
-                // userId = -1 tạm thời — thay bằng user_id từ backend sau khi có API
-                sessionManager.createLoginSession(account.getIdToken(), "GOOGLE",
-                        account.getEmail(), -1L, null);
-                navigateToMain();
-            }
+            if (account == null) return;
+
+            setLoading(true);
+
+            authApi.googleLogin(new GoogleAuthRequest(account.getIdToken()))
+                    .enqueue(new Callback<ApiResponse<AuthResponse>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<AuthResponse>> call,
+                                               Response<ApiResponse<AuthResponse>> response) {
+                            setLoading(false);
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().isSuccess()) {
+                                AuthResponse auth = response.body().getData();
+                                sessionManager.createLoginSession(
+                                        auth.accessToken,
+                                        "GOOGLE",
+                                        auth.username,
+                                        -1L,
+                                        null
+                                );
+                                navigateToMain();
+                            } else {
+                                showToast("Google login thất bại");
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<ApiResponse<AuthResponse>> call, Throwable t) {
+                            setLoading(false);
+                            showToast("Lỗi kết nối: " + t.getMessage());
+                        }
+                    });
+
         } catch (ApiException e) {
             Log.e(TAG, "Ma loi Google Sign-In: " + e.getStatusCode());
             showToast("Loi xac thuc Google (Ma: " + e.getStatusCode() + ")");
@@ -238,5 +294,4 @@ public class LoginActivity extends AppCompatActivity {
     private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
-
 }

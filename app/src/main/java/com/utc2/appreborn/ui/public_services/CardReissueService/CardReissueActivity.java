@@ -10,23 +10,29 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.public_services.model.BaseService;
-import com.utc2.appreborn.ui.public_services.model.CardReissueService;
-import com.utc2.appreborn.utils.MockHelper;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.ProfileApiService;
+import com.utc2.appreborn.network.PublicServicesApiService;
+import com.utc2.appreborn.network.dto.CardReissueRequest;
+import com.utc2.appreborn.network.dto.ProfileResponse;
+import com.utc2.appreborn.network.dto.ServiceRequestResponse;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CardReissueActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
     private TextView btnConfirm, txtName, txtMSSV, txtClass;
     private EditText edtReason;
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,20 +57,32 @@ public class CardReissueActivity extends AppCompatActivity {
         edtReason  = findViewById(R.id.edtReason);
     }
 
+    // ĐÃ SỬA: lấy profile thật từ API
     private void setupData() {
-        // Mapping TABLE USER_PROFILE + STUDENT_PROFILE qua MockHelper / SessionManager
-        // Khi có API thật: thay bằng Room query hoặc Retrofit call
-        SessionManager session = SessionManager.getInstance(this);
+        String token = SessionManager.getInstance(this).getAuthToken();
+        ProfileApiService profileApi = ApiClient.getInstance(token).create(ProfileApiService.class);
 
-        String studentCode = session.getStudentCode();  // STUDENT_PROFILE.student_code
-        String fullName    = MockHelper.getMockFullName();  // USER_PROFILE.full_name
-        String className   = MockHelper.getMockClassName(); // STUDENT_PROFILE.class_name
+        profileApi.getMyProfile().enqueue(new Callback<ApiResponse<ProfileResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ProfileResponse>> call,
+                                   Response<ApiResponse<ProfileResponse>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    ProfileResponse p = response.body().getData();
+                    txtName.setText(p.fullName);
+                    txtMSSV.setText(p.studentId);
+                    txtClass.setText(p.className);
+                }
+            }
 
-        txtName.setText(fullName);
-        txtMSSV.setText(studentCode.isEmpty() ? MockHelper.getMockStudentCode() : studentCode);
-        txtClass.setText(className);
+            @Override
+            public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable t) {
+                Log.e("CardReissue", "Lỗi load profile: " + t.getMessage());
+            }
+        });
     }
 
+    // ĐÃ SỬA: gửi API thay TODO
     private void setupEvents() {
         btnBack.setOnClickListener(v -> finish());
 
@@ -74,35 +92,35 @@ public class CardReissueActivity extends AppCompatActivity {
                 return;
             }
 
-            try {
-                String name      = txtName.getText().toString();
-                String mssv      = txtMSSV.getText().toString();
-                String className = txtClass.getText().toString();
-                String reason    = edtReason.getText().toString().trim();
-                String finalReason = reason.isEmpty() ? "Không có lý do cụ thể" : reason;
+            String reason = edtReason.getText().toString().trim();
+            String finalReason = reason.isEmpty() ? "Không có lý do cụ thể" : reason;
 
-                // Mapping TABLE SERVICE_REQUEST:
-                //   service_type = BaseService.TYPE_CARD_REISSUE  ("thẻ SV")
-                //   status       = BaseService.STATUS_PENDING      ("chờ xử lý")
-                //   submitted_at = System.currentTimeMillis()
-                CardReissueService newRequest = new CardReissueService(
-                        getString(R.string.reissue_card_title),
-                        finalReason,
-                        System.currentTimeMillis(),
-                        BaseService.STATUS_PENDING,     // "chờ xử lý" — khớp SERVICE_REQUEST.status
-                        BaseService.TYPE_CARD_REISSUE,  // "thẻ SV"    — khớp SERVICE_REQUEST.service_type
-                        name,
-                        mssv,
-                        className
-                );
+            String token = SessionManager.getInstance(this).getAuthToken();
+            PublicServicesApiService servicesApi = ApiClient.getInstance(token).create(PublicServicesApiService.class);
 
-                // TODO: gửi `newRequest` lên API / lưu vào Room
-                Toast.makeText(this, R.string.cardReissue_registration_success, Toast.LENGTH_SHORT).show();
-                finish();
+            servicesApi.cardReissue(new CardReissueRequest(finalReason))
+                    .enqueue(new Callback<ApiResponse<ServiceRequestResponse>>() {
+                        @Override
+                        public void onResponse(Call<ApiResponse<ServiceRequestResponse>> call,
+                                               Response<ApiResponse<ServiceRequestResponse>> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().isSuccess()) {
+                                Toast.makeText(CardReissueActivity.this,
+                                        getString(R.string.cardReissue_registration_success),
+                                        Toast.LENGTH_SHORT).show();
+                                finish();
+                            } else {
+                                Toast.makeText(CardReissueActivity.this,
+                                        "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                            }
+                        }
 
-            } catch (Exception e) {
-                Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+                        @Override
+                        public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
+                            Toast.makeText(CardReissueActivity.this,
+                                    "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
     }
 }
