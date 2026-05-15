@@ -67,6 +67,10 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         if (animationEnabled && !TAG_ANIMATED.equals(holder.itemView.getTag())) {
             holder.itemView.setTag(TAG_ANIMATED);
             animateItemIn(holder.itemView, position);
+        } else {
+            // Bắt buộc reset lại thuộc tính hiển thị khi tái sử dụng view
+            holder.itemView.setAlpha(1f);
+            holder.itemView.setTranslationY(0f);
         }
 
         if (holder instanceof HeaderViewHolder) {
