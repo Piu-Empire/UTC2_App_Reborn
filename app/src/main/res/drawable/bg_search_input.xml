@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    bg_search_input.xml
+    Background cho ô EditText tìm kiếm trong toolbar.
+    Nền trắng mờ, bo góc pill — đặt trên toolbar màu tối.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="#FFFFFF" />
+
+    <corners android:radius="20dp" />
+
+</shape>

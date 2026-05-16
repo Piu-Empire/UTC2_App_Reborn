@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import com.utc2.appreborn.utils.LocaleHelper;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
@@ -31,7 +32,14 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private RecyclerView rvDormTuition;
     private List<DormTuition> dormList;
     private Button btnPayDorm;
+    private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+    @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +98,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     }
 
     private void calculateTotal() {
+        totalAmount = 0.0;
         for (DormTuition item : dormList) {
             // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!item.isPaid()) {

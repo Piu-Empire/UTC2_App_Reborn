@@ -301,8 +301,9 @@ public class HomeFragment extends Fragment {
     // ─── 3 toolbar button handlers ────────────────────────────
 
     private void handleSearchClick() {
-        // TODO: mở SearchFragment
-        Toast.makeText(requireContext(), "Tìm kiếm", Toast.LENGTH_SHORT).show();
+        ((MainActivity) requireActivity())
+                .pushFragment(new com.utc2.appreborn.ui.search.SearchFragment(),
+                        com.utc2.appreborn.ui.search.SearchFragment.TAG);
     }
 
     private void handleNotificationClick() {
