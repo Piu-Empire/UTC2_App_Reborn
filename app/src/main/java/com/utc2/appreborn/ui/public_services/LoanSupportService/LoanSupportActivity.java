@@ -9,21 +9,27 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.public_services.model.BaseService;
-import com.utc2.appreborn.ui.public_services.model.LoanSupportService;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.PublicServicesApiService;
+import com.utc2.appreborn.network.dto.LoanSupportRequest;
+import com.utc2.appreborn.network.dto.ServiceRequestResponse;
 import com.utc2.appreborn.utils.NetworkUtils;
+import com.utc2.appreborn.utils.SessionManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LoanSupportActivity extends AppCompatActivity {
 
     private ImageButton btnBack;
     private TextView btnConfirm;
     private EditText edtAmount, edtReason, edtPhone;
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +57,7 @@ public class LoanSupportActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> handleLoanRegistration());
     }
 
+    // ĐÃ SỬA
     private void handleLoanRegistration() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
             Toast.makeText(this, "Không có kết nối mạng. Không thể gửi đơn lúc này!", Toast.LENGTH_SHORT).show();
@@ -71,28 +78,31 @@ public class LoanSupportActivity extends AppCompatActivity {
             return;
         }
 
-        try {
-            // Mapping TABLE SERVICE_REQUEST:
-            //   service_type = BaseService.TYPE_LOAN_SUPPORT  ("vay vốn")
-            //   status       = BaseService.STATUS_PENDING      ("chờ xử lý")
-            //   submitted_at = System.currentTimeMillis()
-            LoanSupportService request = new LoanSupportService(
-                    getString(R.string.loan_support_title),
-                    reason,
-                    System.currentTimeMillis(),
-                    BaseService.STATUS_PENDING,       // "chờ xử lý" — khớp SERVICE_REQUEST.status
-                    BaseService.TYPE_LOAN_SUPPORT,    // "vay vốn"   — khớp SERVICE_REQUEST.service_type
-                    amount,
-                    reason,
-                    phone
-            );
+        String token = SessionManager.getInstance(this).getAuthToken();
+        PublicServicesApiService servicesApi = ApiClient.getInstance(token).create(PublicServicesApiService.class);
 
-            // TODO: gửi `request` lên API / lưu vào Room
-            Toast.makeText(this, "Đăng ký thành công. Nhà trường sẽ liên hệ qua SĐT của bạn!", Toast.LENGTH_LONG).show();
-            finish();
+        servicesApi.loanSupport(new LoanSupportRequest(amount, reason, phone))
+                .enqueue(new Callback<ApiResponse<ServiceRequestResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<ServiceRequestResponse>> call,
+                                           Response<ApiResponse<ServiceRequestResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            Toast.makeText(LoanSupportActivity.this,
+                                    "Đăng ký thành công. Nhà trường sẽ liên hệ qua SĐT của bạn!",
+                                    Toast.LENGTH_LONG).show();
+                            finish();
+                        } else {
+                            Toast.makeText(LoanSupportActivity.this,
+                                    "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
 
-        } catch (Exception e) {
-            Toast.makeText(this, "Đăng ký thất bại: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+                    @Override
+                    public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
+                        Toast.makeText(LoanSupportActivity.this,
+                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

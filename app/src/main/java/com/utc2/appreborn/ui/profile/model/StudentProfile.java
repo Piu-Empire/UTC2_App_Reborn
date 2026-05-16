@@ -2,18 +2,7 @@ package com.utc2.appreborn.ui.profile.model;
 
 /**
  * StudentProfile
- * ──────────────────────────────────────────────────────────────
- * Model mapping TABLE STUDENT_PROFILE.
- *
- * TABLE STUDENT_PROFILE:
- *   user_id       BIGINT PK/FK → USER
- *   student_code  VARCHAR(50) UNIQUE   -- MSSV
- *   faculty       VARCHAR(100)
- *   advisor_id    BIGINT FK → ADVISOR
- *   major         VARCHAR(100)
- *   academic_year VARCHAR(50)
- *   class_name    VARCHAR(50)
- *   status        VARCHAR(50)
+ * Cập nhật: Thêm trường studentCardUrl để hiển thị ảnh thẻ từ Backend.
  */
 public class StudentProfile {
 
@@ -32,12 +21,13 @@ public class StudentProfile {
     private String academicYear;  // academic_year
     private String className;     // class_name
     private String status;        // status
+    private String studentCardUrl; // <-- TRƯỜNG MỚI THÊM
 
     public StudentProfile() {}
 
     public StudentProfile(long userId, String studentCode, String faculty,
                           Long advisorId, String major, String academicYear,
-                          String className, String status) {
+                          String className, String status, String studentCardUrl) {
         this.userId       = userId;
         this.studentCode  = studentCode;
         this.faculty      = faculty;
@@ -46,6 +36,7 @@ public class StudentProfile {
         this.academicYear = academicYear;
         this.className    = className;
         this.status       = status;
+        this.studentCardUrl = studentCardUrl;
     }
 
     // ── Getters ───────────────────────────────────────────────
@@ -57,6 +48,7 @@ public class StudentProfile {
     public String getAcademicYear(){ return academicYear; }
     public String getClassName()   { return className; }
     public String getStatus()      { return status; }
+    public String getStudentCardUrl() { return studentCardUrl; }
 
     // ── Setters ───────────────────────────────────────────────
     public void setUserId(long v)        { this.userId = v; }
@@ -67,6 +59,7 @@ public class StudentProfile {
     public void setAcademicYear(String v){ this.academicYear = v; }
     public void setClassName(String v)   { this.className = v; }
     public void setStatus(String v)      { this.status = v; }
+    public void setStudentCardUrl(String v) { this.studentCardUrl = v; }
 
     /** Tiện ích: true nếu đang theo học. */
     public boolean isActive()    { return STATUS_ACTIVE.equals(status); }

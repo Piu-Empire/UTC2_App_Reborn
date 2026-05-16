@@ -23,6 +23,18 @@ import com.utc2.appreborn.ui.tuition.adapter.SubjectTuitionAdapter;
 import com.utc2.appreborn.ui.tuition.model.SubjectTuition;
 import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
+import com.utc2.appreborn.utils.SessionManager;
+
+// THÊM MỚI
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.TuitionApiService;
+import com.utc2.appreborn.network.dto.TuitionSummaryResponse;
+import com.utc2.appreborn.network.dto.TuitionResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -30,17 +42,16 @@ import java.util.Locale;
 public class SubjectTuitionActivity extends AppCompatActivity {
 
     private RecyclerView rvItems;
-    private List<SubjectTuition> subjectList;
+    private List<SubjectTuition> subjectList = new ArrayList<>();
     private TextView tvTotalAmount;
     private Button btnPay;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
     }
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +61,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         try {
             initViews();
             setupNetworkMonitoring();
-            loadData();
-            calculateTotal();
-            setupRecyclerView();
+            loadData(); // gọi API
         } catch (Exception e) {
             Log.e("SubjectTuition", "Lỗi khởi tạo: " + e.getMessage());
         }
@@ -90,17 +99,49 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         networkUtils.register();
     }
 
+    // ĐÃ SỬA: gọi API thay data cứng
     private void loadData() {
-        subjectList = new ArrayList<>();
-        subjectList.add(new SubjectTuition(1, "Lập trình Android", "3 tín chỉ", 1250000, Tuition.STATUS_UNPAID));
-        subjectList.add(new SubjectTuition(2, "Cấu trúc dữ liệu", "4 tín chỉ", 1600000, Tuition.STATUS_UNPAID));
-        subjectList.add(new SubjectTuition(3, "Anh văn chuyên ngành", "2 tín chỉ", 850000, Tuition.STATUS_UNPAID));
+        String token = SessionManager.getInstance(this).getAuthToken();
+        TuitionApiService tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
+
+        tuitionApi.getSummary().enqueue(new Callback<ApiResponse<TuitionSummaryResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<TuitionSummaryResponse>> call,
+                                   Response<ApiResponse<TuitionSummaryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    TuitionSummaryResponse summary = response.body().getData();
+                    subjectList.clear();
+                    if (summary.semesters != null) {
+                        for (TuitionResponse t : summary.semesters) {
+                            subjectList.add(new SubjectTuition(
+                                    t.id != null ? t.id.intValue() : 0,
+                                    "Học kỳ " + t.semesterId,
+                                    "",
+                                    t.getRemainingAmountAsDouble(),
+                                    t.status
+                            ));
+                        }
+                    }
+                    calculateTotal();
+                    setupRecyclerView();
+                } else {
+                    Toast.makeText(SubjectTuitionActivity.this,
+                            "Không tải được học phí", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<TuitionSummaryResponse>> call, Throwable t) {
+                Toast.makeText(SubjectTuitionActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void calculateTotal() {
         totalAmount = 0.0;
         for (SubjectTuition subject : subjectList) {
-            // Chỉ tính khoản chưa đóng — STATUS_UNPAID hoặc STATUS_PARTIAL
             if (!subject.isPaid()) {
                 totalAmount += subject.getAmount();
             }
@@ -110,8 +151,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
     private void setupRecyclerView() {
         rvItems.setLayoutManager(new LinearLayoutManager(this));
-        SubjectTuitionAdapter adapter = new SubjectTuitionAdapter(subjectList);
-        rvItems.setAdapter(adapter);
+        rvItems.setAdapter(new SubjectTuitionAdapter(subjectList));
     }
 
     private void showPaymentDialog() {
@@ -130,26 +170,17 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         }
 
         ImageView imgQr = dialog.findViewById(R.id.imgQrCode);
-        // SỬA: đúng ID trong layout_payment_qr.xml là tvDialogAmount
         TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
         Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
 
         tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
-        String bankId = "ICB";
-        String accountNo = "102882730986";
-        String accountName = "HINH%20VINH%20PHAT";
-        String description = "AppReborn%20Hoc%20phi%20mon%20hoc";
-
-        String qrUrl = "https://img.vietqr.io/image/" + bankId + "-" + accountNo + "-compact.png"
+        String qrUrl = "https://img.vietqr.io/image/ICB-102882730986-compact.png"
                 + "?amount=" + (long) totalAmount
-                + "&addInfo=" + description
-                + "&accountName=" + accountName;
+                + "&addInfo=AppReborn%20Hoc%20phi%20mon%20hoc"
+                + "&accountName=HINH%20VINH%20PHAT";
 
-        Glide.with(this)
-                .load(qrUrl)
-                .placeholder(R.drawable.logo_utc2)
-                .into(imgQr);
+        Glide.with(this).load(qrUrl).placeholder(R.drawable.logo_utc2).into(imgQr);
 
         btnConfirm.setOnClickListener(v -> {
             Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
