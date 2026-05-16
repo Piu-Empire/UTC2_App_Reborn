@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_manage_feature.xml
+    Item dùng trong grid màn quản lý:
+    - Khi showRemoveBtn=true  → có dấu X góc trên phải (mục đã thêm vào thường dùng)
+    - Khi showRemoveBtn=false → không có dấu X (mục có thể thêm vào)
+    Adapter sẽ set visibility của ivRemove tương ứng.
+-->
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="110dp"
+    android:layout_margin="6dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
+
+    <!-- Card chính -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/cardFeature"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#E0E0E0"
+        app:strokeWidth="1dp"
+        app:rippleColor="@color/accent_yellow_light">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <FrameLayout
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_icon_yellow">
+
+                <ImageView
+                    android:id="@+id/ivIcon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:contentDescription="" />
+
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="7dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="2"
+                android:textColor="#333333"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- Nút X góc trên phải — chỉ visible khi đang ở phần "Thường dùng" -->
+    <!-- Badge X — hiện khi item đang ở "Mục thường dùng" -->
+    <ImageView
+        android:id="@+id/ivRemove"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_rounded_red"
+        android:contentDescription="@string/remove"
+        android:padding="3dp"
+        android:src="@drawable/ic_close"
+        android:visibility="gone" />
+
+    <!-- Badge + — hiện khi item đang ở "Thêm vào mục thường dùng" -->
+    <ImageView
+        android:id="@+id/ivAdd"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="2dp"
+        android:background="@drawable/bg_rounded_amber"
+        android:contentDescription="@string/action_add"
+        android:padding="3dp"
+        android:src="@drawable/ic_plus"
+        android:visibility="gone" />
+
+</FrameLayout>

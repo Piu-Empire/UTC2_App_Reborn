@@ -693,5 +693,21 @@
     <string name="ScrollingError">"Lỗi khi cuộn trang: "</string>
     <string name="sem_1">KỲ HỌC 1</string>
     <string name="sem_2">KỲ HỌC 2</string>
-
+    //other
+    <string name="other_features_title">Danh mục khác</string>
+    <string name="section_favorites">Mục thường dùng</string>
+    <string name="section_others">Mục khác</string>
+    <string name="section_add_more">Thêm vào mục thường dùng</string>
+    <string name="manage_features_title">Chỉnh sửa mục thường dùng</string>
+    <string name="action_add">Thêm</string>
+    <string name="remove">Xóa</string>
+    <string name="close">Đóng</string>
+    <string name="feature_dang_ki_hoc">Đăng ký học</string>
+    <string name="feature_lich">Lịch học</string>
+    <string name="feature_ket_qua">Kết quả học tập</string>
+    <string name="feature_ca_nhan">Trang cá nhân</string>
+    <string name="feature_qr">Mã QR</string>
+    <string name="feature_thong_bao">Thông báo</string>
+    <string name="feature_tim_kiem">Tìm kiếm</string>
+    <string name="action_save">Lưu</string>
 </resources>

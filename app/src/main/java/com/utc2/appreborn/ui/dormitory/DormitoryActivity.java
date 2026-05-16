@@ -227,7 +227,11 @@ public class DormitoryActivity extends AppCompatActivity {
             currentRegId = reg.registrationId;
             layoutSelected.setVisibility(View.VISIBLE);
             txtRoomInfo.setText(room.getName());
-            if (txtRoomSubInfo != null) txtRoomSubInfo.setText(room.getDisplayInfo());
+            if (txtRoomSubInfo != null)
+                txtRoomSubInfo.setText(
+                        room.getCapacity() + " người  •  "
+                                + String.format("%,d", room.getPricePerMonth()) + "đ/tháng  •  "
+                                + room.getRoomType().getLabel());
             txtTotal.setText("Tổng số tiền: "
                     + String.format("%,d", reg.totalPrice) + "đ");
             Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();

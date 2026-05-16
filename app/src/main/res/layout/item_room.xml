@@ -7,8 +7,9 @@
     android:layout_marginTop="12dp"
     android:layout_marginHorizontal="16dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="0dp"
-    app:strokeColor="#000000"
+    app:cardElevation="4dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:strokeColor="#FFC107"
     app:strokeWidth="2dp">
 
     <LinearLayout
@@ -41,13 +42,52 @@
                     android:textColor="#000000"
                     android:layout_marginBottom="6dp"/>
 
-                <TextView
-                    android:id="@+id/txtInfo"
+                <LinearLayout
+                    android:id="@+id/layoutInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="👥 4   💰 300,000đ/tháng   🏠 Nam"
-                    android:textColor="#444444"
-                    android:textSize="13sp"/>
+                    android:orientation="vertical"
+                    android:layout_marginTop="4dp">
+
+                    <TextView
+                        android:id="@+id/txtInfoCapacity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4 người"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:gravity="center_vertical"
+                        android:drawablePadding="6dp"
+                        android:layout_marginBottom="4dp"
+                        app:drawableStartCompat="@drawable/ic_users"
+                        app:drawableTint="#000000" />
+
+                    <TextView
+                        android:id="@+id/txtInfoPrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="300,000đ/tháng"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:gravity="center_vertical"
+                        android:drawablePadding="6dp"
+                        android:layout_marginBottom="4dp"
+                        app:drawableStartCompat="@drawable/ic_coins"
+                        app:drawableTint="#000000" />
+
+                    <TextView
+                        android:id="@+id/txtInfoGender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Nam"
+                        android:textColor="#444444"
+                        android:textSize="13sp"
+                        android:gravity="center_vertical"
+                        android:drawablePadding="6dp"
+                        app:drawableStartCompat="@drawable/ic_house"
+                        app:drawableTint="#000000" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!--
@@ -64,7 +104,7 @@
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="#FFFFFF"
-                android:background="@drawable/bg_button_black"
+                android:background="@drawable/bg_button_pill_black"
                 android:gravity="center"
                 android:paddingHorizontal="20dp"
                 android:clickable="true"
@@ -78,7 +118,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="@drawable/bg_badge_available"
+            android:background="@drawable/bg_badge_amber"
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp"
             android:layout_marginTop="10dp">
@@ -95,7 +135,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Còn chỗ"
-                android:textColor="#00C853"
+                android:textColor="#000000"
                 android:textSize="13sp"
                 android:textStyle="bold"/>
 

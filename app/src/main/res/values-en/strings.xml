@@ -412,4 +412,21 @@
     <string name="sem_1">Semester 1</string>
     <string name="sem_2">Semester 2</string>
     <string name="App_vers">1.0.0</string>
+    //other
+    <string name="other_features_title">More Features</string>
+    <string name="section_favorites">Frequently Used</string>
+    <string name="section_others">Other Features</string>
+    <string name="section_add_more">Add to Frequently Used</string>
+    <string name="manage_features_title">Edit Frequently Used</string>
+    <string name="action_add">Add</string>
+    <string name="remove">Remove</string>
+    <string name="close">Close</string>
+    <string name="feature_dang_ki_hoc">Course Registration</string>
+    <string name="feature_lich">Schedule</string>
+    <string name="feature_ket_qua">Academic Results</string>
+    <string name="feature_ca_nhan">Profile</string>
+    <string name="feature_qr">QR Code</string>
+    <string name="feature_thong_bao">Notifications</string>
+    <string name="feature_tim_kiem">Search</string>
+    <string name="action_save">Save</string>
 </resources>

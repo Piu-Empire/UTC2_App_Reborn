@@ -37,6 +37,7 @@ import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
 import com.utc2.appreborn.utils.MockHelper;
 import com.utc2.appreborn.ui.assessment.AssessmentFragment;
+import com.utc2.appreborn.ui.other.OtherFeaturesFragment;
 /**
  * HomeFragment — FINAL FIXES
  * ──────────────────────────────────────────────────────────────
@@ -281,7 +282,7 @@ public class HomeFragment extends Fragment {
                 startActivity(new Intent(requireContext(), DormitoryActivity.class));
                 break;
             case "danh_muc_khac":
-                Toast.makeText(requireContext(), "Danh mục khác", Toast.LENGTH_SHORT).show();
+                mainActivity.pushFragment(new OtherFeaturesFragment(), OtherFeaturesFragment.TAG);
                 break;
             default:
                 Log.w(TAG, "Unknown feature: " + featureId);

@@ -72,13 +72,14 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         holder.txtTitle.setText(room.getName());
 
         // Gọi getDisplayInfo() – override từ DormitoryItem
-        holder.txtInfo.setText(room.getDisplayInfo());
-
+        holder.txtInfoCapacity.setText(room.getCapacity() + " người");
+        holder.txtInfoPrice.setText(String.format("%,d", room.getPricePerMonth()) + "đ/tháng");
+        holder.txtInfoGender.setText(room.getRoomType().getLabel());
         if (room.isAvailable()) {
-            holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_available);
+            holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_amber);
             holder.imgStatusIcon.setImageResource(R.drawable.ic_status_check);
             holder.tvStatusText.setText("Còn chỗ");
-            holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#00C853"));
+            holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#000000"));
 
             // Nút Đăng ký: đen, chữ trắng, clickable
             holder.btnRegister.setBackgroundResource(R.drawable.bg_button_black);
@@ -87,10 +88,10 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
             holder.btnRegister.setClickable(true);
             holder.btnRegister.setFocusable(true);
         } else {
-            holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_unavailable);
+            holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_amber);
             holder.imgStatusIcon.setImageResource(R.drawable.ic_status_x);
             holder.tvStatusText.setText("Hết chỗ");
-            holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#FF3B30"));
+            holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#000000"));
 
             // Nút Đăng ký: disabled – xám mờ, không click được
             holder.btnRegister.setBackgroundResource(R.drawable.bg_button_disabled);
@@ -110,20 +111,24 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
     // ── Inner ViewHolder ──────────────────────────────────────────────────────
     static class ViewHolder extends RecyclerView.ViewHolder {
         final TextView     txtTitle;
-        final TextView     txtInfo;
+        final TextView     txtInfoCapacity;
+        final TextView     txtInfoPrice;
+        final TextView     txtInfoGender;
         final LinearLayout badgeLayout;
         final ImageView    imgStatusIcon;
         final TextView     tvStatusText;
-        final TextView     btnRegister;   // TextView thay Button – tránh Material override màu
+        final TextView     btnRegister;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
-            txtTitle      = itemView.findViewById(R.id.txtTitle);
-            txtInfo       = itemView.findViewById(R.id.txtInfo);
-            badgeLayout   = itemView.findViewById(R.id.txtStatus);
-            imgStatusIcon = itemView.findViewById(R.id.imgStatusIcon);
-            tvStatusText  = itemView.findViewById(R.id.tvStatusText);
-            btnRegister   = itemView.findViewById(R.id.btnRegister);  // TextView
+            txtTitle        = itemView.findViewById(R.id.txtTitle);
+            txtInfoCapacity = itemView.findViewById(R.id.txtInfoCapacity);
+            txtInfoPrice    = itemView.findViewById(R.id.txtInfoPrice);
+            txtInfoGender   = itemView.findViewById(R.id.txtInfoGender);
+            badgeLayout     = itemView.findViewById(R.id.txtStatus);
+            imgStatusIcon   = itemView.findViewById(R.id.imgStatusIcon);
+            tvStatusText    = itemView.findViewById(R.id.tvStatusText);
+            btnRegister     = itemView.findViewById(R.id.btnRegister);
         }
     }
 }
