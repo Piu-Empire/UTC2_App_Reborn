@@ -319,8 +319,14 @@ public class HomeFragment extends Fragment {
 
     private void openQrFragment() {
         StudentProfile p = viewModel.getStudentProfileLiveData().getValue();
-        String name = (p != null) ? p.getFullName() : MockHelper.getMockFullName();
-        String code = (p != null) ? p.getStudentCode() : MockHelper.getMockStudentCode();
+
+        String name = (p != null && p.getFullName() != null && !p.getFullName().isEmpty())
+                ? p.getFullName()
+                : MockHelper.getMockFullName();
+        String code = (p != null && p.getStudentCode() != null && !p.getStudentCode().isEmpty())
+                ? p.getStudentCode()
+                : MockHelper.getMockStudentCode();
+
         ((MainActivity) requireActivity())
                 .pushFragment(QrFragment.newInstance(name, code), QrFragment.TAG);
     }

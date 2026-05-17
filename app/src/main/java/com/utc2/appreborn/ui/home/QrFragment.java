@@ -219,6 +219,9 @@ public class QrFragment extends Fragment {
 
     @Nullable
     private Bitmap generateQrBitmap(String content, int sizePx) {
+        if (content == null || content.trim().isEmpty()) {
+            return null;
+        }
         try {
             BitMatrix matrix = new MultiFormatWriter()
                     .encode(content, BarcodeFormat.QR_CODE, sizePx, sizePx);
