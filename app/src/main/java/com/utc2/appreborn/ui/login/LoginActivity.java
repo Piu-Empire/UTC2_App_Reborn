@@ -5,7 +5,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+
 import com.utc2.appreborn.utils.LocaleHelper;
+
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
@@ -42,6 +44,7 @@ import com.utc2.appreborn.network.AuthApiService;
 import com.utc2.appreborn.network.dto.AuthResponse;
 import com.utc2.appreborn.network.dto.LoginRequest;
 import com.utc2.appreborn.network.dto.GoogleAuthRequest;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -191,9 +194,9 @@ public class LoginActivity extends AppCompatActivity {
                             sessionManager.createLoginSession(
                                     auth.accessToken,
                                     "EMAIL",
-                                    auth.username,
+                                    auth.email,
                                     -1L,
-                                    auth.username
+                                    auth.studentCode
                             );
                             navigateToMain();
                         } else {
@@ -225,11 +228,18 @@ public class LoginActivity extends AppCompatActivity {
         googleSignInLauncher.launch(mGoogleSignInClient.getSignInIntent());
     }
 
-    // ĐÃ SỬA
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             if (account == null) return;
+
+            // Validate: chỉ cho phép email @st.utc2.edu.vn
+            String email = account.getEmail();
+            if (email == null || !email.endsWith("@st.utc2.edu.vn")) {
+                mGoogleSignInClient.signOut();
+                showToast("Chỉ tài khoản @st.utc2.edu.vn mới được đăng nhập");
+                return;
+            }
 
             setLoading(true);
 
@@ -245,13 +255,16 @@ public class LoginActivity extends AppCompatActivity {
                                 sessionManager.createLoginSession(
                                         auth.accessToken,
                                         "GOOGLE",
-                                        auth.username,
+                                        auth.email,
                                         -1L,
-                                        null
+                                        auth.studentCode
                                 );
                                 navigateToMain();
                             } else {
-                                showToast("Google login thất bại");
+                                String msg = response.body() != null
+                                        ? response.body().getMessage()
+                                        : "Google login thất bại";
+                                showToast(msg);
                             }
                         }
 
