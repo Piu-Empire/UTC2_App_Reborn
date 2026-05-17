@@ -3,11 +3,13 @@ package com.utc2.appreborn.network.dto;
 import com.google.gson.annotations.SerializedName;
 
 public class LoginRequest {
-    @SerializedName("username") public String username;
-    @SerializedName("password") public String password;
+    @SerializedName("studentCode")
+    public String studentCode;
+    @SerializedName("password")
+    public String password;
 
-    public LoginRequest(String username, String password) {
-        this.username = username;
+    public LoginRequest(String studentCode, String password) {
+        this.studentCode = studentCode;
         this.password = password;
     }
 }

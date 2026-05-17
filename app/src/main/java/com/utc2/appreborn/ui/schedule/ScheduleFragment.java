@@ -125,11 +125,24 @@ public class ScheduleFragment extends Fragment {
         timeUpdateHandler.removeCallbacks(timeUpdateRunnable);
     }
 
-    // nạp dữ liệu lịch học từ kho lưu trữ hệ thống
+    // nạp dữ liệu lịch học: hiển thị file local ngay, đồng bộ server trong nền
     private void setupData() {
         scheduleList = new ArrayList<>();
-        scheduleList = com.utc2.appreborn.data.repository.ScheduleRepository.getMockScheduleData();
-        dayManager.updateDayView(scheduleList);
+        com.utc2.appreborn.data.repository.ScheduleRepository repo =
+                new com.utc2.appreborn.data.repository.ScheduleRepository(requireContext());
+
+        repo.loadSchedule(
+            // onImmediate: file local → hiển thị ngay (có thể rỗng lần đầu)
+            items -> {
+                scheduleList = items;
+                dayManager.updateDayView(scheduleList);
+            },
+            // onSynced: server có version mới → cập nhật lại UI
+            items -> {
+                scheduleList = items;
+                updateDateDisplay();
+            }
+        );
     }
 
     // chuyển đổi giữa xem theo ngày và xem theo tuần

@@ -17,18 +17,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.network.ApiClient;
-import com.utc2.appreborn.network.ApiResponse;
-import com.utc2.appreborn.network.ProfileApiService;
-import com.utc2.appreborn.network.dto.ProfileResponse;
 import com.utc2.appreborn.ui.profile.TrainingProgram.TrainingProgramActivity;
 import com.utc2.appreborn.ui.settings.SettingsActivity;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class ProfileFragment extends Fragment {
 
@@ -54,47 +47,27 @@ public class ProfileFragment extends Fragment {
     }
 
     private void initViews(View view) {
-        layoutSubjectList   = view.findViewById(R.id.layoutSubjectList);
+        layoutSubjectList = view.findViewById(R.id.layoutSubjectList);
         layoutGraduationReq = view.findViewById(R.id.layoutGraduationReq);
-        btnInfo             = view.findViewById(R.id.btnProfileInfo);
-        btnChangePassword   = view.findViewById(R.id.btnChangePassword);
-        btnSettings         = view.findViewById(R.id.btnNotification);
-        tvStudentName       = view.findViewById(R.id.tvStudentName);
-        tvStudentId         = view.findViewById(R.id.tvStudentId);
+        btnInfo = view.findViewById(R.id.btnProfileInfo);
+        btnChangePassword = view.findViewById(R.id.btnChangePassword);
+        btnSettings = view.findViewById(R.id.btnNotification);
+        tvStudentName = view.findViewById(R.id.tvStudentName);
+        tvStudentId = view.findViewById(R.id.tvStudentId);
     }
 
-    /** Gọi API lấy profile thực, hiển thị tên + MSSV trên header. */
+    /**
+     * Đọc tên + MSSV từ SessionManager cache (đã được HomeViewModel fetch).
+     */
     private void loadProfileData() {
         if (!isAdded()) return;
 
-        String token = SessionManager.getInstance(requireContext()).getAuthToken();
-        ProfileApiService profileApi = ApiClient.getInstance(token).create(ProfileApiService.class);
+        SessionManager session = SessionManager.getInstance(requireContext());
+        String fullName = session.getCachedFullName();
+        String studentCode = session.getStudentCode();
 
-        profileApi.getMyProfile().enqueue(new Callback<ApiResponse<ProfileResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<ProfileResponse>> call,
-                                   Response<ApiResponse<ProfileResponse>> response) {
-                if (!isAdded()) return;
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess()) {
-                    ProfileResponse p = response.body().getData();
-                    tvStudentName.setText(p.fullName  != null ? p.fullName  : "");
-                    tvStudentId.setText(p.studentId != null ? p.studentId : "");
-                } else {
-                    // Fallback hiển thị trống — không crash
-                    tvStudentName.setText("");
-                    tvStudentId.setText("");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable t) {
-                if (!isAdded()) return;
-                // Không toast lỗi ở đây để không làm phiền UX; InfoFragment đã xử lý chi tiết
-                tvStudentName.setText("");
-                tvStudentId.setText("");
-            }
-        });
+        tvStudentName.setText(fullName != null ? fullName : "");
+        tvStudentId.setText(studentCode != null ? studentCode : "");
     }
 
     private void setClickListeners() {

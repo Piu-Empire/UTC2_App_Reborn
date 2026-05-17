@@ -27,24 +27,19 @@ import java.util.List;
  *  - GradesFragment      → getSemesters(), getAllCourses()
  *  - AcademicResultsFragment → getSemesters()
  */
+import com.utc2.appreborn.utils.SessionManager;
+
 public class AcademicResultViewModel extends AndroidViewModel {
 
     private final AcademicResultRepository repository;
-
-    /**
-     * ID sinh viên hiện tại đang đăng nhập.
-     * Tạm thời hardcode = 1L để test với Mock Data.
-     *
-     * TODO: Thay bằng ID thực lấy từ SharedPreferences / UserSession khi login xong.
-     *  VD: long currentUserId = UserSession.getInstance(getApplication()).getUserId();
-     */
-    private static final long CURRENT_USER_ID = 1L;
-
-    // ─── Constructor ────────────────────────────────────────────────────────────
+    private final long currentUserId;
 
     public AcademicResultViewModel(@NonNull Application application) {
         super(application);
         repository = new AcademicResultRepository(application);
+        // Lấy user_id thực từ SessionManager thay vì hardcode
+        long id = SessionManager.getInstance(application).getUserId();
+        currentUserId = (id > 0) ? id : 1L; // fallback 1L nếu chưa có (guest/skip)
     }
 
     // ════════════════════════════════════════════════════════════════════════════
@@ -54,7 +49,7 @@ public class AcademicResultViewModel extends AndroidViewModel {
     /**
      * Lấy danh sách kỳ học của sinh viên đang đăng nhập.
      * Fragment observe LiveData này — UI tự cập nhật khi data thay đổi.
-     *
+     * <p>
      * Cách dùng trong Fragment:
      * <pre>
      *   viewModel.getSemesters().observe(getViewLifecycleOwner(), semesters -> {
@@ -63,7 +58,7 @@ public class AcademicResultViewModel extends AndroidViewModel {
      * </pre>
      */
     public LiveData<List<SemesterEntity>> getSemesters() {
-        return repository.getSemesters(CURRENT_USER_ID);
+        return repository.getSemesters(currentUserId);
     }
 
     /**
@@ -94,7 +89,7 @@ public class AcademicResultViewModel extends AndroidViewModel {
     /**
      * Lấy toàn bộ cảnh báo học vụ của sinh viên, mới nhất lên đầu.
      * Dùng cho WarningsFragment.
-     *
+     * <p>
      * Cách dùng trong WarningsFragment:
      * <pre>
      *   viewModel.getWarnings().observe(getViewLifecycleOwner(), warnings -> {
@@ -106,7 +101,7 @@ public class AcademicResultViewModel extends AndroidViewModel {
      * </pre>
      */
     public LiveData<List<AcademicWarningEntity>> getWarnings() {
-        return repository.getWarnings(CURRENT_USER_ID);
+        return repository.getWarnings(currentUserId);
     }
 
     /**
@@ -115,12 +110,12 @@ public class AcademicResultViewModel extends AndroidViewModel {
      * @param semesterId ID kỳ học cần lọc
      */
     public LiveData<List<AcademicWarningEntity>> getWarningsBySemester(long semesterId) {
-        return repository.getWarningsBySemester(CURRENT_USER_ID, semesterId);
+        return repository.getWarningsBySemester(currentUserId, semesterId);
     }
 
     /**
      * Đếm số cảnh báo đang active — dùng để hiển thị badge số trên bottom nav.
-     *
+     * <p>
      * Cách dùng trong MainActivity:
      * <pre>
      *   viewModel.getActiveWarningCount().observe(this, count -> {
@@ -131,7 +126,7 @@ public class AcademicResultViewModel extends AndroidViewModel {
      * </pre>
      */
     public LiveData<Integer> getActiveWarningCount() {
-        return repository.getActiveWarningCount(CURRENT_USER_ID);
+        return repository.getActiveWarningCount(currentUserId);
     }
 
     // ════════════════════════════════════════════════════════════════════════════

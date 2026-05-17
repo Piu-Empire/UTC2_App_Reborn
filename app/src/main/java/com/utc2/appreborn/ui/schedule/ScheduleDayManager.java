@@ -415,7 +415,10 @@ public class ScheduleDayManager {
         isVerticalLoading = true;
         lastLoadedVerticalDate = DateUtils.addDays(lastLoadedVerticalDate, 1);
         int added = appendDayToList(lastLoadedVerticalDate, true);
-        scheduleAdapter.notifyItemRangeInserted(continuousScheduleList.size() - added, added);
+        // post ra khỏi scroll callback trước khi notify — tránh IllegalStateException
+        int insertPos = continuousScheduleList.size() - added;
+        recyclerViewSchedule.post(() ->
+                scheduleAdapter.notifyItemRangeInserted(insertPos, added));
         recyclerViewSchedule.postDelayed(() -> isVerticalLoading = false, 150);
     }
 
@@ -424,7 +427,9 @@ public class ScheduleDayManager {
         isVerticalLoading = true;
         firstLoadedVerticalDate = DateUtils.addDays(firstLoadedVerticalDate, -1);
         int added = appendDayToList(firstLoadedVerticalDate, false);
-        scheduleAdapter.notifyItemRangeInserted(0, added);
+        // post ra khỏi scroll callback trước khi notify — tránh IllegalStateException
+        recyclerViewSchedule.post(() ->
+                scheduleAdapter.notifyItemRangeInserted(0, added));
         recyclerViewSchedule.postDelayed(() -> isVerticalLoading = false, 150);
     }
 
