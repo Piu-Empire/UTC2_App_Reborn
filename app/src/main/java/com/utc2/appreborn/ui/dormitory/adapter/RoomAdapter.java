@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Adapter cho RecyclerView hiển thị danh sách phòng KTX.
  *
- * [Chương 3 - OOP]
+ * [Chương 3 - OOP Lập trình hướng đối tượng]
  *  - Bao đóng: private fields + interface callback
  *  - Overload: 2 constructor (có/không có listener)
  *  - Inner class ViewHolder (giống pattern bên HomeFragment)
