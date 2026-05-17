@@ -5,84 +5,51 @@ import android.content.Context;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.utc2.appreborn.data.local.StudentLocalDataSource;
 import com.utc2.appreborn.data.local.StudentProfile;
+import com.utc2.appreborn.utils.SessionManager;
 
 /**
  * StudentRepository
  * ──────────────────────────────────────────────────────────────
  * Nguồn dữ liệu duy nhất cho thông tin sinh viên đang đăng nhập.
- *
- * Thứ tự ưu tiên cho tên hiển thị:
- *   1. Google Account → Display Name
- *   2. Google Account → Email prefix (trước ký tự "@")
- *   3. StudentLocalDataSource → FullName (Dữ liệu mẫu hoặc DB)
+ * <p>
+ * Ưu tiên đọc từ SessionManager cache (được cập nhật sau khi
+ * HomeViewModel fetch /api/v1/profile/me thành công).
+ * Không còn dùng mock data hoặc GoogleSignIn để lấy tên.
  */
 public class StudentRepository {
 
     private static StudentRepository instance;
-    private final StudentLocalDataSource localDataSource;
-    private final Context context;
+    private final SessionManager sessionManager;
+    private final MutableLiveData<StudentProfile> studentProfileLiveData = new MutableLiveData<>();
 
-    // Sử dụng context để truy cập GoogleSignIn
-    private StudentRepository(Context context, StudentLocalDataSource localDataSource) {
-        this.context = context.getApplicationContext();
-        this.localDataSource = localDataSource;
+    private StudentRepository(Context context) {
+        this.sessionManager = SessionManager.getInstance(context);
     }
 
     public static StudentRepository getInstance(Context context) {
         if (instance == null) {
-            instance = new StudentRepository(context, StudentLocalDataSource.getInstance());
+            instance = new StudentRepository(context.getApplicationContext());
         }
         return instance;
     }
 
     /**
-     * Trả về LiveData chứa thông tin StudentProfile.
+     * Trả về LiveData chứa thông tin StudentProfile từ cache.
+     * Gọi updateFromCache() sau khi fetch API để refresh.
      */
     public LiveData<StudentProfile> getStudentProfile() {
-        MutableLiveData<StudentProfile> liveData = new MutableLiveData<>();
-
-        // Đọc profile từ nguồn dữ liệu cục bộ
-        StudentProfile localProfile = localDataSource.getStudentProfile();
-
-        // Xác định tên hiển thị tốt nhất từ Google hoặc Local
-        String displayName = resolveDisplayName(localProfile.getFullName());
-
-        // Cập nhật giá trị mới cho LiveData
-        liveData.setValue(new StudentProfile(
-                localProfile.getStudentCode(),
-                displayName
-        ));
-
-        return liveData;
+        updateFromCache();
+        return studentProfileLiveData;
     }
 
     /**
-     * Giải quyết tên hiển thị theo thứ tự ưu tiên:
-     * Google Display Name → Email prefix → Fallback name.
+     * Đọc fullName và studentCode từ SessionManager rồi post lên LiveData.
+     * Gọi từ HomeViewModel sau khi fetch profile API thành công.
      */
-    private String resolveDisplayName(String fallbackName) {
-        // Lấy thông tin tài khoản Google đã đăng nhập thay vì FirebaseUser
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-
-        if (account != null) {
-            // Ưu tiên 1: Tên hiển thị từ tài khoản Google
-            String displayName = account.getDisplayName();
-            if (displayName != null && !displayName.isEmpty()) {
-                return displayName;
-            }
-
-            // Ưu tiên 2: Tiền tố email (phần trước @)
-            String email = account.getEmail();
-            if (email != null && email.contains("@")) {
-                return email.split("@")[0];
-            }
-        }
-
-        // Ưu tiên 3: Giá trị mặc định từ database hoặc mock data[cite: 5]
-        return fallbackName;
+    public void updateFromCache() {
+        String fullName = sessionManager.getCachedFullName();
+        String studentCode = sessionManager.getStudentCode();
+        studentProfileLiveData.setValue(new StudentProfile(studentCode, fullName));
     }
 }
