@@ -10,26 +10,29 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.adapter.ScholarshipAdapter;
 import com.utc2.appreborn.model.Scholarship;
+import com.utc2.appreborn.ui.adapter.ScholarshipAdapter;
+import com.utc2.appreborn.ui.results.AcademicResultViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScholarshipFragment extends Fragment {
 
-    private View       btnBack;
-    private ChipGroup  chipGroupFilter;
+    private View btnBack;
+    private ChipGroup chipGroupFilter;
     private RecyclerView recyclerView;
     private ScholarshipAdapter scholarshipAdapter;
 
     private final List<Scholarship> allScholarships = new ArrayList<>();
+    private int activeChipId = R.id.chip_all;
 
     @Nullable
     @Override
@@ -51,16 +54,20 @@ public class ScholarshipFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
 
-        loadMockData();
         setupRecyclerView();
         setupChipFilter();
         chipGroupFilter.post(() -> styleAllChips(chipGroupFilter));
-        applyFilter(R.id.chip_all);
+
+        AcademicResultViewModel viewModel =
+                new ViewModelProvider(requireActivity()).get(AcademicResultViewModel.class);
+
+        viewModel.getScholarships().observe(getViewLifecycleOwner(), scholarships -> {
+            allScholarships.clear();
+            if (scholarships != null) allScholarships.addAll(scholarships);
+            applyFilter(activeChipId);
+        });
     }
 
-    // ─────────────────────────────────────────
-    // Chip colors — không dấu tick, set cứng tránh DayNight
-    // ─────────────────────────────────────────
     private void styleAllChips(ChipGroup group) {
         for (int i = 0; i < group.getChildCount(); i++) {
             styleChip((Chip) group.getChildAt(i));
@@ -80,8 +87,9 @@ public class ScholarshipFragment extends Fragment {
     private void setupChipFilter() {
         chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty()) {
+                activeChipId = checkedIds.get(0);
                 styleAllChips(group);
-                applyFilter(checkedIds.get(0));
+                applyFilter(activeChipId);
             }
         });
     }
@@ -105,26 +113,5 @@ public class ScholarshipFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(scholarshipAdapter);
         recyclerView.setNestedScrollingEnabled(false);
-    }
-
-    private void loadMockData() {
-        allScholarships.add(new Scholarship("Học bổng Khuyến khích học tập",
-                "Trường ĐH Bách Khoa HN", 3_000_000L, "HK",
-                Scholarship.STATUS_NOT_RECEIVED, 3.20));
-        allScholarships.add(new Scholarship("Học bổng JICA",
-                "Cơ quan Hợp tác Nhật Bản", 20_000_000L, "năm",
-                Scholarship.STATUS_RECEIVED, 3.70));
-        allScholarships.add(new Scholarship("Học bổng Vallet",
-                "Quỹ Vallet Việt Nam", 15_000_000L, "năm",
-                Scholarship.STATUS_NOT_RECEIVED, 3.60));
-        allScholarships.add(new Scholarship("Học bổng Vingroup",
-                "Tập đoàn Vingroup", 8_000_000L, "HK",
-                Scholarship.STATUS_NOT_RECEIVED, 3.50));
-        allScholarships.add(new Scholarship("Học bổng Chính phủ",
-                "Bộ Giáo dục và Đào tạo", 5_000_000L, "HK",
-                Scholarship.STATUS_RECEIVED, 3.40));
-        allScholarships.add(new Scholarship("Học bổng KKHT Loại A",
-                "Trường ĐH Công Thương TP.HCM", 4_500_000L, "HK",
-                Scholarship.STATUS_NOT_RECEIVED, 3.60));
     }
 }

@@ -39,12 +39,12 @@ public class AssessmentViewModel extends AndroidViewModel {
     private final LiveData<List<AssessmentPeriod>> periods;
 
     // Header RLSV
-    private final MutableLiveData<String>   studentName  = new MutableLiveData<>("");
-    private final MutableLiveData<String>   studentCode  = new MutableLiveData<>("");
-    private final MutableLiveData<String>   studentClass = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentName  = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentCode  = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentClass = new MutableLiveData<>("");
 
     // Header CVHT
-    private final MutableLiveData<String>   advisorName  = new MutableLiveData<>("");
+    private final MutableLiveData<String> advisorName = new MutableLiveData<>("");
 
     private final MutableLiveData<AssessmentPeriod> selectedPeriod = new MutableLiveData<>();
     private LiveData<List<AssessmentCriteria>> currentSource;
@@ -53,10 +53,10 @@ public class AssessmentViewModel extends AndroidViewModel {
 
     public AssessmentViewModel(@NonNull Application application) {
         super(application);
-        repository = AssessmentRepository.getInstance();
+        repository = AssessmentRepository.getInstance(application);
         userDao    = AppDatabase.getInstance(application).userDao();
         advisorDao = AppDatabase.getInstance(application).advisorDao();
-        periods    = repository.getAssessmentPeriods();
+        periods    = repository.getAssessmentPeriods(); // gọi API thật
 
         loadStudentInfo(1L);
         switchTab(true);
@@ -70,12 +70,9 @@ public class AssessmentViewModel extends AndroidViewModel {
     public LiveData<String>                   getClassification() { return classification; }
     public LiveData<Boolean>                  getIsStudentTab()   { return isStudentTab; }
 
-    // Header RLSV
     public LiveData<String> getStudentName()  { return studentName; }
     public LiveData<String> getStudentCode()  { return studentCode; }
     public LiveData<String> getStudentClass() { return studentClass; }
-
-    // Header CVHT
     public LiveData<String> getAdvisorName()  { return advisorName; }
 
     // ─── Tab switch ───────────────────────────────────────────────────────────
@@ -122,42 +119,24 @@ public class AssessmentViewModel extends AndroidViewModel {
         criteria.setValue(list);
     }
 
-    // ─── Save RLSV ───────────────────────────────────────────────────────────
+    // ─── Save RLSV — gọi API thật ────────────────────────────────────────────
 
     public void saveAssessment(List<AssessmentCriteria> criteriaList, SaveCallback callback) {
-        executor.execute(() -> {
-            try {
-                Thread.sleep(400); // giả lập DB write
-
-                // TODO: Uncomment khi AssessmentDao sẵn sàng
-                // AssessmentDao dao = AppDatabase.getInstance(getApplication()).assessmentDao();
-                // dao.insertOrReplace(buildEntity(criteriaList));
-
-                postResult(callback, true);
-            } catch (Exception e) {
-                postResult(callback, false);
-            }
-        });
+        AssessmentPeriod period = selectedPeriod.getValue();
+        String periodId = period != null ? period.getId() : "";
+        repository.saveStudentAssessment(criteriaList, periodId,
+                success -> callback.onResult(success));
     }
 
-    // ─── Submit CVHT ─────────────────────────────────────────────────────────
+    // ─── Submit CVHT — gọi API thật ──────────────────────────────────────────
 
     public void submitCvht(List<AssessmentCriteria> criteriaList,
                            String opinion,
                            SaveCallback callback) {
-        executor.execute(() -> {
-            try {
-                Thread.sleep(400); // giả lập DB write
-
-                // TODO: Uncomment khi CvhtAssessmentDao sẵn sàng
-                // CvhtAssessmentDao dao = AppDatabase.getInstance(getApplication()).cvhtAssessmentDao();
-                // dao.insertOrReplace(buildCvhtEntity(criteriaList, opinion));
-
-                postResult(callback, true);
-            } catch (Exception e) {
-                postResult(callback, false);
-            }
-        });
+        AssessmentPeriod period = selectedPeriod.getValue();
+        String periodId = period != null ? period.getId() : "";
+        repository.saveAdvisorAssessment(criteriaList, periodId, opinion,
+                success -> callback.onResult(success));
     }
 
     // ─── Private ─────────────────────────────────────────────────────────────
@@ -209,7 +188,6 @@ public class AssessmentViewModel extends AndroidViewModel {
                         }
                     }
                 } else {
-                    // Mock fallback
                     studentName.postValue("Nguyễn Văn B");
                     studentCode.postValue("2251060xxx");
                     studentClass.postValue("CQ.65.CNTT");
@@ -221,12 +199,6 @@ public class AssessmentViewModel extends AndroidViewModel {
             }
             advisorName.postValue("ThS. Nguyễn Văn A");
         });
-    }
-
-    private void postResult(SaveCallback callback, boolean success) {
-        if (callback == null) return;
-        new android.os.Handler(android.os.Looper.getMainLooper())
-                .post(() -> callback.onResult(success));
     }
 
     @Override
