@@ -11,14 +11,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.adapter.WarningAdapter;
 import com.utc2.appreborn.model.AcademicWarning;
+import com.utc2.appreborn.ui.adapter.WarningAdapter;
+import com.utc2.appreborn.ui.results.AcademicResultViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +35,7 @@ public class WarningsFragment extends Fragment {
     private WarningAdapter warningAdapter;
 
     private final List<AcademicWarning> allWarnings = new ArrayList<>();
+    private int activeChipId = R.id.chip_all;
 
     @Nullable
     @Override
@@ -56,17 +59,21 @@ public class WarningsFragment extends Fragment {
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
 
-        loadMockData();
         setupRecyclerView();
-        updateStatCards();
         setupChipFilter();
         chipGroupFilter.post(() -> styleAllChips(chipGroupFilter));
-        applyFilter(R.id.chip_all);
+
+        AcademicResultViewModel viewModel =
+                new ViewModelProvider(requireActivity()).get(AcademicResultViewModel.class);
+
+        viewModel.getWarnings(null).observe(getViewLifecycleOwner(), warnings -> {
+            allWarnings.clear();
+            if (warnings != null) allWarnings.addAll(warnings);
+            updateStatCards();
+            applyFilter(activeChipId);
+        });
     }
 
-    // ─────────────────────────────────────────
-    // Chip colors — set cứng, không bị DayNight ảnh hưởng, không có dấu tick
-    // ─────────────────────────────────────────
     private void styleAllChips(ChipGroup group) {
         for (int i = 0; i < group.getChildCount(); i++) {
             styleChip((Chip) group.getChildAt(i));
@@ -86,8 +93,9 @@ public class WarningsFragment extends Fragment {
     private void setupChipFilter() {
         chipGroupFilter.setOnCheckedStateChangeListener((group, checkedIds) -> {
             if (!checkedIds.isEmpty()) {
+                activeChipId = checkedIds.get(0);
                 styleAllChips(group);
-                applyFilter(checkedIds.get(0));
+                applyFilter(activeChipId);
             }
         });
     }
@@ -116,23 +124,5 @@ public class WarningsFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(warningAdapter);
         recyclerView.setNestedScrollingEnabled(false);
-    }
-
-    private void loadMockData() {
-        allWarnings.add(new AcademicWarning(1,
-                "Điểm thi không đạt", "Triết học Mác-Lênin",
-                "18/04/2026", AcademicWarning.TYPE_SERIOUS, AcademicWarning.ICON_BOOK));
-        allWarnings.add(new AcademicWarning(2,
-                "Điểm thi không đạt (HK1 2024-2025)", "Hệ điều hành",
-                "15/01/2026", AcademicWarning.TYPE_SERIOUS, AcademicWarning.ICON_BOOK));
-        allWarnings.add(new AcademicWarning(3,
-                "Cảnh báo học vụ mức 1", null,
-                "01/04/2026", AcademicWarning.TYPE_NORMAL, AcademicWarning.ICON_CLOCK));
-        allWarnings.add(new AcademicWarning(4,
-                "Học phí còn nợ", null,
-                "01/03/2026", AcademicWarning.TYPE_SERIOUS, AcademicWarning.ICON_BOOK));
-        allWarnings.add(new AcademicWarning(5,
-                "Vắng mặt quá mức cho phép", "Lập trình Web",
-                "10/04/2026", AcademicWarning.TYPE_NORMAL, AcademicWarning.ICON_CLOCK));
     }
 }
