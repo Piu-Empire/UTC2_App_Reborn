@@ -227,13 +227,12 @@ public class AssessmentFragment extends Fragment {
             binding.actvPeriod.setOnItemClickListener((p, v, pos, id) ->
                     pendingPeriod = periods.get(pos));
 
-            // Nút Chọn mới thực sự load dữ liệu
+            // Nút Chọn mới thực sự load dữ liệu (local criteria + API overlay)
             binding.btnChoose.setOnClickListener(v -> {
                 if (pendingPeriod != null) {
                     animateButtonPress(binding.btnChoose);
                     binding.progressBar.setVisibility(View.VISIBLE);
-                    viewModel.setSelectedPeriod(pendingPeriod);
-                    viewModel.switchTab(isStudentTab);
+                    viewModel.loadForPeriod(pendingPeriod, isStudentTab);
                 }
             });
         });
