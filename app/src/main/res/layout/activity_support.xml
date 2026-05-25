@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:background="@color/background_gray">
 
+    <!-- Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="80dp"
@@ -48,6 +49,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="20dp">
+
+            <!-- ── FORM GỬI PHẢN HỒI ── -->
 
             <ImageView
                 android:layout_width="90dp"
@@ -132,51 +135,61 @@
                 android:padding="10dp"
                 android:background="@drawable/bg_edittext"/>
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_gravity="center"
-                android:layout_marginTop="12dp">
-
-                <RatingBar
-                    android:id="@+id/ratingBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:numStars="5"
-                    android:stepSize="1"
-                    android:progressTint="@color/star_yellow"
-                    android:secondaryProgressTint="@color/star_yellow"
-                    android:progressBackgroundTint="@color/gray2"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:weightSum="5"
-                    android:layout_marginTop="4dp">
-
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/rate_1" android:textColor="@color/text_gray" android:textSize="11sp"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/rate_2" android:textColor="@color/text_gray" android:textSize="11sp"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/rate_3" android:textColor="@color/text_gray" android:textSize="11sp"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/rate_4" android:textColor="@color/text_gray" android:textSize="11sp"/>
-                    <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/rate_5" android:textColor="@color/text_gray" android:textSize="11sp"/>
-                </LinearLayout>
-
-            </LinearLayout>
-
             <Button
                 android:id="@+id/btnSend"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:text="@string/send_report"
                 android:layout_marginTop="16dp"
-                app:backgroundTint="#000000 "
+                app:backgroundTint="#000000"
                 android:textColor="@color/white"
-                android:textStyle="bold" />
+                android:textStyle="bold"/>
+
+            <!-- ── LỊCH SỬ PHẢN HỒI ── -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_gray"
+                android:layout_marginTop="28dp"
+                android:layout_marginBottom="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lịch sử phản hồi"
+                android:textColor="@color/text_black"
+                android:textStyle="bold"
+                android:textSize="15sp"
+                android:layout_marginBottom="8dp"/>
+
+            <ProgressBar
+                android:id="@+id/progressHistory"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone"/>
+
+            <TextView
+                android:id="@+id/tvEmptyHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bạn chưa gửi phản hồi nào."
+                android:textColor="@color/text_gray"
+                android:textSize="13sp"
+                android:gravity="center"
+                android:paddingVertical="16dp"
+                android:visibility="gone"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvFeedbackHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                tools:itemCount="3"
+                tools:listitem="@layout/item_feedback_history"/>
 
         </LinearLayout>
-
     </ScrollView>
 
 </LinearLayout>
