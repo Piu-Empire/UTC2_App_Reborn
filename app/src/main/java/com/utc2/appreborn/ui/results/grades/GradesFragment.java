@@ -10,12 +10,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.adapter.GradeAdapter;
 import com.utc2.appreborn.model.CourseGrade;
+import com.utc2.appreborn.network.dto.SemesterResponse;
+import com.utc2.appreborn.ui.adapter.GradeAdapter;
+import com.utc2.appreborn.ui.results.AcademicResultViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +35,13 @@ public class GradesFragment extends Fragment {
     private RecyclerView recyclerView;
     private GradeAdapter gradeAdapter;
 
+    private AcademicResultViewModel viewModel;
+
     private final List<CourseGrade> allGrades = new ArrayList<>();
     private String currentSemester = "Tất cả";
 
-    private final String[] semesters = {
-            "Tất cả", "HK1 2024-2025", "HK2 2023-2024", "HK1 2023-2024"
-    };
+    // Danh sách kỳ học sẽ được build từ API
+    private final List<String> semesterLabels = new ArrayList<>();
 
     @Nullable
     @Override
@@ -59,27 +63,62 @@ public class GradesFragment extends Fragment {
         tvPassedSubjects   = view.findViewById(R.id.tv_passed_subjects);
         recyclerView       = view.findViewById(R.id.recycler_grades);
 
-        // Nút quay lại
         btnBack.setOnClickListener(v ->
                 requireActivity().getSupportFragmentManager().popBackStack()
         );
 
-        loadMockData();
-        setupSemesterFilter();
         setupRecyclerView();
-        refreshDisplay();
+        setupSemesterFilter();
+
+        viewModel = new ViewModelProvider(requireActivity()).get(AcademicResultViewModel.class);
+
+        // Load tất cả điểm (không filter kỳ)
+        viewModel.getGrades(null).observe(getViewLifecycleOwner(), grades -> {
+            allGrades.clear();
+            if (grades != null) allGrades.addAll(grades);
+            buildSemesterLabels();
+            refreshDisplay();
+        });
+
+        // Load danh sách kỳ học để build filter
+        viewModel.getSemesters().observe(getViewLifecycleOwner(), semesters -> {
+            buildSemesterLabelsFromSemesters(semesters);
+        });
+    }
+
+    private void buildSemesterLabels() {
+        semesterLabels.clear();
+        semesterLabels.add("Tất cả");
+        for (CourseGrade g : allGrades) {
+            if (!semesterLabels.contains(g.getSemester())) {
+                semesterLabels.add(g.getSemester());
+            }
+        }
+    }
+
+    private void buildSemesterLabelsFromSemesters(List<SemesterResponse> semesters) {
+        if (semesters == null) return;
+        semesterLabels.clear();
+        semesterLabels.add("Tất cả");
+        for (SemesterResponse s : semesters) {
+            String label = s.semesterName != null && s.academicYear != null
+                    ? s.semesterName.replace("Học kỳ ", "HK") + " " + s.academicYear
+                    : "";
+            if (!label.isEmpty() && !semesterLabels.contains(label)) {
+                semesterLabels.add(label);
+            }
+        }
     }
 
     private void setupSemesterFilter() {
         btnSemesterFilter.setOnClickListener(v -> {
-            int currentIndex = 0;
-            for (int i = 0; i < semesters.length; i++) {
-                if (semesters[i].equals(currentSemester)) { currentIndex = i; break; }
-            }
+            String[] arr = semesterLabels.toArray(new String[0]);
+            int currentIndex = semesterLabels.indexOf(currentSemester);
+            if (currentIndex < 0) currentIndex = 0;
             new AlertDialog.Builder(requireContext())
                     .setTitle("Chọn học kỳ")
-                    .setSingleChoiceItems(semesters, currentIndex, (dialog, which) -> {
-                        currentSemester = semesters[which];
+                    .setSingleChoiceItems(arr, currentIndex, (dialog, which) -> {
+                        currentSemester = semesterLabels.get(which);
                         tvSelectedSemester.setText(currentSemester);
                         refreshDisplay();
                         dialog.dismiss();
@@ -87,22 +126,6 @@ public class GradesFragment extends Fragment {
                     .setNegativeButton("Hủy", null)
                     .show();
         });
-    }
-
-    private void loadMockData() {
-        allGrades.add(new CourseGrade("IT3040", "Lập trình Java", 3, 8.5, 7.8, 3.48, "B+", true, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("IT3050", "Cơ sở dữ liệu", 3, 7.0, 8.0, 3.32, "B+", true, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("IT3060", "Hệ điều hành", 3, 4.5, 3.5, 1.72, "F", false, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("IT3070", "Mạng máy tính", 3, 6.0, 7.5, 3.04, "B", true, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("ML3010", "Triết học Mác-Lênin", 3, 4.0, 3.0, 1.48, "F", false, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("IT3080", "Lập trình Web", 2, 8.0, 7.5, 3.32, "B+", true, "HK1 2024-2025"));
-        allGrades.add(new CourseGrade("IT2010", "Giải tích 1", 3, 7.5, 8.0, 3.40, "B+", true, "HK2 2023-2024"));
-        allGrades.add(new CourseGrade("IT2020", "Đại số tuyến tính", 3, 8.0, 9.0, 3.84, "A", true, "HK2 2023-2024"));
-        allGrades.add(new CourseGrade("IT2030", "Cấu trúc dữ liệu", 3, 7.0, 7.5, 3.12, "B", true, "HK2 2023-2024"));
-        allGrades.add(new CourseGrade("EN2010", "Tiếng Anh cơ bản", 3, 8.5, 8.0, 3.48, "B+", true, "HK2 2023-2024"));
-        allGrades.add(new CourseGrade("IT1010", "Nhập môn CNTT", 2, 9.0, 9.5, 3.96, "A", true, "HK1 2023-2024"));
-        allGrades.add(new CourseGrade("IT1020", "Lập trình C++", 3, 8.0, 8.5, 3.60, "A-", true, "HK1 2023-2024"));
-        allGrades.add(new CourseGrade("MA1010", "Giải tích 2", 3, 6.5, 7.0, 2.96, "B", true, "HK1 2023-2024"));
     }
 
     private void setupRecyclerView() {

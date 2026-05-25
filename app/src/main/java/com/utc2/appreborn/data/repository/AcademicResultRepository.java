@@ -1,203 +1,263 @@
 package com.utc2.appreborn.data.repository;
 
-import android.app.Application;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.utc2.appreborn.data.local.dao.AcademicWarningDao;
-import com.utc2.appreborn.data.local.dao.CourseDao;
-import com.utc2.appreborn.data.local.dao.SemesterDao;
-import com.utc2.appreborn.data.local.entity.AcademicWarningEntity;
-import com.utc2.appreborn.data.local.entity.CourseEntity;
-import com.utc2.appreborn.data.local.entity.SemesterEntity;
+import com.utc2.appreborn.model.AcademicWarning;
+import com.utc2.appreborn.model.CourseGrade;
+import com.utc2.appreborn.model.LeaderboardEntry;
+import com.utc2.appreborn.model.Scholarship;
+import com.utc2.appreborn.network.AcademicApiService;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.dto.AcademicWarningResponse;
+import com.utc2.appreborn.network.dto.CourseGradeResponse;
+import com.utc2.appreborn.network.dto.LeaderboardEntryResponse;
+import com.utc2.appreborn.network.dto.ScholarshipResponse;
+import com.utc2.appreborn.network.dto.SemesterResponse;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 /**
- * AcademicResultRepository - Single Source of Truth cho dữ liệu học vụ.
- *
- * Kiến trúc:
- *  ViewModel  →  Repository  →  [Room Cache] hoặc [Remote API]
- *
- * Trạng thái hiện tại: sử dụng MOCK DATA để test UI.
- *
- * Để kích hoạt Room hoặc API thật:
- *  1. Đăng ký các DAO trong AppDatabase
- *  2. Bỏ comment các khối "TODO: Uncomment when Room Database/API is ready"
- *  3. Xoá / comment lại phần Mock Data bên dưới
+ * AcademicResultRepository — kết nối 5 màn hình kết quả học tập với backend API.
+ * Token được truyền từ ViewModel (lấy qua SessionManager).
  */
 public class AcademicResultRepository {
 
-    // ─── DAOs (sẽ dùng khi Room sẵn sàng) ──────────────────────────────────────
+    private final AcademicApiService api;
 
-    private final SemesterDao semesterDao;
-    private final CourseDao courseDao;
-    private final AcademicWarningDao warningDao;
-
-    // ─── Constructor ────────────────────────────────────────────────────────────
-
-    public AcademicResultRepository(Application application) {
-
-        // TODO: Uncomment when Room Database is ready
-        // AppDatabase db = AppDatabase.getInstance(application);
-        // semesterDao = db.semesterDao();
-        // courseDao   = db.courseDao();
-        // warningDao  = db.academicWarningDao();
-
-        semesterDao = null;
-        courseDao   = null;
-        warningDao  = null;
+    public AcademicResultRepository(String token) {
+        api = ApiClient.getInstance(token).create(AcademicApiService.class);
     }
 
-    // ════════════════════════════════════════════════════════════════════════════
-    //  SEMESTER
-    // ════════════════════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════════════
+    //  SEMESTERS
+    // ════════════════════════════════════════════════════════════════════════
 
-    public LiveData<List<SemesterEntity>> getSemesters(long userId) {
-
-        // TODO: Uncomment when Room Database is ready
-        // return semesterDao.getSemestersByUserId(userId);
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<List<SemesterEntity>> mockLiveData = new MutableLiveData<>();
-        List<SemesterEntity> mockList = new ArrayList<>();
-
-        mockList.add(new SemesterEntity(1L, userId, "Học kỳ 1", "2023-2024", 1,
-                "2023-09-04", "2024-01-05", 3.45, 20, 20));
-        mockList.add(new SemesterEntity(2L, userId, "Học kỳ 2", "2023-2024", 2,
-                "2024-02-05", "2024-06-07", 3.20, 18, 16));
-        mockList.add(new SemesterEntity(3L, userId, "Học kỳ 1", "2024-2025", 1,
-                "2024-09-02", "2025-01-03", 3.60, 21, 21));
-        mockList.add(new SemesterEntity(4L, userId, "Học kỳ 2", "2024-2025", 2,
-                "2025-02-03", "2025-06-06", 3.10, 19, 17));
-
-        mockLiveData.setValue(mockList);
-        return mockLiveData;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
+    public LiveData<List<SemesterResponse>> getSemesters() {
+        MutableLiveData<List<SemesterResponse>> liveData = new MutableLiveData<>();
+        api.getSemesters().enqueue(new Callback<ApiResponse<List<SemesterResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<SemesterResponse>>> call,
+                                   Response<ApiResponse<List<SemesterResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    liveData.postValue(response.body().getData());
+                } else {
+                    liveData.postValue(new ArrayList<>());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<SemesterResponse>>> call, Throwable t) {
+                liveData.postValue(new ArrayList<>());
+            }
+        });
+        return liveData;
     }
 
-    public LiveData<SemesterEntity> getSemesterById(long semesterId) {
+    // ════════════════════════════════════════════════════════════════════════
+    //  GRADES
+    // ════════════════════════════════════════════════════════════════════════
 
-        // TODO: Uncomment when Room Database is ready
-        // MutableLiveData<SemesterEntity> result = new MutableLiveData<>();
-        // AsyncTask.execute(() -> result.postValue(semesterDao.getSemesterById(semesterId)));
-        // return result;
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<SemesterEntity> mockLiveData = new MutableLiveData<>();
-        mockLiveData.setValue(new SemesterEntity(semesterId, 1L,
-                "Học kỳ 1", "2024-2025", 1,
-                "2024-09-02", "2025-01-03", 3.60, 21, 21));
-        return mockLiveData;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
+    public LiveData<List<CourseGrade>> getGrades(Long semesterId) {
+        MutableLiveData<List<CourseGrade>> liveData = new MutableLiveData<>();
+        api.getGrades(semesterId).enqueue(new Callback<ApiResponse<List<CourseGradeResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<CourseGradeResponse>>> call,
+                                   Response<ApiResponse<List<CourseGradeResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    liveData.postValue(mapGrades(response.body().getData()));
+                } else {
+                    liveData.postValue(new ArrayList<>());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<CourseGradeResponse>>> call, Throwable t) {
+                liveData.postValue(new ArrayList<>());
+            }
+        });
+        return liveData;
     }
 
-    // ════════════════════════════════════════════════════════════════════════════
-    //  COURSE
-    // ════════════════════════════════════════════════════════════════════════════
-
-    public LiveData<List<CourseEntity>> getAllCourses() {
-
-        // TODO: Uncomment when Room Database is ready
-        // return courseDao.getAllCourses();
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<List<CourseEntity>> mockLiveData = new MutableLiveData<>();
-        List<CourseEntity> mockList = new ArrayList<>();
-
-        mockList.add(new CourseEntity(101L, "IT3040", "Lập trình Java nâng cao",
-                3, 30, 15, "Công nghệ thông tin",
-                "Các kỹ thuật lập trình Java hiện đại."));
-        mockList.add(new CourseEntity(102L, "IT3080", "Cơ sở dữ liệu",
-                3, 30, 15, "Công nghệ thông tin",
-                "Thiết kế CSDL quan hệ, SQL nâng cao."));
-        mockList.add(new CourseEntity(103L, "IT4060", "Phát triển ứng dụng di động",
-                3, 20, 25, "Công nghệ thông tin",
-                "Phát triển ứng dụng Android và iOS."));
-
-        mockLiveData.setValue(mockList);
-        return mockLiveData;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
-    }
-
-    // ════════════════════════════════════════════════════════════════════════════
-    //  ACADEMIC WARNING
-    // ════════════════════════════════════════════════════════════════════════════
-
-    public LiveData<List<AcademicWarningEntity>> getWarnings(long userId) {
-
-        // TODO: Uncomment when Room Database is ready
-        // return warningDao.getWarningsByUserId(userId);
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<List<AcademicWarningEntity>> mockLiveData = new MutableLiveData<>();
-        List<AcademicWarningEntity> mockList = new ArrayList<>();
-
-        mockList.add(new AcademicWarningEntity(1001L, userId, 4L,
-                "FAILED_EXAM",
-                "Điểm thi kết thúc học phần môn Giải tích 1 dưới 4.0. Yêu cầu thi lại.",
-                1_740_000_000_000L, null, "ACTIVE"));
-
-        mockList.add(new AcademicWarningEntity(1002L, userId, 4L,
-                "ATTENDANCE",
-                "Vắng quá 20% tổng số buổi học môn Lập trình Java nâng cao.",
-                1_741_000_000_000L, null, "ACTIVE"));
-
-        mockList.add(new AcademicWarningEntity(1003L, userId, 2L,
-                "LOW_GPA",
-                "GPA học kỳ 2 năm 2023-2024 đạt 3.20, thấp hơn ngưỡng học bổng 3.50.",
-                1_712_000_000_000L, 1_720_000_000_000L, "RESOLVED"));
-
-        mockLiveData.setValue(mockList);
-        return mockLiveData;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
-    }
-
-    public LiveData<List<AcademicWarningEntity>> getWarningsBySemester(long userId, long semesterId) {
-
-        // TODO: Uncomment when Room Database is ready
-        // return warningDao.getWarningsByUserAndSemester(userId, semesterId);
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<List<AcademicWarningEntity>> mockLiveData = new MutableLiveData<>();
-        List<AcademicWarningEntity> filtered = new ArrayList<>();
-        if (semesterId == 4L) {
-            filtered.add(new AcademicWarningEntity(1001L, userId, 4L,
-                    "FAILED_EXAM", "Điểm thi môn Giải tích 1 dưới 4.0.",
-                    1_740_000_000_000L, null, "ACTIVE"));
+    private List<CourseGrade> mapGrades(List<CourseGradeResponse> raw) {
+        List<CourseGrade> result = new ArrayList<>();
+        if (raw == null) return result;
+        for (CourseGradeResponse r : raw) {
+            String semLabel = buildSemLabel(r.semesterName, r.academicYear);
+            result.add(new CourseGrade(
+                    r.courseCode   != null ? r.courseCode   : "",
+                    r.courseName   != null ? r.courseName   : "",
+                    r.credits      != null ? r.credits      : 0,
+                    r.midtermScore != null ? r.midtermScore : 0.0,
+                    r.finalScore   != null ? r.finalScore   : 0.0,
+                    r.gradePoint   != null ? r.gradePoint   : 0.0,
+                    r.letterGrade  != null ? r.letterGrade  : "—",
+                    Boolean.TRUE.equals(r.isPassed),
+                    semLabel
+            ));
         }
-        mockLiveData.setValue(filtered);
-        return mockLiveData;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
+        return result;
     }
 
-    public LiveData<Integer> getActiveWarningCount(long userId) {
-
-        // TODO: Uncomment when Room Database is ready
-        // MutableLiveData<Integer> result = new MutableLiveData<>();
-        // AsyncTask.execute(() ->
-        //     result.postValue(warningDao.countActiveWarnings(userId, "ACTIVE"))
-        // );
-        // return result;
-
-        // ── MOCK DATA ───────────────────────────────────────────────────────────
-        MutableLiveData<Integer> mockCount = new MutableLiveData<>();
-        mockCount.setValue(2);
-        return mockCount;
-        // ── END MOCK DATA ───────────────────────────────────────────────────────
+    /** "Học kỳ 1" + "2024-2025" → "HK1 2024-2025" */
+    private String buildSemLabel(String semesterName, String academicYear) {
+        if (semesterName == null || academicYear == null) return "";
+        String hk = semesterName.replace("Học kỳ ", "HK");
+        return hk + " " + academicYear;
     }
 
-    // ════════════════════════════════════════════════════════════════════════════
-    //  CACHE MANAGEMENT
-    // ════════════════════════════════════════════════════════════════════════════
+    // ════════════════════════════════════════════════════════════════════════
+    //  LEADERBOARD
+    // ════════════════════════════════════════════════════════════════════════
 
-    public void clearCacheForUser(long userId) {
-        // TODO: Uncomment when Room Database is ready
-        // AsyncTask.execute(() -> {
-        //     semesterDao.deleteAllByUserId(userId);
-        //     warningDao.deleteAllByUserId(userId);
-        // });
+    public LiveData<List<LeaderboardEntry>> getLeaderboard(Long semesterId, String academicYear) {
+        MutableLiveData<List<LeaderboardEntry>> liveData = new MutableLiveData<>();
+        api.getLeaderboard(semesterId, academicYear)
+                .enqueue(new Callback<ApiResponse<List<LeaderboardEntryResponse>>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<List<LeaderboardEntryResponse>>> call,
+                                           Response<ApiResponse<List<LeaderboardEntryResponse>>> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            liveData.postValue(mapLeaderboard(response.body().getData()));
+                        } else {
+                            liveData.postValue(new ArrayList<>());
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<ApiResponse<List<LeaderboardEntryResponse>>> call, Throwable t) {
+                        liveData.postValue(new ArrayList<>());
+                    }
+                });
+        return liveData;
+    }
+
+    private List<LeaderboardEntry> mapLeaderboard(List<LeaderboardEntryResponse> raw) {
+        List<LeaderboardEntry> result = new ArrayList<>();
+        if (raw == null) return result;
+        for (LeaderboardEntryResponse r : raw) {
+            result.add(new LeaderboardEntry(
+                    r.rank         != null ? r.rank         : 0,
+                    r.fullName     != null ? r.fullName     : "",
+                    r.initials     != null ? r.initials     : "??",
+                    r.totalCredits != null ? r.totalCredits : 0,
+                    r.gpa          != null ? r.gpa          : 0.0,
+                    Boolean.TRUE.equals(r.isCurrentUser)
+            ));
+        }
+        return result;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  SCHOLARSHIPS
+    // ════════════════════════════════════════════════════════════════════════
+
+    public LiveData<List<Scholarship>> getScholarships() {
+        MutableLiveData<List<Scholarship>> liveData = new MutableLiveData<>();
+        api.getScholarships().enqueue(new Callback<ApiResponse<List<ScholarshipResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<ScholarshipResponse>>> call,
+                                   Response<ApiResponse<List<ScholarshipResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    liveData.postValue(mapScholarships(response.body().getData()));
+                } else {
+                    liveData.postValue(new ArrayList<>());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<ScholarshipResponse>>> call, Throwable t) {
+                liveData.postValue(new ArrayList<>());
+            }
+        });
+        return liveData;
+    }
+
+    private List<Scholarship> mapScholarships(List<ScholarshipResponse> raw) {
+        List<Scholarship> result = new ArrayList<>();
+        if (raw == null) return result;
+        for (ScholarshipResponse r : raw) {
+            String status = "received".equals(r.status)
+                    ? Scholarship.STATUS_RECEIVED
+                    : Scholarship.STATUS_NOT_RECEIVED;
+            result.add(new Scholarship(
+                    r.name         != null ? r.name         : "",
+                    r.organization != null ? r.organization : "",
+                    r.amount       != null ? r.amount       : 0L,
+                    r.unit         != null ? r.unit         : "",
+                    status,
+                    r.minGpa       != null ? r.minGpa       : 0.0
+            ));
+        }
+        return result;
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    //  WARNINGS
+    // ════════════════════════════════════════════════════════════════════════
+
+    public LiveData<List<AcademicWarning>> getWarnings(Long semesterId) {
+        MutableLiveData<List<AcademicWarning>> liveData = new MutableLiveData<>();
+        api.getWarnings(semesterId).enqueue(new Callback<ApiResponse<List<AcademicWarningResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<AcademicWarningResponse>>> call,
+                                   Response<ApiResponse<List<AcademicWarningResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    liveData.postValue(mapWarnings(response.body().getData()));
+                } else {
+                    liveData.postValue(new ArrayList<>());
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<AcademicWarningResponse>>> call, Throwable t) {
+                liveData.postValue(new ArrayList<>());
+            }
+        });
+        return liveData;
+    }
+
+    private List<AcademicWarning> mapWarnings(List<AcademicWarningResponse> raw) {
+        List<AcademicWarning> result = new ArrayList<>();
+        if (raw == null) return result;
+        for (AcademicWarningResponse r : raw) {
+            int type = "ACTIVE".equals(r.status)
+                    ? AcademicWarning.TYPE_SERIOUS
+                    : AcademicWarning.TYPE_NORMAL;
+            int icon = "FAILED_EXAM".equals(r.warningType) || "LOW_GPA".equals(r.warningType)
+                    ? AcademicWarning.ICON_BOOK
+                    : AcademicWarning.ICON_CLOCK;
+            result.add(new AcademicWarning(
+                    r.warningId != null ? r.warningId.intValue() : 0,
+                    mapWarningTitle(r.warningType),
+                    r.description,
+                    formatDate(r.issuedAt),
+                    type,
+                    icon
+            ));
+        }
+        return result;
+    }
+
+    private String mapWarningTitle(String warningType) {
+        if (warningType == null) return "Cảnh báo học vụ";
+        switch (warningType) {
+            case "FAILED_EXAM": return "Điểm thi không đạt";
+            case "LOW_GPA":     return "GPA thấp";
+            case "ATTENDANCE":  return "Vắng mặt quá mức";
+            default:            return "Cảnh báo học vụ";
+        }
+    }
+
+    /** "2026-01-15T00:00:00" → "15/01/2026" */
+    private String formatDate(String issuedAt) {
+        if (issuedAt == null || issuedAt.length() < 10) return "";
+        try {
+            String[] parts = issuedAt.substring(0, 10).split("-");
+            return parts[2] + "/" + parts[1] + "/" + parts[0];
+        } catch (Exception e) {
+            return issuedAt;
+        }
     }
 }

@@ -16,6 +16,9 @@ import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
 import com.utc2.appreborn.data.repository.AssessmentRepository;
 import com.utc2.appreborn.model.AssessmentCriteria;
 import com.utc2.appreborn.model.AssessmentPeriod;
+import com.utc2.appreborn.network.dto.assessment.ExternalAssessmentResponse;
+import com.utc2.appreborn.network.dto.assessment.StudentAssessmentResponse;
+import com.utc2.appreborn.utils.SessionManager;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -39,12 +42,12 @@ public class AssessmentViewModel extends AndroidViewModel {
     private final LiveData<List<AssessmentPeriod>> periods;
 
     // Header RLSV
-    private final MutableLiveData<String>   studentName  = new MutableLiveData<>("");
-    private final MutableLiveData<String>   studentCode  = new MutableLiveData<>("");
-    private final MutableLiveData<String>   studentClass = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentName  = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentCode  = new MutableLiveData<>("");
+    private final MutableLiveData<String> studentClass = new MutableLiveData<>("");
 
     // Header CVHT
-    private final MutableLiveData<String>   advisorName  = new MutableLiveData<>("");
+    private final MutableLiveData<String> advisorName = new MutableLiveData<>("");
 
     private final MutableLiveData<AssessmentPeriod> selectedPeriod = new MutableLiveData<>();
     private LiveData<List<AssessmentCriteria>> currentSource;
@@ -53,12 +56,12 @@ public class AssessmentViewModel extends AndroidViewModel {
 
     public AssessmentViewModel(@NonNull Application application) {
         super(application);
-        repository = AssessmentRepository.getInstance();
+        repository = AssessmentRepository.getInstance(application);
         userDao    = AppDatabase.getInstance(application).userDao();
         advisorDao = AppDatabase.getInstance(application).advisorDao();
-        periods    = repository.getAssessmentPeriods();
+        periods    = repository.getAssessmentPeriods(); // gọi API thật
 
-        loadStudentInfo(1L);
+        loadStudentInfo();
         switchTab(true);
     }
 
@@ -70,12 +73,9 @@ public class AssessmentViewModel extends AndroidViewModel {
     public LiveData<String>                   getClassification() { return classification; }
     public LiveData<Boolean>                  getIsStudentTab()   { return isStudentTab; }
 
-    // Header RLSV
     public LiveData<String> getStudentName()  { return studentName; }
     public LiveData<String> getStudentCode()  { return studentCode; }
     public LiveData<String> getStudentClass() { return studentClass; }
-
-    // Header CVHT
     public LiveData<String> getAdvisorName()  { return advisorName; }
 
     // ─── Tab switch ───────────────────────────────────────────────────────────
@@ -122,42 +122,59 @@ public class AssessmentViewModel extends AndroidViewModel {
         criteria.setValue(list);
     }
 
-    // ─── Save RLSV ───────────────────────────────────────────────────────────
+    // ─── Load dữ liệu khi chọn kỳ — gọi API thật ────────────────────────────
 
-    public void saveAssessment(List<AssessmentCriteria> criteriaList, SaveCallback callback) {
-        executor.execute(() -> {
-            try {
-                Thread.sleep(400); // giả lập DB write
+    /**
+     * Gọi khi user bấm nút "Chọn" kỳ đánh giá.
+     * Luồng: build criteria local → overlay điểm đã lưu (SV tab) → overlay điểm external → post lên UI.
+     */
+    public void loadForPeriod(AssessmentPeriod period, boolean toStudentTab) {
+        selectedPeriod.setValue(period);
+        isStudentTab.setValue(toStudentTab);
+        if (currentSource != null) { criteria.removeSource(currentSource); currentSource = null; }
 
-                // TODO: Uncomment khi AssessmentDao sẵn sàng
-                // AssessmentDao dao = AppDatabase.getInstance(getApplication()).assessmentDao();
-                // dao.insertOrReplace(buildEntity(criteriaList));
+        List<AssessmentCriteria> list = repository.getCriteriaList(toStudentTab);
 
-                postResult(callback, true);
-            } catch (Exception e) {
-                postResult(callback, false);
-            }
-        });
+        if (!toStudentTab || period == null) {
+            // Tab CVHT hoặc chưa có kỳ: hiển thị criteria local ngay
+            criteria.setValue(list);
+            recalculate(list);
+            return;
+        }
+
+        // Tab RLSV: load điểm đã lưu → rồi load điểm external
+        String periodId = period.getId();
+        repository.getStudentAssessment(periodId,
+                /* onLoaded (luôn gọi) */ loadSuccess ->
+                        repository.getExternalAssessment(periodId,
+                                /* onLoaded (luôn gọi) */ extSuccess -> {
+                                    criteria.setValue(list);
+                                    recalculate(list);
+                                },
+                                /* onData */ extData -> applyExternalData(list, extData)
+                        ),
+                /* onData */ svData -> applyStudentData(list, svData)
+        );
     }
 
-    // ─── Submit CVHT ─────────────────────────────────────────────────────────
+    // ─── Save RLSV — gọi API thật ────────────────────────────────────────────
+
+    public void saveAssessment(List<AssessmentCriteria> criteriaList, SaveCallback callback) {
+        AssessmentPeriod period = selectedPeriod.getValue();
+        String periodId = period != null ? period.getId() : "";
+        repository.saveStudentAssessment(criteriaList, periodId,
+                success -> callback.onResult(success));
+    }
+
+    // ─── Submit CVHT — gọi API thật ──────────────────────────────────────────
 
     public void submitCvht(List<AssessmentCriteria> criteriaList,
                            String opinion,
                            SaveCallback callback) {
-        executor.execute(() -> {
-            try {
-                Thread.sleep(400); // giả lập DB write
-
-                // TODO: Uncomment khi CvhtAssessmentDao sẵn sàng
-                // CvhtAssessmentDao dao = AppDatabase.getInstance(getApplication()).cvhtAssessmentDao();
-                // dao.insertOrReplace(buildCvhtEntity(criteriaList, opinion));
-
-                postResult(callback, true);
-            } catch (Exception e) {
-                postResult(callback, false);
-            }
-        });
+        AssessmentPeriod period = selectedPeriod.getValue();
+        String periodId = period != null ? period.getId() : "";
+        repository.saveAdvisorAssessment(criteriaList, periodId, opinion,
+                success -> callback.onResult(success));
     }
 
     // ─── Private ─────────────────────────────────────────────────────────────
@@ -192,41 +209,62 @@ public class AssessmentViewModel extends AndroidViewModel {
         }
     }
 
-    private void loadStudentInfo(long userId) {
+    private void applyStudentData(List<AssessmentCriteria> list, StudentAssessmentResponse data) {
+        if (data == null || data.items == null) return;
+        for (StudentAssessmentResponse.Item item : data.items) {
+            for (AssessmentCriteria c : list) {
+                if (c.getId() == item.criteriaId) {
+                    c.setCurrentScore(item.score);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void applyExternalData(List<AssessmentCriteria> list, ExternalAssessmentResponse data) {
+        if (data == null || data.items == null) return;
+        for (ExternalAssessmentResponse.Item item : data.items) {
+            for (AssessmentCriteria c : list) {
+                if (c.getId() == item.criteriaId) {
+                    c.setTapTheScore(item.tapTheScore);
+                    c.setKhoaScore(item.khoaScore);
+                    c.setTruongScore(item.truongScore);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void loadStudentInfo() {
+        SessionManager session = SessionManager.getInstance(getApplication());
+
+        // Hiển thị từ cache SessionManager ngay (đã được HomeViewModel fetch)
+        String cachedName = session.getFullName();
+        String cachedCode = session.getStudentCode();
+        studentName.setValue(!cachedName.isEmpty() ? cachedName : "Sinh viên");
+        studentCode.setValue(!cachedCode.isEmpty() ? cachedCode : "—");
+        studentClass.setValue("—");
+        advisorName.setValue("—");
+
+        long userId = session.getUserId();
+        if (userId <= 0) return; // chưa có userId thật, dùng cache là đủ
+
         executor.execute(() -> {
             try {
                 StudentProfileEntity profile = userDao.getStudentProfileByUserId(userId);
                 if (profile != null) {
-                    studentName.postValue(profile.fullName != null ? profile.fullName : "Sinh viên");
-                    studentCode.postValue(profile.studentCode != null ? profile.studentCode : "—");
+                    if (profile.fullName != null)    studentName.postValue(profile.fullName);
+                    if (profile.studentCode != null) studentCode.postValue(profile.studentCode);
                     studentClass.postValue(profile.className != null ? profile.className : "—");
 
                     if (profile.advisorId != null) {
                         AdvisorEntity advisor = advisorDao.getAdvisorById(profile.advisorId);
-                        if (advisor != null) {
-                            advisorName.postValue(advisor.fullName);
-                            return;
-                        }
+                        if (advisor != null) { advisorName.postValue(advisor.fullName); return; }
                     }
-                } else {
-                    // Mock fallback
-                    studentName.postValue("Nguyễn Văn B");
-                    studentCode.postValue("2251060xxx");
-                    studentClass.postValue("CQ.65.CNTT");
                 }
-            } catch (Exception e) {
-                studentName.postValue("Nguyễn Văn B");
-                studentCode.postValue("2251060xxx");
-                studentClass.postValue("CQ.65.CNTT");
-            }
-            advisorName.postValue("ThS. Nguyễn Văn A");
+            } catch (Exception ignored) {}
+            advisorName.postValue("—");
         });
-    }
-
-    private void postResult(SaveCallback callback, boolean success) {
-        if (callback == null) return;
-        new android.os.Handler(android.os.Looper.getMainLooper())
-                .post(() -> callback.onResult(success));
     }
 
     @Override
