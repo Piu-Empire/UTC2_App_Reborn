@@ -58,6 +58,11 @@ public class AssessmentRepository {
         return liveData;
     }
 
+    /** Trả về danh sách tiêu chí local trực tiếp (không qua LiveData). */
+    public List<AssessmentCriteria> getCriteriaList(boolean isStudentTab) {
+        return isStudentTab ? buildRlsvCriteria() : buildCvhtCriteria();
+    }
+
     // ─── Periods — gọi API thật ──────────────────────────────────────────────
 
     public LiveData<List<AssessmentPeriod>> getAssessmentPeriods() {
@@ -149,6 +154,30 @@ public class AssessmentRepository {
                 callback.onResult(false);
             }
         });
+    }
+
+    // ─── Lấy điểm external (Tập thể/Khoa/Trường) — gọi API thật ─────────────
+
+    public void getExternalAssessment(String periodId,
+                                      ActionCallback onLoaded,
+                                      java.util.function.Consumer<ExternalAssessmentResponse> onData) {
+        getApi().getExternalAssessment(periodId).enqueue(
+                new Callback<ApiResponse<ExternalAssessmentResponse>>() {
+                    @Override
+                    public void onResponse(Call<ApiResponse<ExternalAssessmentResponse>> call,
+                                           Response<ApiResponse<ExternalAssessmentResponse>> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().getData() != null) {
+                            onData.accept(response.body().getData());
+                        }
+                        onLoaded.onResult(response.isSuccessful());
+                    }
+
+                    @Override
+                    public void onFailure(Call<ApiResponse<ExternalAssessmentResponse>> call, Throwable t) {
+                        onLoaded.onResult(false);
+                    }
+                });
     }
 
     // ─── Private helpers ──────────────────────────────────────────────────────
