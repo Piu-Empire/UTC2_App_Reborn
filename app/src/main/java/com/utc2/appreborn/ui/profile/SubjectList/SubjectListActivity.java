@@ -1,4 +1,4 @@
-package com.utc2.appreborn.ui.profile.TrainingProgram;
+package com.utc2.appreborn.ui.profile.SubjectList;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Map;
 
-public class TrainingProgramActivity extends AppCompatActivity {
+public class SubjectListActivity extends AppCompatActivity {
 
     private RecyclerView    recyclerView;
     private SubjectAdapter  adapter;
@@ -52,7 +52,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_training_program);
+        setContentView(R.layout.activity_subject_list);
 
         try {
             initViews();
@@ -102,7 +102,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
 
             @Override
             public void onNetworkLost() {
-                Toast.makeText(TrainingProgramActivity.this,
+                Toast.makeText(SubjectListActivity.this,
                         "Mất kết nối mạng. Bạn đang xem dữ liệu ngoại tuyến.",
                         Toast.LENGTH_LONG).show();
             }
@@ -129,7 +129,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
                                 && response.body().isSuccess()) {
                             bindEnrollments(response.body().getData());
                         } else {
-                            Toast.makeText(TrainingProgramActivity.this,
+                            Toast.makeText(SubjectListActivity.this,
                                     "Không tải được chương trình đào tạo", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -138,7 +138,7 @@ public class TrainingProgramActivity extends AppCompatActivity {
                     public void onFailure(Call<ApiResponse<List<EnrollmentResponse>>> call,
                                           Throwable t) {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
-                        Toast.makeText(TrainingProgramActivity.this,
+                        Toast.makeText(SubjectListActivity.this,
                                 "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });

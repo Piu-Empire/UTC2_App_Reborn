@@ -21,15 +21,13 @@ import com.bumptech.glide.Glide;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.tuition.adapter.DormAdapter;
 import com.utc2.appreborn.ui.tuition.model.DormTuition;
-import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
 
-// THÊM MỚI
 import com.utc2.appreborn.network.ApiClient;
 import com.utc2.appreborn.network.ApiResponse;
-import com.utc2.appreborn.network.TuitionApiService;
-import com.utc2.appreborn.network.dto.TuitionResponse;
+import com.utc2.appreborn.network.DormApiService;
+import com.utc2.appreborn.network.dto.DormRegistrationResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -43,6 +41,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private RecyclerView rvDormTuition;
     private List<DormTuition> dormList = new ArrayList<>();
     private Button btnPayDorm;
+    private TextView tvTotalAmount;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
 
@@ -67,7 +66,8 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private void initViews() {
         rvDormTuition = findViewById(R.id.rvDormTuition);
-        btnPayDorm = findViewById(R.id.btnPayDorm);
+        btnPayDorm    = findViewById(R.id.btnPayDorm);
+        tvTotalAmount = findViewById(R.id.tvTotalAmount);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnPayDorm.setOnClickListener(v -> {
@@ -96,27 +96,43 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         networkUtils.register();
     }
 
-    // ĐÃ SỬA: gọi API thay data cứng
     private void loadDormData() {
         String token = SessionManager.getInstance(this).getAuthToken();
-        TuitionApiService tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
+        // FIX: dùng DormApiService thay TuitionApiService
+        // → gọi /api/v1/dormitory/my thay vì /api/v1/tuition/summary
+        DormApiService dormApi = ApiClient.getInstance(token).create(DormApiService.class);
 
-        tuitionApi.getSummary().enqueue(new Callback<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>>() {
+        dormApi.getMyRegistrations().enqueue(new Callback<ApiResponse<List<DormRegistrationResponse>>>() {
             @Override
-            public void onResponse(Call<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> call,
-                                   Response<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> response) {
+            public void onResponse(Call<ApiResponse<List<DormRegistrationResponse>>> call,
+                                   Response<ApiResponse<List<DormRegistrationResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null
                         && response.body().isSuccess()) {
+                    List<DormRegistrationResponse> list = response.body().getData();
                     dormList.clear();
-                    List<TuitionResponse> semesters = response.body().getData().semesters;
-                    if (semesters != null) {
-                        for (TuitionResponse t : semesters) {
+                    if (list != null) {
+                        for (DormRegistrationResponse dto : list) {
+                            long   regId    = dto.dormRegId      != null ? dto.dormRegId      : 0L;
+                            long   roomId   = dto.roomId         != null ? dto.roomId         : 0L;
+                            String roomName = dto.roomCode       != null ? dto.roomCode       : "";
+                            String building = dto.building       != null ? dto.building       : "";
+                            double price    = dto.pricePerMonth  != null ? dto.pricePerMonth  : 0.0;
+                            String start    = dto.startDate      != null ? dto.startDate      : "";
+                            String end      = dto.endDate        != null ? dto.endDate        : "";
+                            String regSt    = dto.status         != null ? dto.status         : "";
+                            double totalFee = dto.getTotalFeeAsDouble();
+                            // FIX: paidStatus từ DB là "đã đóng" / "chưa đóng"
+                            // Không dùng STATUS_PAID của Tuition.java (dành cho bảng fee)
+                            String paidSt   = dto.paidStatus     != null ? dto.paidStatus     : "chưa đóng";
+
                             dormList.add(new DormTuition(
-                                    t.id != null ? t.id.intValue() : 0,
-                                    "Học kỳ " + t.semesterId,
-                                    t.dueDate != null ? t.dueDate : "",
-                                    t.getRemainingAmountAsDouble(),
-                                    t.status
+                                    0L, 0L, 0L,
+                                    totalFee, dto.isPaid() ? totalFee : 0.0,
+                                    end, paidSt, "", "",
+                                    regId, roomId,
+                                    roomName, building,
+                                    price, start, end,
+                                    regSt, totalFee, paidSt
                             ));
                         }
                     }
@@ -129,7 +145,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<com.utc2.appreborn.network.dto.TuitionSummaryResponse>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<List<DormRegistrationResponse>>> call, Throwable t) {
                 Toast.makeText(DormitoryTuitionActivity.this,
                         "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -139,9 +155,14 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private void calculateTotal() {
         totalAmount = 0.0;
         for (DormTuition item : dormList) {
-            if (!item.isPaid()) {
-                totalAmount += item.getAmount();
+            // FIX: isPaid() trong DormTuition so sánh status với Tuition.STATUS_PAID ("đã đóng đủ")
+            // nhưng paid_status của KTX là "đã đóng" → kiểm tra getDormPaidStatus() trực tiếp
+            if (!"đã đóng".equals(item.getDormPaidStatus())) {
+                totalAmount += item.getRemainingAmount();
             }
+        }
+        if (tvTotalAmount != null) {
+            tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
         }
     }
 
@@ -165,9 +186,9 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
             window.setAttributes(params);
         }
 
-        ImageView imgQr = dialog.findViewById(R.id.imgQrCode);
-        TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
-        Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
+        ImageView imgQr          = dialog.findViewById(R.id.imgQrCode);
+        TextView  tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
+        Button    btnConfirm     = dialog.findViewById(R.id.btnConfirmPayment);
 
         tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 

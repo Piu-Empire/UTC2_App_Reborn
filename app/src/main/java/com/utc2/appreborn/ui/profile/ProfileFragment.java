@@ -17,7 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.ui.profile.TrainingProgram.TrainingProgramActivity;
+import com.utc2.appreborn.ui.profile.SubjectList.SubjectListActivity;
 import com.utc2.appreborn.ui.settings.SettingsActivity;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
@@ -88,7 +88,7 @@ public class ProfileFragment extends Fragment {
         });
 
         layoutSubjectList.setOnClickListener(v ->
-                startActivity(new Intent(requireContext(), TrainingProgramActivity.class)));
+                startActivity(new Intent(requireContext(), SubjectListActivity.class)));
 
         layoutGraduationReq.setOnClickListener(v ->
                 startActivity(new Intent(requireContext(), GraduationRequirementsActivity.class)));
