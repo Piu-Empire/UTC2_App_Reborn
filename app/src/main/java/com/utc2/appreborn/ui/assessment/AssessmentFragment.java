@@ -277,8 +277,10 @@ public class AssessmentFragment extends Fragment {
             adapter.submitList(list);
         });
 
-        viewModel.getTotalScore().observe(getViewLifecycleOwner(), score ->
-                binding.tvTotalScore.setText(fmt(score)));
+        viewModel.getTotalScore().observe(getViewLifecycleOwner(), score -> {
+            binding.tvTotalScore.setText(fmt(score));
+            binding.tvTotalScoreCvht.setText(fmt(score));
+        });
 
         viewModel.getClassification().observe(getViewLifecycleOwner(), cls ->
                 binding.tvClassification.setText(cls));
