@@ -1,5 +1,6 @@
 package com.utc2.appreborn.ui.tuition.adapter;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,11 +13,8 @@ import com.utc2.appreborn.ui.tuition.model.DormTuition;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Adapter hiển thị danh sách tiền KTX cho sinh viên UTC2.
- * Kế thừa dữ liệu từ lớp cha Tuition để đảm bảo tính nhất quán.
- */
 public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
+
     private final List<DormTuition> dormList;
 
     public DormAdapter(List<DormTuition> dormList) {
@@ -26,8 +24,8 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflate layout item_dorm_tuition mà bạn đã thiết kế
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dorm_tuition, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_dorm_tuition, parent, false);
         return new ViewHolder(view);
     }
 
@@ -35,20 +33,46 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DormTuition item = dormList.get(position);
 
-        // Hiển thị Tên phòng (Lấy từ trường 'name' của lớp cha Tuition)
+        // Tên phòng — roomCode từ DormRegistrationResponse
         if (holder.tvRoomName != null) {
-            holder.tvRoomName.setText(item.getName());
+            String roomDisplay = item.getName();
+            // Thêm tên tòa nếu có
+            if (item.getBuilding() != null && !item.getBuilding().isEmpty()) {
+                roomDisplay = item.getBuilding() + " · " + roomDisplay;
+            }
+            holder.tvRoomName.setText(roomDisplay);
         }
 
-        // Hiển thị chi tiết (Lấy từ trường 'details' của lớp cha Tuition - VD: "Tiền điện tháng 10")
+        // Chi tiết: thời gian thuê
         if (holder.tvDormDetails != null) {
-            holder.tvDormDetails.setText(item.getDetails());
+            String start = item.getStartDate();
+            String end   = item.getEndDate();
+            String detail = "";
+            if (start != null && !start.isEmpty() && end != null && !end.isEmpty()) {
+                detail = start + " → " + end;
+            } else if (item.getDetails() != null) {
+                detail = item.getDetails();
+            }
+            holder.tvDormDetails.setText(detail);
         }
 
-        // Hiển thị số tiền (Định dạng kiểu 1,000,000 VND)
+        // Số tiền còn phải đóng
         if (holder.tvDormAmount != null) {
-            String formattedAmount = String.format(Locale.getDefault(), "%,.0f VND", item.getAmount());
-            holder.tvDormAmount.setText(formattedAmount);
+            double amount = item.getRemainingAmount();
+            holder.tvDormAmount.setText(
+                    String.format(Locale.getDefault(), "%,.0f VND", amount));
+        }
+
+        // Trạng thái đóng tiền — dùng paidStatus ("đã đóng" / "chưa đóng")
+        if (holder.tvStatus != null) {
+            String paidStatus = item.getDormPaidStatus();
+            if ("đã đóng".equals(paidStatus)) {
+                holder.tvStatus.setText("Đã đóng");
+                holder.tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh lá
+            } else {
+                holder.tvStatus.setText("Chưa đóng");
+                holder.tvStatus.setTextColor(Color.parseColor("#C62828")); // đỏ
+            }
         }
     }
 
@@ -57,18 +81,15 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
         return dormList != null ? dormList.size() : 0;
     }
 
-    /**
-     * ViewHolder tối ưu hóa việc tìm View (findViewById)
-     */
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvRoomName, tvDormDetails, tvDormAmount;
+        TextView tvRoomName, tvDormDetails, tvDormAmount, tvStatus;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            // Đảm bảo ID trong file item_dorm_tuition.xml trùng khớp với các ID dưới đây:
-            tvRoomName = itemView.findViewById(R.id.tvRoomName);
+            tvRoomName    = itemView.findViewById(R.id.tvRoomName);
             tvDormDetails = itemView.findViewById(R.id.tvDormDetails);
-            tvDormAmount = itemView.findViewById(R.id.tvDormAmount);
+            tvDormAmount  = itemView.findViewById(R.id.tvDormAmount);
+            tvStatus      = itemView.findViewById(R.id.tvStatus); // nullable — thêm nếu layout có
         }
     }
 }

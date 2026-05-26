@@ -67,7 +67,7 @@
             android:exported="false"
             android:label="@string/title_change_password" />
         <activity
-            android:name=".ui.profile.TrainingProgram.TrainingProgramActivity"
+            android:name=".ui.profile.SubjectList.SubjectListActivity"
             android:exported="false"
             android:label="@string/training_program" />
         <activity

@@ -21,7 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.material.button.MaterialButton;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.ui.login.LoginActivity;
-import com.utc2.appreborn.ui.profile.TrainingProgram.TrainingProgramActivity;
+import com.utc2.appreborn.ui.profile.SubjectList.SubjectListActivity;
 import com.utc2.appreborn.ui.profile.adapter.StudentInfoAdapter;
 import com.utc2.appreborn.ui.profile.model.StudentInfoItem;
 import com.utc2.appreborn.utils.SessionManager;
@@ -120,7 +120,7 @@ public class InfoFragment extends Fragment {
         });
 
         btnTrainingProgram.setOnClickListener(v ->
-                startActivity(new Intent(getContext(), TrainingProgramActivity.class)));
+                startActivity(new Intent(getContext(), SubjectListActivity.class)));
 
         btnSupport.setOnClickListener(v ->
                 startActivity(new Intent(getContext(), SupportActivity.class)));
