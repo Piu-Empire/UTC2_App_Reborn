@@ -14,50 +14,83 @@ import java.util.Locale;
 
 public class InvoiceAdapter extends RecyclerView.Adapter<InvoiceAdapter.ViewHolder> {
 
-    private List<Invoice> invoiceList;
+    private static final int VIEW_HEADER = 0;
+    private static final int VIEW_ITEM   = 1;
 
-    public InvoiceAdapter(List<Invoice> invoiceList) {
-        this.invoiceList = invoiceList;
+    private final List<Object> items;
+
+    public InvoiceAdapter(List<Object> items) {
+        this.items = items;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return items.get(position) instanceof String ? VIEW_HEADER : VIEW_ITEM;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_invoice, parent, false);
-        return new ViewHolder(view);
+        int layout = viewType == VIEW_HEADER
+                ? R.layout.item_invoice_header
+                : R.layout.item_invoice;
+        View view = LayoutInflater.from(parent.getContext()).inflate(layout, parent, false);
+        return new ViewHolder(view, viewType);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Invoice item = invoiceList.get(position);
+        if (getItemViewType(position) == VIEW_HEADER) {
+            if (holder.tvHeader != null) {
+                holder.tvHeader.setText((String) items.get(position));
+            }
+        } else {
+            Invoice item = (Invoice) items.get(position);
 
-        // Mã hóa đơn
-        holder.tvID.setText("Mã HD: " + item.getInvoiceCode());
+            // tvInvoiceID — hiển thị label (tên kỳ / tên phòng) + mã HD
+            if (holder.tvInvoiceID != null) {
+                holder.tvInvoiceID.setText(
+                        holder.tvInvoiceID.getContext().getString(
+                                R.string.invoice_id_format,
+                                item.getLabel(),
+                                item.getInvoiceCode()));
+            }
 
-        // Ngày thanh toán — paidAt từ API là ISO String "yyyy-MM-dd'T'HH:mm:ss"
-        // hiển thị nguyên hoặc format lại nếu cần
-        String paidAt = item.getPaidAt();
-        holder.tvDate.setText("Ngày: " + (paidAt != null && !paidAt.isEmpty() ? paidAt : "---"));
+            // tvInvoiceDate — ngày thanh toán
+            if (holder.tvInvoiceDate != null) {
+                String paidAt = item.getPaidAt();
+                String display = (paidAt != null && !paidAt.isEmpty()) ? paidAt : "---";
+                holder.tvInvoiceDate.setText(
+                        holder.tvInvoiceDate.getContext().getString(
+                                R.string.invoice_date_format, display));
+            }
 
-        // FIX NPE: dùng getTotalAmount() — null-safe, không gọi getTuition().getAmount()
-        double amount = item.getTotalAmount();
-        holder.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", amount));
+            // tvInvoiceAmount — tổng tiền
+            if (holder.tvInvoiceAmount != null) {
+                holder.tvInvoiceAmount.setText(
+                        String.format(Locale.getDefault(), "%,.0f VND", item.getTotalAmount()));
+            }
+        }
     }
 
     @Override
     public int getItemCount() {
-        return invoiceList != null ? invoiceList.size() : 0;
+        return items != null ? items.size() : 0;
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvID, tvDate, tvAmount;
+        TextView tvHeader;
+        TextView tvInvoiceID, tvInvoiceDate, tvInvoiceAmount;
 
-        public ViewHolder(@NonNull View itemView) {
+        public ViewHolder(@NonNull View itemView, int viewType) {
             super(itemView);
-            tvID     = itemView.findViewById(R.id.tvInvoiceID);
-            tvDate   = itemView.findViewById(R.id.tvInvoiceDate);
-            tvAmount = itemView.findViewById(R.id.tvInvoiceAmount);
+            if (viewType == VIEW_HEADER) {
+                tvHeader = itemView.findViewById(R.id.tvSectionHeader);
+            } else {
+                tvInvoiceID     = itemView.findViewById(R.id.tvInvoiceID);
+                tvInvoiceDate   = itemView.findViewById(R.id.tvInvoiceDate);
+                tvInvoiceAmount = itemView.findViewById(R.id.tvInvoiceAmount);
+            }
         }
     }
 }

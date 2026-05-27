@@ -9,28 +9,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.utc2.appreborn.R;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.DormApiService;
+import com.utc2.appreborn.network.TuitionApiService;
+import com.utc2.appreborn.network.dto.DormRegistrationResponse;
+import com.utc2.appreborn.network.dto.TuitionResponse;
 import com.utc2.appreborn.ui.tuition.adapter.InvoiceAdapter;
 import com.utc2.appreborn.ui.tuition.model.Invoice;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
-
-import com.utc2.appreborn.network.ApiClient;
-import com.utc2.appreborn.network.ApiResponse;
-import com.utc2.appreborn.network.TuitionApiService;
-import com.utc2.appreborn.network.dto.TuitionResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class InvoiceActivity extends AppCompatActivity {
 
     private RecyclerView   rvInvoices;
-    private InvoiceAdapter adapter;
-    private List<Invoice>  invoiceList = new ArrayList<>();
     private NetworkUtils   networkUtils;
+
+    // Kết quả từ 2 API — ghép lại khi cả 2 xong
+    private List<TuitionResponse>       tuitionPaid = new ArrayList<>();
+    private List<DormRegistrationResponse> dormPaid  = new ArrayList<>();
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -45,7 +49,7 @@ public class InvoiceActivity extends AppCompatActivity {
         try {
             initViews();
             setupNetworkMonitoring();
-            loadInvoiceData();
+            loadAllInvoices();
         } catch (Exception e) {
             Log.e("InvoiceActivity", "Lỗi khởi tạo: " + e.getMessage());
         }
@@ -59,71 +63,115 @@ public class InvoiceActivity extends AppCompatActivity {
 
     private void setupNetworkMonitoring() {
         networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
-            @Override
-            public void onNetworkAvailable() {
-                Log.d("Network", "Đã kết nối - Sẵn sàng cập nhật hóa đơn");
-            }
-
-            @Override
-            public void onNetworkLost() {
+            @Override public void onNetworkAvailable() {}
+            @Override public void onNetworkLost() {
                 Toast.makeText(InvoiceActivity.this,
-                        "Mất kết nối mạng! Lịch sử hóa đơn có thể chưa được cập nhật mới nhất.",
-                        Toast.LENGTH_LONG).show();
+                        "Mất kết nối mạng!", Toast.LENGTH_LONG).show();
             }
         });
         networkUtils.register();
     }
 
-    private void setupRecyclerView() {
-        rvInvoices.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new InvoiceAdapter(invoiceList);
-        rvInvoices.setAdapter(adapter);
-    }
-
-    private void loadInvoiceData() {
+    /**
+     * Gọi 2 API song song, đợi cả 2 xong rồi render.
+     * AtomicInteger đếm số API đã trả về để biết khi nào render.
+     */
+    private void loadAllInvoices() {
         String token = SessionManager.getInstance(this).getAuthToken();
         TuitionApiService tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
+        DormApiService    dormApi    = ApiClient.getInstance(token).create(DormApiService.class);
 
-        tuitionApi.getHistory().enqueue(new Callback<ApiResponse<List<TuitionResponse>>>() {
+        AtomicInteger done = new AtomicInteger(0); // đếm API đã xong
+
+        // ── API 1: học phí đã đóng ───────────────────────────
+        tuitionApi.getPaid().enqueue(new Callback<ApiResponse<List<TuitionResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<TuitionResponse>>> call,
                                    Response<ApiResponse<List<TuitionResponse>>> response) {
                 if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess()) {
-                    List<TuitionResponse> list = response.body().getData();
-                    invoiceList.clear();
-                    for (TuitionResponse t : list) {
-                        // FIX: null-safe unboxing Long → long
-                        long feeId      = t.id         != null ? t.id         : 0L;
-                        long semesterId = t.semesterId != null ? t.semesterId : 0L;
+                        && response.body().isSuccess() && response.body().getData() != null) {
+                    tuitionPaid = response.body().getData();
+                }
+                if (done.incrementAndGet() == 2) renderInvoices();
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<TuitionResponse>>> call, Throwable t) {
+                Log.e("InvoiceActivity", "Lỗi tải học phí: " + t.getMessage());
+                if (done.incrementAndGet() == 2) renderInvoices();
+            }
+        });
 
-                        // FIX NPE: dùng constructor với amount tường minh,
-                        // không truyền tuition=null nữa
-                        double totalAmount = t.getTotalAmountAsDouble();
-                        double paidAmount  = t.getPaidAmountAsDouble();
-
-                        invoiceList.add(new Invoice(
-                                "UTC2_" + feeId,
-                                feeId,
-                                semesterId,
-                                t.paidAt        != null ? t.paidAt        : "",
-                                t.paymentMethod != null ? t.paymentMethod : "",
-                                totalAmount,
-                                paidAmount
-                        ));
+        // ── API 2: KTX đã đóng ───────────────────────────────
+        dormApi.getMyRegistrations().enqueue(new Callback<ApiResponse<List<DormRegistrationResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<DormRegistrationResponse>>> call,
+                                   Response<ApiResponse<List<DormRegistrationResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess() && response.body().getData() != null) {
+                    // Chỉ lấy đăng ký đã đóng tiền
+                    for (DormRegistrationResponse dto : response.body().getData()) {
+                        if (dto.isPaid()) dormPaid.add(dto);
                     }
-                    setupRecyclerView();
-                } else {
-                    Toast.makeText(InvoiceActivity.this,
-                            "Không tải được lịch sử hóa đơn", Toast.LENGTH_SHORT).show();
+                }
+                if (done.incrementAndGet() == 2) renderInvoices();
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<List<DormRegistrationResponse>>> call, Throwable t) {
+                Log.e("InvoiceActivity", "Lỗi tải KTX: " + t.getMessage());
+                if (done.incrementAndGet() == 2) renderInvoices();
+            }
+        });
+    }
+
+    private void renderInvoices() {
+        runOnUiThread(() -> {
+            List<Object> items = new ArrayList<>();
+
+            // Section 1: Học phí môn học
+            items.add(getString(R.string.invoice_section_tuition));
+            if (tuitionPaid.isEmpty()) {
+                items.add(getString(R.string.invoice_empty_tuition));
+            } else {
+                for (TuitionResponse t : tuitionPaid) {
+                    long feeId = t.id         != null ? t.id         : 0L;
+                    long semId = t.semesterId != null ? t.semesterId : 0L;
+                    items.add(new Invoice(
+                            Invoice.Type.TUITION,
+                            "HP_" + feeId,
+                            feeId, semId,
+                            getString(R.string.semester_label, semId),
+                            t.paidAt        != null ? t.paidAt        : "",
+                            t.paymentMethod != null ? t.paymentMethod : "",
+                            t.getTotalAmountAsDouble(),
+                            t.getPaidAmountAsDouble()
+                    ));
                 }
             }
 
-            @Override
-            public void onFailure(Call<ApiResponse<List<TuitionResponse>>> call, Throwable t) {
-                Toast.makeText(InvoiceActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            // Section 2: Phí ký túc xá
+            items.add(getString(R.string.invoice_section_dorm));
+            if (dormPaid.isEmpty()) {
+                items.add(getString(R.string.invoice_empty_dorm));
+            } else {
+                for (DormRegistrationResponse dto : dormPaid) {
+                    long   regId  = dto.dormRegId != null ? dto.dormRegId : 0L;
+                    String label  = (dto.building != null ? dto.building + " \u00b7 " : "")
+                            + (dto.roomCode != null ? dto.roomCode : "KTX");
+                    items.add(new Invoice(
+                            Invoice.Type.DORM,
+                            "KTX_" + regId,
+                            regId, 0L,
+                            label,
+                            dto.endDate != null ? dto.endDate : "",
+                            "online",
+                            dto.getTotalFeeAsDouble(),
+                            dto.getTotalFeeAsDouble()
+                    ));
+                }
             }
+
+            rvInvoices.setLayoutManager(new LinearLayoutManager(this));
+            rvInvoices.setAdapter(new InvoiceAdapter(items));
         });
     }
 

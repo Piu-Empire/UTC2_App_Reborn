@@ -710,4 +710,13 @@
     <string name="feature_thong_bao">Thông báo</string>
     <string name="feature_tim_kiem">Tìm kiếm</string>
     <string name="action_save">Lưu</string>
+
+    <string name="invoice_id_format">%1$s · %2$s</string>
+    <string name="invoice_date_format">Ngày: %1$s</string>
+    <string name="invoice_section_tuition">Học phí môn học</string>
+    <string name="invoice_section_dorm">Phí ký túc xá</string>
+    <string name="invoice_empty_tuition">Chưa có lịch sử đóng học phí</string>
+    <string name="invoice_empty_dorm">Chưa có lịch sử đóng tiền KTX</string>
+    <string name="semester_label">Học kỳ %1$d</string>
+
 </resources>
