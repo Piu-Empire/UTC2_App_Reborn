@@ -47,6 +47,10 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     private Button btnPay;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+    private TuitionApiService tuitionApi;
+
+    // Danh sách semesterId chưa đóng — dùng để gọi pay() sau khi xác nhận QR
+    private final List<Long> unpaidSemesterIds = new ArrayList<>();
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -99,10 +103,9 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         networkUtils.register();
     }
 
-    // ĐÃ SỬA: gọi API thay data cứng
     private void loadData() {
         String token = SessionManager.getInstance(this).getAuthToken();
-        TuitionApiService tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
+        tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
 
         tuitionApi.getSummary().enqueue(new Callback<ApiResponse<TuitionSummaryResponse>>() {
             @Override
@@ -112,15 +115,29 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                         && response.body().isSuccess()) {
                     TuitionSummaryResponse summary = response.body().getData();
                     subjectList.clear();
+                    unpaidSemesterIds.clear();
                     if (summary.semesters != null) {
                         for (TuitionResponse t : summary.semesters) {
+                            long   feeId  = t.id         != null ? t.id         : 0L;
+                            long   semId  = t.semesterId != null ? t.semesterId : 0L;
+                            double total  = t.getTotalAmountAsDouble();
+                            double paid   = t.getPaidAmountAsDouble();
+                            String status = t.status          != null ? t.status          : "";
+                            String due    = t.dueDate         != null ? t.dueDate         : "";
+                            String paidAt = t.paidAt          != null ? t.paidAt          : "";
+                            String method = t.paymentMethod   != null ? t.paymentMethod   : "";
+
                             subjectList.add(new SubjectTuition(
-                                    t.id != null ? t.id.intValue() : 0,
-                                    "Học kỳ " + t.semesterId,
-                                    "",
-                                    t.getRemainingAmountAsDouble(),
-                                    t.status
+                                    feeId, 0L, semId,
+                                    total, paid,
+                                    due, status, method, paidAt,
+                                    0L, "", "Học kỳ " + semId, 0, ""
                             ));
+
+                            // Track kỳ chưa đóng để gọi pay() sau khi xác nhận QR
+                            if (!Tuition.STATUS_PAID.equals(status)) {
+                                unpaidSemesterIds.add(semId);
+                            }
                         }
                     }
                     calculateTotal();
@@ -143,7 +160,8 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         totalAmount = 0.0;
         for (SubjectTuition subject : subjectList) {
             if (!subject.isPaid()) {
-                totalAmount += subject.getAmount();
+                // FIX: dùng getRemainingAmount() (= total - paid), không phải getAmount()
+                totalAmount += subject.getRemainingAmount();
             }
         }
         tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
@@ -169,9 +187,9 @@ public class SubjectTuitionActivity extends AppCompatActivity {
             window.setAttributes(params);
         }
 
-        ImageView imgQr = dialog.findViewById(R.id.imgQrCode);
-        TextView tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
-        Button btnConfirm = dialog.findViewById(R.id.btnConfirmPayment);
+        ImageView imgQr          = dialog.findViewById(R.id.imgQrCode);
+        TextView  tvDialogAmount = dialog.findViewById(R.id.tvDialogAmount);
+        Button    btnConfirm     = dialog.findViewById(R.id.btnConfirmPayment);
 
         tvDialogAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
 
@@ -183,17 +201,56 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         Glide.with(this).load(qrUrl).placeholder(R.drawable.logo_utc2).into(imgQr);
 
         btnConfirm.setOnClickListener(v -> {
+            btnConfirm.setEnabled(false);
             Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
-            btnConfirm.postDelayed(() -> {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                    Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-            }, 2000);
+            // Gọi pay API cho từng kỳ chưa đóng
+            confirmPaymentToServer(dialog);
         });
 
         dialog.show();
+    }
+
+    /** Gọi POST /api/v1/tuition/pay/{semesterId} cho từng kỳ chưa đóng */
+    private void confirmPaymentToServer(Dialog dialog) {
+        if (unpaidSemesterIds.isEmpty()) {
+            dialog.dismiss();
+            return;
+        }
+        // Gọi tuần tự từng kỳ — đơn giản vì thường chỉ có 1 kỳ chưa đóng
+        callPayRecursive(dialog, new ArrayList<>(unpaidSemesterIds), 0);
+    }
+
+    private void callPayRecursive(Dialog dialog, List<Long> ids, int index) {
+        if (index >= ids.size()) {
+            // Tất cả kỳ đã gọi pay xong
+            if (dialog.isShowing()) dialog.dismiss();
+            Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+            // Reload lại data
+            loadData();
+            return;
+        }
+        long semId = ids.get(index);
+        tuitionApi.pay(semId, "online").enqueue(new Callback<ApiResponse<TuitionResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<TuitionResponse>> call,
+                                   Response<ApiResponse<TuitionResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // Tiếp tục kỳ tiếp theo
+                    callPayRecursive(dialog, ids, index + 1);
+                } else {
+                    if (dialog.isShowing()) dialog.dismiss();
+                    Toast.makeText(SubjectTuitionActivity.this,
+                            "Lỗi xác nhận thanh toán kỳ " + semId, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<TuitionResponse>> call, Throwable t) {
+                if (dialog.isShowing()) dialog.dismiss();
+                Toast.makeText(SubjectTuitionActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

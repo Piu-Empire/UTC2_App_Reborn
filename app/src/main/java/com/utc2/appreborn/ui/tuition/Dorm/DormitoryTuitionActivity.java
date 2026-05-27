@@ -44,6 +44,10 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private TextView tvTotalAmount;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
+    private DormApiService dormApi;
+
+    // dormRegId chưa đóng — dùng để gọi pay() sau khi xác nhận QR
+    private long unpaidDormRegId = -1L;
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -98,9 +102,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private void loadDormData() {
         String token = SessionManager.getInstance(this).getAuthToken();
-        // FIX: dùng DormApiService thay TuitionApiService
-        // → gọi /api/v1/dormitory/my thay vì /api/v1/tuition/summary
-        DormApiService dormApi = ApiClient.getInstance(token).create(DormApiService.class);
+        dormApi = ApiClient.getInstance(token).create(DormApiService.class);
 
         dormApi.getMyRegistrations().enqueue(new Callback<ApiResponse<List<DormRegistrationResponse>>>() {
             @Override
@@ -110,6 +112,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                         && response.body().isSuccess()) {
                     List<DormRegistrationResponse> list = response.body().getData();
                     dormList.clear();
+                    unpaidDormRegId = -1L;
                     if (list != null) {
                         for (DormRegistrationResponse dto : list) {
                             long   regId    = dto.dormRegId      != null ? dto.dormRegId      : 0L;
@@ -121,8 +124,6 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                             String end      = dto.endDate        != null ? dto.endDate        : "";
                             String regSt    = dto.status         != null ? dto.status         : "";
                             double totalFee = dto.getTotalFeeAsDouble();
-                            // FIX: paidStatus từ DB là "đã đóng" / "chưa đóng"
-                            // Không dùng STATUS_PAID của Tuition.java (dành cho bảng fee)
                             String paidSt   = dto.paidStatus     != null ? dto.paidStatus     : "chưa đóng";
 
                             dormList.add(new DormTuition(
@@ -134,6 +135,11 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                                     price, start, end,
                                     regSt, totalFee, paidSt
                             ));
+
+                            // Track đăng ký KTX chưa đóng và đã duyệt để gọi pay()
+                            if (!dto.isPaid() && "đã duyệt".equals(regSt) && unpaidDormRegId == -1L) {
+                                unpaidDormRegId = regId;
+                            }
                         }
                     }
                     calculateTotal();
@@ -200,14 +206,38 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         Glide.with(this).load(qrUrl).placeholder(R.drawable.logo_utc2).into(imgQr);
 
         btnConfirm.setOnClickListener(v -> {
+            if (unpaidDormRegId == -1L) {
+                dialog.dismiss();
+                return;
+            }
+            btnConfirm.setEnabled(false);
             Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
-            btnConfirm.postDelayed(() -> {
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                    Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
-                    finish();
+
+            // Gọi POST /api/v1/dormitory/pay/{dormRegId}
+            dormApi.pay(unpaidDormRegId).enqueue(new Callback<ApiResponse<DormRegistrationResponse>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<DormRegistrationResponse>> call,
+                                       Response<ApiResponse<DormRegistrationResponse>> response) {
+                    if (dialog.isShowing()) dialog.dismiss();
+                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                        Toast.makeText(DormitoryTuitionActivity.this,
+                                getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+                        loadDormData(); // reload lại
+                    } else {
+                        Toast.makeText(DormitoryTuitionActivity.this,
+                                "Lỗi xác nhận thanh toán KTX", Toast.LENGTH_SHORT).show();
+                        btnConfirm.setEnabled(true);
+                    }
                 }
-            }, 2000);
+
+                @Override
+                public void onFailure(Call<ApiResponse<DormRegistrationResponse>> call, Throwable t) {
+                    if (dialog.isShowing()) dialog.dismiss();
+                    Toast.makeText(DormitoryTuitionActivity.this,
+                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    btnConfirm.setEnabled(true);
+                }
+            });
         });
 
         dialog.show();

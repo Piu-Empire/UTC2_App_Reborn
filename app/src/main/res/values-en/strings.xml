@@ -429,4 +429,12 @@
     <string name="feature_thong_bao">Notifications</string>
     <string name="feature_tim_kiem">Search</string>
     <string name="action_save">Save</string>
+
+    <string name="invoice_id_format">%1$s · %2$s</string>
+    <string name="invoice_date_format">Day: %1$s</string>
+    <string name="invoice_section_tuition">Subject fees</string>
+    <string name="invoice_section_dorm">Dorm fees</string>
+    <string name="invoice_empty_tuition">No history of tuition fees</string>
+    <string name="invoice_empty_dorm">No history of dorm fees</string>
+    <string name="semester_label">Semester %1$d</string>
 </resources>
