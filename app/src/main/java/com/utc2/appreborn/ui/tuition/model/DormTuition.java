@@ -24,11 +24,11 @@ package com.utc2.appreborn.ui.tuition.model;
  */
 public class DormTuition extends Tuition {
 
-    // ── Hằng DORMITORY_REGISTRATION.status ───────────────────
-    public static final String REG_PENDING     = "PENDING";
-    public static final String REG_APPROVED    = "APPROVED";
-    public static final String REG_REJECTED    = "REJECTED";
-    public static final String REG_CHECKED_OUT = "CHECKED_OUT";
+    // ── Hằng DORMITORY_REGISTRATION.status — khớp backend ───
+    public static final String REG_PENDING     = "chờ duyệt";
+    public static final String REG_APPROVED    = "đã duyệt";
+    public static final String REG_REJECTED    = "từ chối";
+    public static final String REG_CHECKED_OUT = "đã trả phòng";
 
     // ── Hằng DORMITORY_REGISTRATION.paid_status ──────────────
     public static final String DORM_PAY_UNPAID = "chưa đóng";

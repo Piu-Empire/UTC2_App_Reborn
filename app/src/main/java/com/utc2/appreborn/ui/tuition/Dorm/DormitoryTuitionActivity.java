@@ -137,7 +137,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                             ));
 
                             // Track đăng ký KTX chưa đóng và đã duyệt để gọi pay()
-                            if (!dto.isPaid() && "đã duyệt".equals(regSt) && unpaidDormRegId == -1L) {
+                            if (!dto.isPaid() && DormTuition.REG_APPROVED.equals(regSt) && unpaidDormRegId == -1L) {
                                 unpaidDormRegId = regId;
                             }
                         }

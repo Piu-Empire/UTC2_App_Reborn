@@ -21,11 +21,11 @@ package com.utc2.appreborn.ui.tuition.model;
  */
 public abstract class Tuition {
 
-    // ── Hằng status ──────────────────────────────────────────
-    public static final String STATUS_UNPAID  = "UNPAID";
-    public static final String STATUS_PARTIAL = "PARTIAL";
-    public static final String STATUS_PAID    = "PAID";
-    public static final String STATUS_OVERDUE = "OVERDUE";
+    // ── Hằng status — khớp với giá trị backend trả về ───────
+    public static final String STATUS_UNPAID  = "chưa đóng";
+    public static final String STATUS_PARTIAL = "đóng một phần";
+    public static final String STATUS_PAID    = "đã đóng đủ";
+    public static final String STATUS_OVERDUE = "quá hạn";
 
     // ── Fields ────────────────────────────────────────────────
     protected long   feeId;           // fee_id
