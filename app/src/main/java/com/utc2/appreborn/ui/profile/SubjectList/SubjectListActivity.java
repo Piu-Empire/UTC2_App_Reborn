@@ -31,18 +31,29 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class SubjectListActivity extends AppCompatActivity {
 
-    private RecyclerView    recyclerView;
-    private SubjectAdapter  adapter;
-    private List<Subject>   fullList = new ArrayList<>();
-    private Chip            chipSem1, chipSem2;
-    private ProgressBar     progressBar;
-    private NetworkUtils    networkUtils;
+    private RecyclerView         recyclerView;
+    private SubjectAdapter       adapter;
+    private AutoCompleteTextView dropYear;
+    private List<EnrollmentResponse> rawData = new ArrayList<>();
+
+    /**
+     * fullList = data đang hiển thị (sau khi lọc năm + search).
+     * Đây là list Subject gồm header + môn, được truyền vào adapter.
+     */
+    private List<Subject> fullList = new ArrayList<>();
+
+    private ProgressBar progressBar;
+    private NetworkUtils networkUtils;
+
+    /** Năm học đang được chọn, null = hiển thị tất cả */
+    private String selectedYear = null;
 
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -58,7 +69,6 @@ public class SubjectListActivity extends AppCompatActivity {
             initViews();
             setupNetworkMonitoring();
             loadDataFromApi();
-            setupEvents();
         } catch (Exception e) {
             Log.e("TrainingProgram", "Lỗi khởi tạo Activity: " + e.getMessage());
         }
@@ -66,25 +76,28 @@ public class SubjectListActivity extends AppCompatActivity {
 
     private void initViews() {
         recyclerView = findViewById(R.id.recyclerSubject);
-        chipSem1     = findViewById(R.id.chipSem1);
-        chipSem2     = findViewById(R.id.chipSem2);
-        progressBar  = findViewById(R.id.progressBar); // thêm ProgressBar vào layout nếu chưa có
+        progressBar  = findViewById(R.id.progressBar);
+        dropYear     = findViewById(R.id.dropYear);
 
-        ImageButton            btnBack   = findViewById(R.id.btnBackProfile);
-        SearchView             searchView = findViewById(R.id.searchView);
-        AutoCompleteTextView   dropYear  = findViewById(R.id.dropYear);
+        ImageButton btnBack    = findViewById(R.id.btnBackProfile);
+        SearchView  searchView = findViewById(R.id.searchView);
+        com.google.android.material.chip.ChipGroup chipGroup =
+                findViewById(R.id.chipGroupSemester);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        String[] years = {"Năm 1", "Năm 2", "Năm 3", "Năm 4"};
-        dropYear.setAdapter(new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, years));
-
         btnBack.setOnClickListener(v -> finish());
 
+        // Dùng ChipGroup listener thay vì setOnClickListener từng chip
+        // vì singleSelection=true, click chip đang checked sẽ không fire onClick
+        chipGroup.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.contains(R.id.chipSem1)) scrollToSemester(1);
+            else if (checkedIds.contains(R.id.chipSem2)) scrollToSemester(2);
+        });
+
+        // Search — áp lên fullList hiện tại
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override public boolean onQueryTextSubmit(String query) { return false; }
-
             @Override
             public boolean onQueryTextChange(String newText) {
                 searchSubject(newText);
@@ -95,13 +108,10 @@ public class SubjectListActivity extends AppCompatActivity {
 
     private void setupNetworkMonitoring() {
         networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
-            @Override
-            public void onNetworkAvailable() {
+            @Override public void onNetworkAvailable() {
                 Log.d("Network", "Đã có mạng");
             }
-
-            @Override
-            public void onNetworkLost() {
+            @Override public void onNetworkLost() {
                 Toast.makeText(SubjectListActivity.this,
                         "Mất kết nối mạng. Bạn đang xem dữ liệu ngoại tuyến.",
                         Toast.LENGTH_LONG).show();
@@ -127,7 +137,9 @@ public class SubjectListActivity extends AppCompatActivity {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().isSuccess()) {
-                            bindEnrollments(response.body().getData());
+                            rawData = response.body().getData();
+                            setupYearDropdown(rawData);
+                            applyFilters(null); // hiện tất cả ban đầu
                         } else {
                             Toast.makeText(SubjectListActivity.this,
                                     "Không tải được chương trình đào tạo", Toast.LENGTH_SHORT).show();
@@ -144,33 +156,92 @@ public class SubjectListActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Chuyển list EnrollmentResponse → list Subject (có header theo kỳ),
-     * rồi gán vào adapter.
-     */
-    private void bindEnrollments(List<EnrollmentResponse> data) {
-        fullList.clear();
+    // ── Dropdown năm học (dynamic) ────────────────────────────
 
-        // Gom môn học theo kỳ (semesterNumber), giữ thứ tự tăng dần
-        TreeMap<Integer, List<EnrollmentResponse>> bySem = new TreeMap<>();
+    /**
+     * Lấy danh sách academicYear duy nhất từ data (đã sort tăng dần),
+     * build dropdown với option "Tất cả" ở đầu.
+     */
+    private void setupYearDropdown(List<EnrollmentResponse> data) {
+        // Dùng LinkedHashMap để giữ thứ tự insert (data đã sort từ query)
+        LinkedHashMap<String, Boolean> seen = new LinkedHashMap<>();
         for (EnrollmentResponse e : data) {
-            int sem = e.semesterNumber != null ? e.semesterNumber : 0;
-            bySem.computeIfAbsent(sem, k -> new ArrayList<>()).add(e);
+            if (e.academicYear != null && !e.academicYear.isEmpty()) {
+                seen.put(e.academicYear, true);
+            }
         }
 
-        for (Map.Entry<Integer, List<EnrollmentResponse>> entry : bySem.entrySet()) {
-            int semNum = entry.getKey();
-            // Header row
-            fullList.add(Subject.headerOf(semNum));
-            // Môn học trong kỳ
+        List<String> yearOptions = new ArrayList<>();
+        yearOptions.add("Tất cả");
+        yearOptions.addAll(seen.keySet());
+
+        ArrayAdapter<String> yearAdapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_list_item_1, yearOptions);
+        dropYear.setAdapter(yearAdapter);
+        dropYear.setText("Tất cả", false); // hiển thị mặc định, không trigger filter
+
+        dropYear.setOnItemClickListener((parent, view, position, id) -> {
+            String picked = (String) parent.getItemAtPosition(position);
+            selectedYear = "Tất cả".equals(picked) ? null : picked;
+            applyFilters(null); // reset search khi đổi năm
+        });
+    }
+
+    // ── Filter + build list ───────────────────────────────────
+
+    /**
+     * Lọc rawData theo selectedYear, rồi build Subject list (header + môn),
+     * cuối cùng áp thêm search query nếu có.
+     *
+     * @param searchQuery null hoặc rỗng = không lọc search
+     */
+    private void applyFilters(String searchQuery) {
+        fullList.clear();
+
+        // 1. Lọc theo năm học
+        List<EnrollmentResponse> filtered = new ArrayList<>();
+        for (EnrollmentResponse e : rawData) {
+            if (selectedYear == null || selectedYear.equals(e.academicYear)) {
+                filtered.add(e);
+            }
+        }
+
+        // 2. Gom theo (academicYear, semesterNumber) — TreeMap giữ thứ tự
+        //    Key: "2025-2026|1", "2025-2026|2", ...
+        TreeMap<String, List<EnrollmentResponse>> bySem = new TreeMap<>();
+        for (EnrollmentResponse e : filtered) {
+            String year = e.academicYear != null ? e.academicYear : "";
+            int    sem  = e.semesterNumber != null ? e.semesterNumber : 0;
+            String key  = year + "|" + sem;
+            bySem.computeIfAbsent(key, k -> new ArrayList<>()).add(e);
+        }
+
+        // 3. Build Subject list với header
+        for (Map.Entry<String, List<EnrollmentResponse>> entry : bySem.entrySet()) {
+            String[] parts  = entry.getKey().split("\\|");
+            String   year   = parts[0];
+            int      semNum = parts.length > 1 ? Integer.parseInt(parts[1]) : 0;
+
+            // Header: "KỲ 1 – 2025-2026"
+            String headerLabel = "KỲ " + semNum + " – " + year;
+            fullList.add(Subject.headerOf(semNum, headerLabel));
+
             for (EnrollmentResponse e : entry.getValue()) {
+                String scoreStr;
+                if (e.totalScore != null) {
+                    scoreStr = e.totalScore % 1 == 0
+                            ? String.valueOf(e.totalScore.intValue())
+                            : String.format("%.1f", e.totalScore);
+                } else {
+                    scoreStr = "N/A";
+                }
                 fullList.add(new Subject(
-                        e.courseCode   != null ? e.courseCode   : "",
-                        e.courseName   != null ? e.courseName   : "",
-                        e.credits      != null ? e.credits      : 0,
-                        e.totalScore   != null ? e.totalScore   : "N/A",
-                        e.letterGrade  != null ? e.letterGrade  : "",
-                        e.gradePoint   != null ? e.gradePoint   : 0.0,
+                        e.courseCode  != null ? e.courseCode  : "",
+                        e.courseName  != null ? e.courseName  : "",
+                        e.credits     != null ? e.credits     : 0,
+                        scoreStr,
+                        e.letterGrade != null ? e.letterGrade : "",
+                        e.gradePoint  != null ? e.gradePoint  : 0.0,
                         Boolean.TRUE.equals(e.isPassed),
                         semNum,
                         false
@@ -178,20 +249,20 @@ public class SubjectListActivity extends AppCompatActivity {
             }
         }
 
-        if (adapter == null) {
-            adapter = new SubjectAdapter(fullList);
-            recyclerView.setAdapter(adapter);
+        // 4. Áp search nếu có
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            searchSubject(searchQuery);
         } else {
-            adapter.updateList(fullList);
+            if (adapter == null) {
+                adapter = new SubjectAdapter(fullList);
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.updateList(fullList);
+            }
         }
     }
 
-    // ── Events ────────────────────────────────────────────────
-
-    private void setupEvents() {
-        chipSem1.setOnClickListener(v -> scrollToSemester(1));
-        chipSem2.setOnClickListener(v -> scrollToSemester(2));
-    }
+    // ── Scroll + Search ───────────────────────────────────────
 
     private void scrollToSemester(int sem) {
         try {
@@ -211,18 +282,54 @@ public class SubjectListActivity extends AppCompatActivity {
     }
 
     private void searchSubject(String query) {
-        List<Subject> filteredList = new ArrayList<>();
+        String input = (query != null) ? query.toLowerCase().trim() : "";
+
+        // Query rỗng → hiện lại toàn bộ theo filter năm hiện tại
+        if (input.isEmpty()) {
+            if (adapter == null) {
+                adapter = new SubjectAdapter(fullList);
+                recyclerView.setAdapter(adapter);
+            } else {
+                adapter.updateList(fullList);
+            }
+            return;
+        }
+
+        List<Subject> result = new ArrayList<>();
         try {
-            String input = (query != null) ? query.toLowerCase().trim() : "";
+            // pendingHeader giữ header + các môn khớp của kỳ đang xét
+            // Chỉ flush vào result khi có ít nhất 1 môn khớp
+            List<Subject> pendingHeader = new ArrayList<>();
+            boolean hasMatch = false;
+
             for (Subject item : fullList) {
-                if (item.isHeader() || item.getName().toLowerCase().contains(input)) {
-                    filteredList.add(item);
+                if (item.isHeader()) {
+                    // Flush kỳ trước
+                    if (hasMatch) result.addAll(pendingHeader);
+                    pendingHeader.clear();
+                    hasMatch = false;
+                    pendingHeader.add(item);
+                } else {
+                    if (item.getName().toLowerCase().contains(input)
+                            || item.getCode().toLowerCase().contains(input)) {
+                        hasMatch = true;
+                        pendingHeader.add(item);
+                    }
                 }
             }
+            // Flush kỳ cuối
+            if (hasMatch) result.addAll(pendingHeader);
+
         } catch (Exception e) {
             Log.e("TrainingProgram", getString(R.string.FindingError) + e.getMessage());
         }
-        if (adapter != null) adapter.updateList(filteredList);
+
+        if (adapter == null) {
+            adapter = new SubjectAdapter(result);
+            recyclerView.setAdapter(adapter);
+        } else {
+            adapter.updateList(result);
+        }
     }
 
     @Override
