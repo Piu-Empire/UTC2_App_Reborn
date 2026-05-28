@@ -112,7 +112,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="24dp"
-                android:text="@string/training_program"
+                android:text="@string/profile_subject_list"
                 android:textColor="@color/white"
                 android:textSize="15sp"
                 android:textStyle="bold"

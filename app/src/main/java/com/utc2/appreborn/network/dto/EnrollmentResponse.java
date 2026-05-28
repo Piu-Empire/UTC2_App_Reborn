@@ -20,9 +20,12 @@ public class EnrollmentResponse {
     @SerializedName("semesterNumber")
     public Integer semesterNumber;
 
+    @SerializedName("academicYear")
+    public String  academicYear;
+
     /** null nếu chưa có điểm — hiển thị "N/A" ở UI */
     @SerializedName("totalScore")
-    public String  totalScore;
+    public Double  totalScore;
 
     @SerializedName("letterGrade")
     public String  letterGrade;

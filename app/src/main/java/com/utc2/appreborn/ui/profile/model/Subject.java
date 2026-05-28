@@ -72,6 +72,12 @@ public class Subject {
                 "", "", 0.0, false, semesterNumber, true);
     }
 
+    /** Constructor header row với label tùy chỉnh (VD: "KỲ 1 – 2025-2026"). */
+    public static Subject headerOf(int semesterNumber, String label) {
+        return new Subject("", label != null ? label : "KỲ HỌC " + semesterNumber, 0,
+                "", "", 0.0, false, semesterNumber, true);
+    }
+
     // ── Getters ──────────────────────────────────────────────
 
     public String getCode()        { return code; }
