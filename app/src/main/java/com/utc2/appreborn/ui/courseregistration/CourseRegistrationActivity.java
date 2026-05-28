@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -85,6 +88,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_course_registration);
 
         courseRepo = CourseRepository.getInstance();
@@ -94,6 +98,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         Log.d(TAG, "Khởi động: đọc được " + confirmedIds.size() + " môn đã xác nhận.");
 
         bindViews();
+        applyWindowInsets();
         setupTabs();
         setupRecyclerView();
         setupFilterButtons();
@@ -102,6 +107,25 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         // Đã xóa setupBackButton() tại đây
 
         showPage(true);
+    }
+
+    // ── Tự động căn theo status bar của từng máy ──────────────────────────────
+    private void applyWindowInsets() {
+        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
+        View navBarSpacer = findViewById(R.id.navBarSpacer);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
+            lp.height = statusH;
+            statusBarSpacer.setLayoutParams(lp);
+
+            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            ViewGroup.LayoutParams lpNav = navBarSpacer.getLayoutParams();
+            lpNav.height = navH;
+            navBarSpacer.setLayoutParams(lpNav);
+
+            return insets;
+        });
     }
 
     // ── Ánh xạ views ─────────────────────────────────────────────────────────

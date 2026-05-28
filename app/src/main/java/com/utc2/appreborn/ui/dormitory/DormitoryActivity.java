@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -95,12 +99,14 @@ public class DormitoryActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_dormitory);
 
         dormRepo = DormitoryDbRepository.getInstance(this);
         lookupRepo = LookupRepository.getInstance();
 
         bindViews();
+        applyWindowInsets();
         setupTabs();
         setupBackButton();
 
@@ -116,6 +122,23 @@ public class DormitoryActivity extends AppCompatActivity {
 
         // Hiển thị trang Đăng ký mặc định
         showPage(true);
+    }
+
+    // ── Tự động căn theo status bar của từng máy ──────────────────────────────
+    private void applyWindowInsets() {
+        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
+        View scrollView = findViewById(R.id.scrollView);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
+            lp.height = statusH;
+            statusBarSpacer.setLayoutParams(lp);
+
+            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            scrollView.setPadding(0, 0, 0, navH);
+
+            return insets;
+        });
     }
 
     // ── Ánh xạ tất cả views ───────────────────────────────────────────────────

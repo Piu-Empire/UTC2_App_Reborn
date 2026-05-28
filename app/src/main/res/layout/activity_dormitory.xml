@@ -12,8 +12,14 @@
     android:orientation="vertical"
     android:background="#F1F5F9"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
+    android:layout_height="match_parent">
+
+    <!-- Status bar spacer: tự động căn theo chiều cao status bar của từng máy -->
+    <View
+        android:id="@+id/statusBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F1F5F9"/>
 
     <!-- ══ HEADER (cố định trên cùng) ══ -->
     <LinearLayout
@@ -82,9 +88,12 @@
 
     <!-- ══ CONTENT AREA (cuộn được) ══ -->
     <!-- Dùng FrameLayout để chồng 2 page lên nhau, show/hide bằng VISIBLE/GONE -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:clipToPadding="false">
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -590,6 +599,7 @@
             <!-- END pageTraPhong -->
 
         </FrameLayout>
-    </ScrollView>
+
+    </androidx.core.widget.NestedScrollView>
 
 </LinearLayout>
