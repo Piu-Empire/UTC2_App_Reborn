@@ -69,13 +69,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         holder.txtTitle.setText(course.getName());
 
         // Label màu đỏ, value màu đen
-        setSpannedText(holder.txtMaMonHoc,    "Mã môn: ",          course.getCourseCode());
-        setSpannedText(holder.txtSoTinChi,    "Số tín chỉ: ",      String.valueOf(course.getCredits()));
-        setSpannedText(holder.txtGiangVien,   "Giảng viên: ",      course.getLecturer());
-        setSpannedText(holder.txtThoiGian,    "Thời gian: ",       course.getSchedule());
-        setSpannedText(holder.txtPhong,       "Phòng: ",           course.getRoom());
-        setSpannedText(holder.txtNgayHoc,     "Bắt đầu: ",  course.getStartDate() + " → " + course.getEndDate());
-        setSpannedText(holder.txtSoTiet,      "Số tiết: ",  String.valueOf(course.getTotalPeriods()));
+        android.content.Context ctx = holder.itemView.getContext();
+        setSpannedText(holder.txtMaMonHoc,  ctx.getString(R.string.course_label_ma_mon),     course.getCourseCode());
+        setSpannedText(holder.txtSoTinChi,  ctx.getString(R.string.course_label_tin_chi),    String.valueOf(course.getCredits()));
+        setSpannedText(holder.txtGiangVien, ctx.getString(R.string.course_label_giang_vien), course.getLecturer());
+        setSpannedText(holder.txtThoiGian,  ctx.getString(R.string.course_label_thoi_gian),  course.getSchedule());
+        setSpannedText(holder.txtPhong,     ctx.getString(R.string.course_label_phong),      course.getRoom());
+        setSpannedText(holder.txtNgayHoc,   ctx.getString(R.string.course_label_bat_dau),    course.getStartDate() + " → " + course.getEndDate());
+        setSpannedText(holder.txtSoTiet,    ctx.getString(R.string.course_label_so_tiet),    String.valueOf(course.getTotalPeriods()));
 
         // ── Thanh sĩ số, CỨ ĐĂNG KÍ THÌ NÓ TĂNG LÊN 1, NẾU HỦY ĐĂNG KÍ THÌ NÓ GIẢM  ──────────────────────────────────────────────────────
         int current = course.getCurrentStudents();
@@ -86,17 +87,17 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         holder.progressSiSo.setProgress(current);
 
         // Text "Hiện tại : X    X / Y"
-        holder.txtSiSoCurrent.setText("Hiện tại : " + current);
+        holder.txtSiSoCurrent.setText(ctx.getString(R.string.course_si_so_current, current));
         holder.txtSiSoRatio.setText(current + " / " + max);
 
         // Trạng thái – dùng ic_status_check / ic_status_x
         if (full) {
             holder.icTrangThai.setImageResource(R.drawable.ic_status_x);
-            holder.txtTrangThai.setText("Trạng thái: Hết chỗ");
+            holder.txtTrangThai.setText(ctx.getString(R.string.course_status_full));
             holder.txtTrangThai.setTextColor(Color.parseColor("#E53935"));
         } else {
             holder.icTrangThai.setImageResource(R.drawable.ic_status_check);
-            holder.txtTrangThai.setText("Trạng thái: Còn chỗ");
+            holder.txtTrangThai.setText(ctx.getString(R.string.course_status_available));
             holder.txtTrangThai.setTextColor(Color.parseColor("#2E7D32"));
         }
 
@@ -105,7 +106,7 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
 
         if (isRegistered) {
             holder.btnRegister.setBackgroundResource(R.drawable.bg_button_disabled);
-            holder.btnRegister.setText("Đã đăng ký");
+            holder.btnRegister.setText(ctx.getString(R.string.room_btn_registered));
             holder.btnRegister.setTextColor(Color.parseColor("#888888"));
             holder.btnRegister.setAlpha(0.6f);
             holder.btnRegister.setClickable(false);
@@ -113,14 +114,14 @@ public class CourseAdapter extends RecyclerView.Adapter<CourseAdapter.ViewHolder
         } else if (full) {
             // Hết chỗ – vô hiệu hóa nút
             holder.btnRegister.setBackgroundResource(R.drawable.bg_button_disabled);
-            holder.btnRegister.setText("Hết chỗ");
+            holder.btnRegister.setText(ctx.getString(R.string.room_status_full));
             holder.btnRegister.setTextColor(Color.parseColor("#888888"));
             holder.btnRegister.setAlpha(0.6f);
             holder.btnRegister.setClickable(false);
             holder.btnRegister.setFocusable(false);
         } else {
             holder.btnRegister.setBackgroundResource(R.drawable.bg_button_black);
-            holder.btnRegister.setText("Đăng ký");
+            holder.btnRegister.setText(ctx.getString(R.string.room_btn_register));
             holder.btnRegister.setTextColor(Color.WHITE);
             holder.btnRegister.setAlpha(1.0f);
             holder.btnRegister.setClickable(true);

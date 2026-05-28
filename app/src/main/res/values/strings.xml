@@ -718,5 +718,77 @@
     <string name="invoice_empty_tuition">Chưa có lịch sử đóng học phí</string>
     <string name="invoice_empty_dorm">Chưa có lịch sử đóng tiền KTX</string>
     <string name="semester_label">Học kỳ %1$d</string>
-
+    <!-- Dormitory adapter -->
+    <string name="room_subinfo">%1$d người  •  %2$s đ/tháng  •  %3$s</string>
+    <string name="room_capacity">%d người</string>
+    <string name="room_price">%sđ/tháng</string>
+    <string name="room_status_available">Còn chỗ</string>
+    <string name="room_status_full">Hết chỗ</string>
+    <string name="room_btn_register">Đăng ký</string>
+    <string name="room_btn_registered">Đã đăng ký</string>
+    <!-- Course adapter -->
+    <string name="course_label_ma_mon">Mã môn: </string>
+    <string name="course_label_tin_chi">Số tín chỉ: </string>
+    <string name="course_label_giang_vien">Giảng viên: </string>
+    <string name="course_label_thoi_gian">Thời gian: </string>
+    <string name="course_label_phong">Phòng: </string>
+    <string name="course_label_bat_dau">Bắt đầu: </string>
+    <string name="course_label_so_tiet">Số tiết: </string>
+    <string name="course_status_full">Trạng thái: Hết chỗ</string>
+    <string name="course_status_available">Trạng thái: Còn chỗ</string>
+    <string name="course_si_so_current">Hiện tại : %d</string>
+    <!-- Occupant adapter -->
+    <string name="occupant_mssv">MSSV: %s</string>
+    <string name="occupant_lop">Lớp: %s</string>
+    <!-- Dormitory Activity -->
+    <string name="tim_kiem_phong">Tìm phòng...</string>
+    <string name="chon_phong">Chọn phòng  ▾</string>
+    <string name="chon_toa">Chọn tòa  ▾</string>
+    <string name="tim_kiem">Tìm kiếm</string>
+    <string name="sinh_vien_dang_o">Sinh viên đang ở</string>
+    <string name="trang_thai_con_cho">Trạng thái: Còn chỗ</string>
+    <string name="trang_thai_het_cho">Trạng thái: Hết chỗ</string>
+    <string name="dorm_id_invalid">ID phòng không hợp lệ.</string>
+    <string name="dorm_register_success">Đăng ký thành công!</string>
+    <string name="dorm_cancel_success">Đã hủy đăng ký.</string>
+    <string name="dorm_select_both">Vui lòng chọn phòng và tòa nhà trước khi tìm kiếm.</string>
+    <string name="dorm_select_room">Vui lòng chọn phòng.</string>
+    <string name="dorm_select_building">Vui lòng chọn tòa nhà.</string>
+    <string name="dorm_wrong_building">Phòng đã chọn không thuộc Tòa %s. Vui lòng kiểm tra lại.</string>
+    <string name="dorm_unknown_error">Lỗi không xác định, vui lòng thử lại.</string>
+    <string name="dorm_trang_thai">Trạng thái: %s</string>
+    <string name="dorm_loai_phong">Loại phòng: %s</string>
+    <string name="dorm_suc_chua">Sức chứa: %d</string>
+    <string name="dorm_gia">Giá: %s/tháng</string>
+    <string name="dorm_hien_tai">Hiện tại : %d</string>
+    <string name="dorm_tong_tien">Tổng số tiền: %sđ</string>
+    <string name="dorm_filter_all">Tất cả</string>
+    <string name="dorm_filter_toa_a">Tòa A</string>
+    <string name="dorm_filter_toa_b">Tòa B</string>
+    <string name="dorm_filter_toa_c">Tòa C</string>
+    <string name="dorm_dropdown_chon_phong">-- Chọn phòng --</string>
+    <string name="dorm_dropdown_chon_toa">-- Chọn tòa --</string>
+    <string name="dorm_toa_prefix">Tòa %s  ▾</string>
+    <!-- Course Registration Activity -->
+    <string name="course_reg_title">Đăng ký học phần</string>
+    <string name="course_tab_dang_ky">Đăng ký</string>
+    <string name="course_tab_ket_qua">Kết quả</string>
+    <string name="course_hoc_ky">Học kỳ ▾</string>
+    <string name="course_khoa_hoc">Khóa học ▾</string>
+    <string name="course_nganh">Ngành ▾</string>
+    <string name="course_da_chon">Đã chọn:</string>
+    <string name="course_tong_tin_chi">Tổng số tín chỉ: %d</string>
+    <string name="course_xac_nhan">Xác nhận đăng ký</string>
+    <string name="course_empty_result">Bạn chưa xác nhận đăng ký môn học nào.\nHãy chọn môn và bấm Xác nhận đăng ký.</string>
+    <string name="course_tong_tc_ket_qua">Tổng số tín chỉ đã đăng ký: %d</string>
+    <string name="course_confirmed">Môn này đã được xác nhận rồi!</string>
+    <string name="course_added">Đã thêm "%s" vào giỏ.</string>
+    <string name="course_gio_trong">Giỏ đăng ký trống!</string>
+    <string name="course_xac_nhan_success">Xác nhận thành công!</string>
+    <string name="course_chon_hoc_ky">Chọn học kỳ</string>
+    <string name="course_chon_khoa">Chọn khóa học</string>
+    <string name="course_chon_nganh">Chọn ngành</string>
+    <string name="course_hoc_ky_prefix">Học kỳ: %s ▾</string>
+    <string name="course_khoa_prefix">%s ▾</string>
+    <string name="course_nganh_prefix">Ngành: %s ▾</string>
 </resources>

@@ -72,13 +72,14 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         holder.txtTitle.setText(room.getName());
 
         // Gọi getDisplayInfo() – override từ DormitoryItem
-        holder.txtInfoCapacity.setText(room.getCapacity() + " người");
-        holder.txtInfoPrice.setText(String.format("%,d", room.getPricePerMonth()) + "đ/tháng");
+        android.content.Context ctx = holder.itemView.getContext();
+        holder.txtInfoCapacity.setText(ctx.getString(R.string.room_capacity, room.getCapacity()));
+        holder.txtInfoPrice.setText(ctx.getString(R.string.room_price, String.format("%,d", room.getPricePerMonth())));
         holder.txtInfoGender.setText(room.getRoomType().getLabel());
         if (room.isAvailable()) {
             holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_amber);
             holder.imgStatusIcon.setImageResource(R.drawable.ic_status_check);
-            holder.tvStatusText.setText("Còn chỗ");
+            holder.tvStatusText.setText(ctx.getString(R.string.room_status_available));
             holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#000000"));
 
             // Nút Đăng ký: đen, chữ trắng, clickable
@@ -90,7 +91,7 @@ public class RoomAdapter extends RecyclerView.Adapter<RoomAdapter.ViewHolder> {
         } else {
             holder.badgeLayout.setBackgroundResource(R.drawable.bg_badge_amber);
             holder.imgStatusIcon.setImageResource(R.drawable.ic_status_x);
-            holder.tvStatusText.setText("Hết chỗ");
+            holder.tvStatusText.setText(ctx.getString(R.string.room_status_full));
             holder.tvStatusText.setTextColor(android.graphics.Color.parseColor("#000000"));
 
             // Nút Đăng ký: disabled – xám mờ, không click được
