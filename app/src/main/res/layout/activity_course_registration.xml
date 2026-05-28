@@ -13,8 +13,14 @@
     android:orientation="vertical"
     android:background="#F1F5F9"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="24dp">
+    android:layout_height="match_parent">
+
+    <!-- Status bar spacer: tự động căn theo chiều cao status bar của từng máy -->
+    <View
+        android:id="@+id/statusBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="#F1F5F9"/>
 
 
     <!-- ══ HEADER ══ -->
@@ -28,7 +34,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Đăng ký học phần"
+            android:text="@string/course_reg_title"
             android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#000000"/>
@@ -49,7 +55,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Đăng ký"
+            android:text="@string/course_tab_dang_ky"
             android:gravity="center"
             android:padding="10dp"
             android:textColor="#FFFFFF"
@@ -62,7 +68,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Kết quả"
+            android:text="@string/course_tab_ket_qua"
             android:gravity="center"
             android:padding="10dp"
             android:textColor="#000000"
@@ -71,7 +77,7 @@
     </LinearLayout>
 
     <!-- ══ CONTENT AREA ══ -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -94,7 +100,7 @@
                     android:id="@+id/searchBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Tìm môn học..."
+                    android:hint="@string/search_hint"
                     android:textColor="#000000"
                     android:layout_marginHorizontal="16dp"
                     android:background="@drawable/bg_search"
@@ -115,7 +121,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Học kỳ ▾"
+                        android:text="@string/course_hoc_ky"
                         android:textColor="#000000"
                         android:textSize="12sp"
                         android:gravity="center"
@@ -129,7 +135,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Khóa học ▾"
+                        android:text="@string/course_khoa_hoc"
                         android:textColor="#000000"
                         android:textSize="12sp"
                         android:gravity="center"
@@ -144,7 +150,7 @@
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
-                        android:text="Ngành ▾"
+                        android:text="@string/course_nganh"
                         android:textColor="#000000"
                         android:textSize="12sp"
                         android:gravity="center"
@@ -198,7 +204,7 @@
                                     android:layout_width="0dp"
                                     android:layout_weight="1"
                                     android:layout_height="wrap_content"
-                                    android:text="Đã chọn:"
+                                    android:text="@string/course_da_chon"
                                     android:textColor="#E53935"
                                     android:textSize="16sp"
                                     android:textStyle="bold"/>
@@ -238,7 +244,7 @@
                                 android:paddingHorizontal="16dp"
                                 android:paddingTop="10dp"
                                 android:paddingBottom="16dp"
-                                android:text="Tổng số tín chỉ: 0"
+                                android:text="@string/course_da_chon"
                                 android:textColor="#555555"
                                 android:textSize="14sp"
                                 android:textStyle="bold"/>
@@ -253,7 +259,7 @@
                         android:layout_marginHorizontal="16dp"
                         android:layout_marginTop="12dp"
                         android:layout_marginBottom="16dp"
-                        android:text="Xác nhận đăng ký"
+                        android:text="@string/course_xac_nhan"
                         android:background="@drawable/bg_button_black"
                         android:textColor="#FFFFFF"
                         android:textAllCaps="false"
@@ -283,7 +289,7 @@
                     android:id="@+id/txtKetQuaTrong"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Bạn chưa xác nhận đăng ký môn học nào.\nHãy chọn môn và bấm Xác nhận đăng ký."
+                    android:text="@string/course_empty_result"
                     android:textSize="14sp"
                     android:textColor="#888888"
                     android:gravity="center"
@@ -294,7 +300,7 @@
                     android:id="@+id/txtKetQuaTongTinChi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tổng số tín chỉ đã đăng ký: 0"
+                    android:text="@string/course_tab_ket_qua"
                     android:textSize="15sp"
                     android:textColor="#000000"
                     android:textStyle="bold"
@@ -311,6 +317,12 @@
             <!-- END pageKetQua -->
 
         </FrameLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Navigation bar spacer: tránh content bị khuất sau nav bar -->
+    <View
+        android:id="@+id/navBarSpacer"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"/>
 
 </LinearLayout>

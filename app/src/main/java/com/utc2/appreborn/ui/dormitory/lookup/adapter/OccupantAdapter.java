@@ -44,9 +44,10 @@ public class OccupantAdapter extends RecyclerView.Adapter<OccupantAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         RoomOccupant o = items.get(position);
+        android.content.Context ctx = holder.itemView.getContext();
         holder.tvName.setText(o.getName());
-        holder.tvMssv.setText("MSSV: " + o.getMssv());
-        holder.tvClass.setText("Lớp: " + o.getClassId());
+        holder.tvMssv.setText(ctx.getString(R.string.occupant_mssv, o.getMssv()));
+        holder.tvClass.setText(ctx.getString(R.string.occupant_lop, o.getClassId()));
         // Dùng ic_user có sẵn trong drawable làm avatar mặc định
         holder.imgAvatar.setImageResource(R.drawable.ic_user);
     }

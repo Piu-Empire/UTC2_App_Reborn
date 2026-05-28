@@ -5,6 +5,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,6 +15,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,6 +32,7 @@ import com.utc2.appreborn.ui.dormitory.lookup.model.DormitoryDbRepository;
 import com.utc2.appreborn.ui.dormitory.lookup.model.LookupRepository;
 import com.utc2.appreborn.ui.dormitory.lookup.model.RoomDetail;
 import com.utc2.appreborn.ui.dormitory.model.Room;
+import com.utc2.appreborn.utils.LocaleHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -87,14 +92,21 @@ public class DormitoryActivity extends AppCompatActivity {
 
     // ─────────────────────────────────────────────────────────────────────────
     @Override
+    protected void attachBaseContext(android.content.Context base) {
+        super.attachBaseContext(LocaleHelper.applyLocale(base));
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_dormitory);
 
         dormRepo = DormitoryDbRepository.getInstance(this);
         lookupRepo = LookupRepository.getInstance();
 
         bindViews();
+        applyWindowInsets();
         setupTabs();
         setupBackButton();
 
@@ -110,6 +122,23 @@ public class DormitoryActivity extends AppCompatActivity {
 
         // Hiển thị trang Đăng ký mặc định
         showPage(true);
+    }
+
+    // ── Tự động căn theo status bar của từng máy ──────────────────────────────
+    private void applyWindowInsets() {
+        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
+        View scrollView = findViewById(R.id.scrollView);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
+            lp.height = statusH;
+            statusBarSpacer.setLayoutParams(lp);
+
+            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            scrollView.setPadding(0, 0, 0, navH);
+
+            return insets;
+        });
     }
 
     // ── Ánh xạ tất cả views ───────────────────────────────────────────────────
@@ -215,7 +244,7 @@ public class DormitoryActivity extends AppCompatActivity {
         try {
             roomId = Long.parseLong(room.getId());
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "ID phòng không hợp lệ.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.dorm_id_invalid), Toast.LENGTH_SHORT).show();
             return;
         }
         dormRepo.registerRoom(roomId, userId, 8, (reg, error) -> {
@@ -228,13 +257,13 @@ public class DormitoryActivity extends AppCompatActivity {
             layoutSelected.setVisibility(View.VISIBLE);
             txtRoomInfo.setText(room.getName());
             if (txtRoomSubInfo != null)
-                txtRoomSubInfo.setText(
-                        room.getCapacity() + " người  •  "
-                                + String.format("%,d", room.getPricePerMonth()) + "đ/tháng  •  "
-                                + room.getRoomType().getLabel());
-            txtTotal.setText("Tổng số tiền: "
-                    + String.format("%,d", reg.totalPrice) + "đ");
-            Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show();
+                txtRoomSubInfo.setText(getString(R.string.room_subinfo,
+                        room.getCapacity(),
+                        String.format("%,d", room.getPricePerMonth()),
+                        room.getRoomType().getLabel()));
+            txtTotal.setText(getString(R.string.dorm_tong_tien,
+                    String.format("%,d", reg.totalPrice)));
+            Toast.makeText(this, getString(R.string.dorm_register_success), Toast.LENGTH_SHORT).show();
             Log.d(TAG, "handleRegisterClick() done – roomId: " + room.getId());
         });
     }
@@ -251,7 +280,7 @@ public class DormitoryActivity extends AppCompatActivity {
                 }
                 currentRegId = -1;
                 layoutSelected.setVisibility(View.GONE);
-                Toast.makeText(this, "Đã hủy đăng ký.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.dorm_cancel_success), Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "handleCancelClick() done.");
             });
         });
@@ -260,16 +289,19 @@ public class DormitoryActivity extends AppCompatActivity {
     private void setupFilterButtons() {
         btnToa.setOnClickListener(v ->
                 showPopupMenu(btnToa,
-                        new String[]{"Tất cả", "Tòa A", "Tòa B", "Tòa C"},
+                        new String[]{getString(R.string.dorm_filter_all),
+                                getString(R.string.dorm_filter_toa_a),
+                                getString(R.string.dorm_filter_toa_b),
+                                getString(R.string.dorm_filter_toa_c)},
                         choice -> {
-                            filterBuilding = choice.equals("Tất cả") ? "" : choice.replace("Tòa ", "");
+                            filterBuilding = choice.equals(getString(R.string.dorm_filter_all)) ? "" : choice.replace(getString(R.string.toa_nha) + " ", "").replace("Block ", "");
                             btnToa.setText(choice + " ▾");
                             applyFilter();
                         }));
 
         btnGia.setOnClickListener(v ->
                 showPopupMenu(btnGia,
-                        new String[]{"Tất cả", "≤ 300,000đ", "≤ 500,000đ", "≤ 700,000đ"},
+                        new String[]{getString(R.string.dorm_filter_all), "≤ 300,000đ", "≤ 500,000đ", "≤ 700,000đ"},
                         choice -> {
                             if      (choice.contains("300")) filterMaxPrice = 300000;
                             else if (choice.contains("500")) filterMaxPrice = 500000;
@@ -281,7 +313,7 @@ public class DormitoryActivity extends AppCompatActivity {
 
         btnLoai.setOnClickListener(v ->
                 showPopupMenu(btnLoai,
-                        new String[]{"Tất cả", "Nam", "Nữ"},
+                        new String[]{getString(R.string.dorm_filter_all), "Nam", "Nữ"},
                         choice -> {
                             if      (choice.equals("Nam")) filterRoomType = Room.RoomType.NAM;
                             else if (choice.equals("Nữ"))  filterRoomType = Room.RoomType.NU;
@@ -336,7 +368,7 @@ public class DormitoryActivity extends AppCompatActivity {
             PopupMenu popup = new PopupMenu(this, v);
             List<RoomDetail> all = lookupRepo.getAllRoomDetails();
             all.sort((a, b) -> a.getRoom().getId().compareTo(b.getRoom().getId()));
-            popup.getMenu().add(0, 0, 0, "-- Chọn phòng --");
+            popup.getMenu().add(0, 0, 0, getString(R.string.dorm_dropdown_chon_phong));
             for (int i = 0; i < all.size(); i++) {
                 String label = extractRoomNumber(all.get(i).getRoom().getName());
                 popup.getMenu().add(0, i + 1, i + 1, label);
@@ -344,7 +376,7 @@ public class DormitoryActivity extends AppCompatActivity {
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == 0) {
                     selectedRoomId = null;
-                    btnChonPhong.setText("Chọn phòng  ▾");
+                    btnChonPhong.setText(getString(R.string.chon_phong));
                 } else {
                     RoomDetail chosen = all.get(item.getItemId() - 1);
                     selectedRoomId = chosen.getRoom().getId();
@@ -358,19 +390,19 @@ public class DormitoryActivity extends AppCompatActivity {
         // Dropdown Chọn tòa nhà
         btnChonToa.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
-            popup.getMenu().add(0, 0, 0, "-- Chọn tòa --");
-            popup.getMenu().add(0, 1, 1, "Tòa A");
-            popup.getMenu().add(0, 2, 2, "Tòa B");
-            popup.getMenu().add(0, 3, 3, "Tòa C");
+            popup.getMenu().add(0, 0, 0, getString(R.string.dorm_dropdown_chon_toa));
+            popup.getMenu().add(0, 1, 1, getString(R.string.dorm_filter_toa_a));
+            popup.getMenu().add(0, 2, 2, getString(R.string.dorm_filter_toa_b));
+            popup.getMenu().add(0, 3, 3, getString(R.string.dorm_filter_toa_c));
             popup.setOnMenuItemClickListener(item -> {
                 int idx = item.getItemId();
                 if (idx == 0) {
                     selectedBuilding = null;
-                    btnChonToa.setText("Chọn tòa  ▾");
+                    btnChonToa.setText(getString(R.string.chon_toa));
                 } else {
                     String[] buildings = {"A", "B", "C"};
                     selectedBuilding = buildings[idx - 1];
-                    btnChonToa.setText("Tòa " + selectedBuilding + "  ▾");
+                    btnChonToa.setText(getString(R.string.dorm_toa_prefix, selectedBuilding));
                 }
                 return true;
             });
@@ -395,17 +427,15 @@ public class DormitoryActivity extends AppCompatActivity {
     private void handleLookupSearch() {
         // Validate: BẮT BUỘC phải chọn đủ cả 2
         if (selectedRoomId == null && selectedBuilding == null) {
-            Toast.makeText(this,
-                    "Vui lòng chọn phòng và tòa nhà trước khi tìm kiếm.",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.dorm_select_both), Toast.LENGTH_SHORT).show();
             return;
         }
         if (selectedRoomId == null) {
-            Toast.makeText(this, "Vui lòng chọn phòng.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.dorm_select_room), Toast.LENGTH_SHORT).show();
             return;
         }
         if (selectedBuilding == null) {
-            Toast.makeText(this, "Vui lòng chọn tòa nhà.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.dorm_select_building), Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -415,7 +445,7 @@ public class DormitoryActivity extends AppCompatActivity {
             String roomBuilding = detail.getRoom().getBuilding(); // "A", "B", "C"
             if (!roomBuilding.equalsIgnoreCase(selectedBuilding)) {
                 Toast.makeText(this,
-                        "Phòng đã chọn không thuộc Tòa " + selectedBuilding + ". Vui lòng kiểm tra lại.",
+                        getString(R.string.dorm_wrong_building, selectedBuilding),
                         Toast.LENGTH_LONG).show();
                 cardRoomInfo.setVisibility(View.GONE);
                 cardOccupants.setVisibility(View.GONE);
@@ -432,7 +462,7 @@ public class DormitoryActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             Log.e(TAG, "Unexpected error khi tra phòng", e);
-            Toast.makeText(this, "Lỗi không xác định, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.dorm_unknown_error), Toast.LENGTH_SHORT).show();
 
         } finally {
             Log.d(TAG, "handleLookupSearch() done");
@@ -444,24 +474,24 @@ public class DormitoryActivity extends AppCompatActivity {
 
         cardRoomInfo.setVisibility(View.VISIBLE);
         tvRoomName.setText(room.getName());
-        tvRoomStatus.setText("Trạng thái: " + detail.getStatusLabel());
-        tvRoomType.setText("Loại phòng: " + room.getRoomType().getLabel());
-        tvCapacity.setText("Sức chứa: " + room.getCapacity());
-        tvPrice.setText("Giá: " + String.format("%,d", room.getPricePerMonth()) + "/tháng");
+        tvRoomStatus.setText(getString(R.string.dorm_trang_thai, detail.getStatusLabel()));
+        tvRoomType.setText(getString(R.string.dorm_loai_phong, room.getRoomType().getLabel()));
+        tvCapacity.setText(getString(R.string.dorm_suc_chua, room.getCapacity()));
+        tvPrice.setText(getString(R.string.dorm_gia, String.format("%,d", room.getPricePerMonth())));
 
         int progress = (int) (detail.getOccupancyRatio() * 100);
         progressOccupancy.setProgress(progress);
-        tvCurrentCount.setText("Hiện tại : " + detail.getCurrentOccupants());
+        tvCurrentCount.setText(getString(R.string.dorm_hien_tai, detail.getCurrentOccupants()));
         tvCapacityLabel.setText(detail.getCurrentOccupants() + " / " + room.getCapacity());
 
         // Dùng ic_status_check / ic_status_x có sẵn trong drawable
         if (room.isAvailable()) {
             ivStatusIcon.setImageResource(R.drawable.ic_status_check);
-            tvStatusBadge.setText("Trạng thái: Còn chỗ");
+            tvStatusBadge.setText(getString(R.string.trang_thai_con_cho));
             tvStatusBadge.setTextColor(getResources().getColor(R.color.green, null));
         } else {
             ivStatusIcon.setImageResource(R.drawable.ic_status_x);
-            tvStatusBadge.setText("Trạng thái: Hết chỗ");
+            tvStatusBadge.setText(getString(R.string.trang_thai_het_cho));
             tvStatusBadge.setTextColor(getResources().getColor(R.color.red, null));
         }
 

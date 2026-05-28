@@ -115,7 +115,7 @@
             android:exported="false" />
 
         <!-- MODULE KÝ TÚC XÁ -->
-        <activity android:name=".ui.dormitory.DormitoryActivity" android:exported="false" />
+        <activity android:name=".ui.dormitory.DormitoryActivity" android:exported="false" android:windowSoftInputMode="adjustResize" />
 
         <!-- PROVIDER CHIA SẺ FILE -->
         <provider

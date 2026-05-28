@@ -437,4 +437,77 @@
     <string name="invoice_empty_tuition">No history of tuition fees</string>
     <string name="invoice_empty_dorm">No history of dorm fees</string>
     <string name="semester_label">Semester %1$d</string>
+    <!-- Dormitory adapter -->
+    <string name="room_subinfo">%1$d people  •  %2$s VND/month  •  %3$s</string>
+    <string name="room_capacity">%d people</string>
+    <string name="room_price">%s VND/month</string>
+    <string name="room_status_available">Available</string>
+    <string name="room_status_full">Full</string>
+    <string name="room_btn_register">Register</string>
+    <string name="room_btn_registered">Registered</string>
+    <!-- Course adapter -->
+    <string name="course_label_ma_mon">Code: </string>
+    <string name="course_label_tin_chi">Credits: </string>
+    <string name="course_label_giang_vien">Lecturer: </string>
+    <string name="course_label_thoi_gian">Schedule: </string>
+    <string name="course_label_phong">Room: </string>
+    <string name="course_label_bat_dau">Start: </string>
+    <string name="course_label_so_tiet">Periods: </string>
+    <string name="course_status_full">Status: Full</string>
+    <string name="course_status_available">Status: Available</string>
+    <string name="course_si_so_current">Current : %d</string>
+    <!-- Occupant adapter -->
+    <string name="occupant_mssv">ID: %s</string>
+    <string name="occupant_lop">Class: %s</string>
+    <!-- Dormitory Activity -->
+    <string name="tim_kiem_phong">Search room...</string>
+    <string name="chon_phong">Select room  ▾</string>
+    <string name="chon_toa">Select building  ▾</string>
+    <string name="tim_kiem">Search</string>
+    <string name="sinh_vien_dang_o">Current residents</string>
+    <string name="trang_thai_con_cho">Status: Available</string>
+    <string name="trang_thai_het_cho">Status: Full</string>
+    <string name="dorm_id_invalid">Invalid room ID.</string>
+    <string name="dorm_register_success">Registration successful!</string>
+    <string name="dorm_cancel_success">Registration cancelled.</string>
+    <string name="dorm_select_both">Please select both a room and a building before searching.</string>
+    <string name="dorm_select_room">Please select a room.</string>
+    <string name="dorm_select_building">Please select a building.</string>
+    <string name="dorm_wrong_building">The selected room is not in Building %s. Please check again.</string>
+    <string name="dorm_unknown_error">Unknown error, please try again.</string>
+    <string name="dorm_trang_thai">Status: %s</string>
+    <string name="dorm_loai_phong">Room type: %s</string>
+    <string name="dorm_suc_chua">Capacity: %d</string>
+    <string name="dorm_gia">Price: %s/month</string>
+    <string name="dorm_hien_tai">Current : %d</string>
+    <string name="dorm_tong_tien">Total: %s VND</string>
+    <string name="dorm_filter_all">All</string>
+    <string name="dorm_filter_toa_a">Block A</string>
+    <string name="dorm_filter_toa_b">Block B</string>
+    <string name="dorm_filter_toa_c">Block C</string>
+    <string name="dorm_dropdown_chon_phong">-- Select room --</string>
+    <string name="dorm_dropdown_chon_toa">-- Select building --</string>
+    <string name="dorm_toa_prefix">Block %s  ▾</string>
+    <!-- Course Registration Activity -->
+    <string name="course_reg_title">Course Registration</string>
+    <string name="course_tab_dang_ky">Register</string>
+    <string name="course_tab_ket_qua">Results</string>
+    <string name="course_hoc_ky">Semester ▾</string>
+    <string name="course_khoa_hoc">Course ▾</string>
+    <string name="course_nganh">Major ▾</string>
+    <string name="course_da_chon">Selected:</string>
+    <string name="course_tong_tin_chi">Total credits: %d</string>
+    <string name="course_xac_nhan">Confirm Registration</string>
+    <string name="course_empty_result">You have not confirmed any course registrations yet.\nSelect courses and press Confirm Registration.</string>
+    <string name="course_tong_tc_ket_qua">Total registered credits: %d</string>
+    <string name="course_confirmed">This course has already been confirmed!</string>
+    <string name="course_added">Added "%s" to cart.</string>
+    <string name="course_gio_trong">Registration cart is empty!</string>
+    <string name="course_xac_nhan_success">Registration confirmed!</string>
+    <string name="course_chon_hoc_ky">Select semester</string>
+    <string name="course_chon_khoa">Select course</string>
+    <string name="course_chon_nganh">Select major</string>
+    <string name="course_hoc_ky_prefix">Semester: %s ▾</string>
+    <string name="course_khoa_prefix">%s ▾</string>
+    <string name="course_nganh_prefix">Major: %s ▾</string>
 </resources>

@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -67,13 +70,13 @@ public class CourseRegistrationActivity extends AppCompatActivity {
     private String filterKhoaHoc  = "";
     private String filterMajor    = "";
 
-    private static final String[] SEMESTERS = {"Tất cả", "HK1", "HK2", "HK3"};
-    private static final String[] KHOAHOC   = {
-            "Tất cả","K51","K52","K53","K54","K55","K56","K57","K58","K59","K60",
+    private static final String[] SEMESTERS_CODES = {"", "HK1", "HK2", "HK3"};
+    private static final String[] KHOAHOC_CODES   = {
+            "","K51","K52","K53","K54","K55","K56","K57","K58","K59","K60",
             "K61","K62","K63","K64","K65","K66","K67","K68","K69","K70"
     };
-    private static final String[] NGANH = {
-            "Tất cả","CNTT","KTPM","HTTT","MMT","CK","XD","KT","MT","DTVT"
+    private static final String[] NGANH_CODES = {
+            "","CNTT","KTPM","HTTT","MMT","CK","XD","KT","MT","DTVT"
     };
     @Override
     protected void attachBaseContext(android.content.Context base) {
@@ -85,6 +88,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_course_registration);
 
         courseRepo = CourseRepository.getInstance();
@@ -94,6 +98,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         Log.d(TAG, "Khởi động: đọc được " + confirmedIds.size() + " môn đã xác nhận.");
 
         bindViews();
+        applyWindowInsets();
         setupTabs();
         setupRecyclerView();
         setupFilterButtons();
@@ -102,6 +107,25 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         // Đã xóa setupBackButton() tại đây
 
         showPage(true);
+    }
+
+    // ── Tự động căn theo status bar của từng máy ──────────────────────────────
+    private void applyWindowInsets() {
+        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
+        View navBarSpacer = findViewById(R.id.navBarSpacer);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
+            lp.height = statusH;
+            statusBarSpacer.setLayoutParams(lp);
+
+            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            ViewGroup.LayoutParams lpNav = navBarSpacer.getLayoutParams();
+            lpNav.height = navH;
+            navBarSpacer.setLayoutParams(lpNav);
+
+            return insets;
+        });
     }
 
     // ── Ánh xạ views ─────────────────────────────────────────────────────────
@@ -127,9 +151,9 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         txtKetQuaTongTinChi  = findViewById(R.id.txtKetQuaTongTinChi);
         txtKetQuaTrong       = findViewById(R.id.txtKetQuaTrong);
 
-        btnHocKy.setText("Học kỳ ▾");
-        btnKhoaHoc.setText("Khóa học ▾");
-        btnNganh.setText("Ngành ▾");
+        btnHocKy.setText(getString(R.string.course_hoc_ky));
+        btnKhoaHoc.setText(getString(R.string.course_khoa_hoc));
+        btnNganh.setText(getString(R.string.course_nganh));
     }
 
     // ── Tab ───────────────────────────────────────────────────────────────────
@@ -172,14 +196,14 @@ public class CourseRegistrationActivity extends AppCompatActivity {
 
     private void handleRegisterClick(Course course) {
         if (confirmedIds.contains(course.getId())) {
-            Toast.makeText(this, "Môn này đã được xác nhận rồi!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.course_confirmed), Toast.LENGTH_SHORT).show();
             return;
         }
         try {
             courseRepo.registerCourse(course.getId());
             updateSelectedPanel();
             refreshAdapterPending();
-            Toast.makeText(this, "Đã thêm \"" + course.getName() + "\" vào giỏ.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.course_added, course.getName()), Toast.LENGTH_SHORT).show();
         } catch (CourseException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
         }
@@ -199,7 +223,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
             tv.setTextSize(13);
             layoutSelectedItems.addView(tv);
         }
-        txtTongTinChi.setText("Tổng số tín chỉ: " + courseRepo.getTotalRegisteredCredits());
+        txtTongTinChi.setText(getString(R.string.course_tong_tin_chi, courseRepo.getTotalRegisteredCredits()));
     }
 
     private void refreshAdapterPending() {
@@ -212,7 +236,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> {
             Map<String, CourseRegistration> pending = courseRepo.getRegistrations();
             if (pending.isEmpty()) {
-                Toast.makeText(this, "Giỏ đăng ký trống!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.course_gio_trong), Toast.LENGTH_SHORT).show();
                 return;
             }
             for (String id : pending.keySet()) {
@@ -222,24 +246,35 @@ public class CourseRegistrationActivity extends AppCompatActivity {
             courseRepo.clearPendingRegistrations();
             layoutSelected.setVisibility(View.GONE);
             courseAdapter.setRegisteredIds(new ArrayList<>(confirmedIds));
-            Toast.makeText(this, "Xác nhận thành công!", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.course_xac_nhan_success), Toast.LENGTH_LONG).show();
         });
     }
 
     private void setupFilterButtons() {
-        btnHocKy.setOnClickListener(v -> showScrollableDialog("Chọn học kỳ", SEMESTERS, choice -> {
-            filterSemester = "Tất cả".equals(choice) ? "" : choice;
-            btnHocKy.setText("Tất cả".equals(choice) ? "Học kỳ ▾" : "Học kỳ: " + choice + " ▾");
+        String all = getString(R.string.dorm_filter_all);
+        String[] semesters = buildDisplayArray(all, SEMESTERS_CODES);
+        String[] khoaHoc   = buildDisplayArray(all, KHOAHOC_CODES);
+        String[] nganh     = buildDisplayArray(all, NGANH_CODES);
+
+        btnHocKy.setOnClickListener(v -> showScrollableDialog(getString(R.string.course_chon_hoc_ky), semesters, choice -> {
+            filterSemester = all.equals(choice) ? "" : choice;
+            btnHocKy.setText(all.equals(choice)
+                    ? getString(R.string.course_hoc_ky)
+                    : getString(R.string.course_hoc_ky_prefix, choice));
             applyFilter();
         }));
-        btnKhoaHoc.setOnClickListener(v -> showScrollableDialog("Chọn khóa học", KHOAHOC, choice -> {
-            filterKhoaHoc = "Tất cả".equals(choice) ? "" : choice;
-            btnKhoaHoc.setText("Tất cả".equals(choice) ? "Khóa học ▾" : choice + " ▾");
+        btnKhoaHoc.setOnClickListener(v -> showScrollableDialog(getString(R.string.course_chon_khoa), khoaHoc, choice -> {
+            filterKhoaHoc = all.equals(choice) ? "" : choice;
+            btnKhoaHoc.setText(all.equals(choice)
+                    ? getString(R.string.course_khoa_hoc)
+                    : getString(R.string.course_khoa_prefix, choice));
             applyFilter();
         }));
-        btnNganh.setOnClickListener(v -> showScrollableDialog("Chọn ngành", NGANH, choice -> {
-            filterMajor = "Tất cả".equals(choice) ? "" : choice;
-            btnNganh.setText("Tất cả".equals(choice) ? "Ngành ▾" : "Ngành: " + choice + " ▾");
+        btnNganh.setOnClickListener(v -> showScrollableDialog(getString(R.string.course_chon_nganh), nganh, choice -> {
+            filterMajor = all.equals(choice) ? "" : choice;
+            btnNganh.setText(all.equals(choice)
+                    ? getString(R.string.course_nganh)
+                    : getString(R.string.course_nganh_prefix, choice));
             applyFilter();
         }));
     }
@@ -292,7 +327,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
             tv.setText(c.getName() + " - " + c.getCredits() + " TC");
             layoutKetQuaItems.addView(tv);
         }
-        txtKetQuaTongTinChi.setText("Tổng số tín chỉ đã đăng ký: " + tongTC);
+        txtKetQuaTongTinChi.setText(getString(R.string.course_tong_tc_ket_qua, tongTC));
     }
 
     // ── Dialog dropdown có scroll ─────────────────────────────────────────────
@@ -326,5 +361,13 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         root.addView(scrollView);
         dialog.setContentView(root);
         dialog.show();
+    }
+
+    /** Tạo mảng hiển thị với phần tử đầu tiên là nhãn "Tất cả" / "All" từ string resource. */
+    private String[] buildDisplayArray(String allLabel, String[] codes) {
+        String[] result = new String[codes.length];
+        result[0] = allLabel;
+        System.arraycopy(codes, 1, result, 1, codes.length - 1);
+        return result;
     }
 }
