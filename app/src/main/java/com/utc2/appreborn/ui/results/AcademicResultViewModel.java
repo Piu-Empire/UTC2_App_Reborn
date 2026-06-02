@@ -5,6 +5,7 @@ import android.app.Application;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 
 import com.utc2.appreborn.data.repository.AcademicResultRepository;
 import com.utc2.appreborn.model.AcademicWarning;
@@ -20,14 +21,21 @@ public class AcademicResultViewModel extends AndroidViewModel {
 
     private final AcademicResultRepository repository;
 
+    // Cache semesters — chỉ gọi API 1 lần suốt vòng đời ViewModel
+    private LiveData<List<SemesterResponse>> semestersLiveData;
+
     public AcademicResultViewModel(@NonNull Application application) {
         super(application);
         String token = SessionManager.getInstance(application).getAuthToken();
         repository = new AcademicResultRepository(token);
     }
 
+    /** Trả về cùng 1 LiveData instance — tránh gọi API nhiều lần */
     public LiveData<List<SemesterResponse>> getSemesters() {
-        return repository.getSemesters();
+        if (semestersLiveData == null) {
+            semestersLiveData = repository.getSemesters();
+        }
+        return semestersLiveData;
     }
 
     public LiveData<List<CourseGrade>> getGrades(Long semesterId) {

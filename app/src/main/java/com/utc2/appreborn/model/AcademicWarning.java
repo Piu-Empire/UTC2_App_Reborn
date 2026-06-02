@@ -3,47 +3,40 @@ package com.utc2.appreborn.model;
 /**
  * AcademicWarning - Model cho một cảnh báo học vụ.
  *
- * Fields:
- *  id           - ID cảnh báo
- *  title        - Tiêu đề cảnh báo (VD: "Điểm thi không đạt")
- *  subTitle     - Thông tin phụ (VD: tên môn học)
- *  date         - Ngày cảnh báo (VD: "18/04/2026")
- *  type         - Loại cảnh báo: SERIOUS hoặc NORMAL
- *  iconType     - Loại icon: BOOK hoặc CLOCK
+ * status: ACTIVE (chưa giải quyết) | RESOLVED (đã giải quyết)
  */
 public class AcademicWarning {
 
-    public static final int TYPE_SERIOUS = 1;  // NGHIÊM TRỌNG - nền đỏ
-    public static final int TYPE_NORMAL = 2;   // Cảnh báo thường - nền vàng
+    public static final String STATUS_ACTIVE   = "ACTIVE";
+    public static final String STATUS_RESOLVED = "RESOLVED";
 
-    public static final int ICON_BOOK = 1;
+    public static final int ICON_BOOK  = 1;
     public static final int ICON_CLOCK = 2;
 
-    private int id;
+    private int    id;
     private String title;
     private String subTitle;
     private String date;
-    private int type;
-    private int iconType;
+    private String status;   // "ACTIVE" | "RESOLVED"
+    private int    iconType;
 
     public AcademicWarning(int id, String title, String subTitle,
-                           String date, int type, int iconType) {
-        this.id = id;
-        this.title = title;
+                           String date, String status, int iconType) {
+        this.id       = id;
+        this.title    = title;
         this.subTitle = subTitle;
-        this.date = date;
-        this.type = type;
+        this.date     = date;
+        this.status   = status;
         this.iconType = iconType;
     }
 
-    public int getId() { return id; }
-    public String getTitle() { return title; }
+    public int    getId()       { return id; }
+    public String getTitle()    { return title; }
     public String getSubTitle() { return subTitle; }
-    public String getDate() { return date; }
-    public int getType() { return type; }
-    public int getIconType() { return iconType; }
+    public String getDate()     { return date; }
+    public String getStatus()   { return status; }
+    public int    getIconType() { return iconType; }
 
-    public boolean isSerious() {
-        return type == TYPE_SERIOUS;
-    }
+    public boolean isActive()   { return STATUS_ACTIVE.equals(status); }
+    public boolean isResolved() { return STATUS_RESOLVED.equals(status); }
 }

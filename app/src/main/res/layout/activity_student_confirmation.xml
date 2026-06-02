@@ -151,6 +151,31 @@
         android:textColor="@color/black"
         android:textColorHint="@color/text_hint"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="8dp"
+        android:text="@string/transcript_quantity"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        android:textSize="14sp"/>
+
+    <EditText
+        android:id="@+id/edtQuantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/bg_rounded_white"
+        android:hint="@string/transcript_quantity_hint"
+        android:autofillHints="none"
+        android:padding="12dp"
+        android:textSize="14sp"
+        android:elevation="1dp"
+        android:inputType="number"
+        android:textColor="@color/black"
+        android:textColorHint="@color/text_hint"/>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="0dp"

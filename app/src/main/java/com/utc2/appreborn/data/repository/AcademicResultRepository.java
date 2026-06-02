@@ -222,9 +222,7 @@ public class AcademicResultRepository {
         List<AcademicWarning> result = new ArrayList<>();
         if (raw == null) return result;
         for (AcademicWarningResponse r : raw) {
-            int type = "ACTIVE".equals(r.status)
-                    ? AcademicWarning.TYPE_SERIOUS
-                    : AcademicWarning.TYPE_NORMAL;
+            String status = r.status != null ? r.status : AcademicWarning.STATUS_ACTIVE;
             int icon = "FAILED_EXAM".equals(r.warningType) || "LOW_GPA".equals(r.warningType)
                     ? AcademicWarning.ICON_BOOK
                     : AcademicWarning.ICON_CLOCK;
@@ -233,7 +231,7 @@ public class AcademicResultRepository {
                     mapWarningTitle(r.warningType),
                     r.description,
                     formatDate(r.issuedAt),
-                    type,
+                    status,
                     icon
             ));
         }

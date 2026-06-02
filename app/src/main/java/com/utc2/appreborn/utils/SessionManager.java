@@ -27,6 +27,7 @@ public class SessionManager {
     private static final String KEY_USER_ID      = "user_id";      // USER.user_id (BIGINT)
     private static final String KEY_EMAIL        = "email";         // USER.email
     private static final String KEY_STUDENT_CODE = "student_code"; // STUDENT_PROFILE.student_code (MSSV)
+    private static final String KEY_CLASS_NAME   = "class_name";
     private static final String KEY_FULL_NAME    = "full_name";    // USER_PROFILE.full_name
 
     private static SessionManager instance;
@@ -110,10 +111,19 @@ public class SessionManager {
      * Gọi sau khi đăng nhập thành công và nhận response từ server.
      */
     public void saveProfile(String fullName, String studentCode) {
+        saveProfile(fullName, studentCode, "");
+    }
+
+    public void saveProfile(String fullName, String studentCode, String className) {
         sharedPreferences.edit()
                 .putString(KEY_FULL_NAME,    fullName    != null ? fullName    : "")
                 .putString(KEY_STUDENT_CODE, studentCode != null ? studentCode : "")
+                .putString(KEY_CLASS_NAME,   className   != null ? className   : "")
                 .apply();
+    }
+
+    public String getClassName() {
+        return sharedPreferences.getString(KEY_CLASS_NAME, "");
     }
 
     /** USER_PROFILE.full_name — trả về "" nếu chưa fetch về */

@@ -11,13 +11,11 @@ import androidx.annotation.Nullable;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.card.MaterialCardView;
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.network.ApiClient;
-import com.utc2.appreborn.network.ApiResponse;
-import com.utc2.appreborn.network.EnrollmentApiService;
-import com.utc2.appreborn.network.dto.EnrollmentResponse;
+import com.utc2.appreborn.network.dto.SemesterResponse;
 import com.utc2.appreborn.ui.results.grades.GradesFragment;
 import com.utc2.appreborn.ui.results.leaderboard.LeaderboardFragment;
 import com.utc2.appreborn.ui.results.scholarship.ScholarshipFragment;
@@ -26,10 +24,6 @@ import com.utc2.appreborn.utils.SessionManager;
 
 import java.util.List;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class AcademicResultsFragment extends Fragment {
 
@@ -69,31 +63,47 @@ public class AcademicResultsFragment extends Fragment {
         initViews(view);
         populateStudentCard();
         setupCardNavigation();
+
+        // Bug fix: dùng getSemesters() để lấy GPA thay vì gọi thêm enrollment API
+        AcademicResultViewModel viewModel =
+                new ViewModelProvider(requireActivity()).get(AcademicResultViewModel.class);
+
+        viewModel.getSemesters().observe(getViewLifecycleOwner(), semesters -> {
+            if (semesters == null || semesters.isEmpty()) return;
+            // Tính GPA tích lũy = tổng (gpa * totalCredits) / tổng totalCredits
+            double totalWeighted = 0;
+            int totalCredits = 0;
+            for (SemesterResponse s : semesters) {
+                if (s.gpa != null && s.totalCredits != null && s.totalCredits > 0) {
+                    totalWeighted += s.gpa * s.totalCredits;
+                    totalCredits  += s.totalCredits;
+                }
+            }
+            if (totalCredits > 0) {
+                double gpa = totalWeighted / totalCredits;
+                tvGpa.setText(String.format(Locale.getDefault(), "%.2f", gpa));
+            }
+        });
     }
 
     private void initViews(View view) {
-        tvAvatar = view.findViewById(R.id.tv_avatar);
+        tvAvatar      = view.findViewById(R.id.tv_avatar);
         tvStudentName = view.findViewById(R.id.tv_student_name);
-        tvStudentId = view.findViewById(R.id.tv_student_id);
-        tvMajor = view.findViewById(R.id.tv_major);
-        tvGpa = view.findViewById(R.id.tv_gpa);
+        tvStudentId   = view.findViewById(R.id.tv_student_id);
+        tvMajor       = view.findViewById(R.id.tv_major);
+        tvGpa         = view.findViewById(R.id.tv_gpa);
 
-        cardGrades = view.findViewById(R.id.card_grades);
+        cardGrades      = view.findViewById(R.id.card_grades);
         cardLeaderboard = view.findViewById(R.id.card_leaderboard);
         cardScholarship = view.findViewById(R.id.card_scholarship);
-        cardWarnings = view.findViewById(R.id.card_warnings);
+        cardWarnings    = view.findViewById(R.id.card_warnings);
     }
 
-    /**
-     * Đọc tên + MSSV từ SessionManager cache (fetch 1 lần ở HomeViewModel).
-     * Sau đó gọi enrollment API để tính GPA tích lũy.
-     */
     private void populateStudentCard() {
         SessionManager session = SessionManager.getInstance(requireContext());
         String name = session.getCachedFullName();
         String mssv = session.getStudentCode();
 
-        // Avatar: 2 chữ cái đầu từ 2 từ cuối của tên
         String[] parts = (name != null ? name.trim() : "").split("\\s+");
         String initials = parts.length >= 2
                 ? String.valueOf(parts[parts.length - 2].charAt(0))
@@ -103,56 +113,15 @@ public class AcademicResultsFragment extends Fragment {
         tvAvatar.setText(initials.toUpperCase());
         tvStudentName.setText(name != null ? name : "");
         tvStudentId.setText("MSSV: " + (mssv != null ? mssv : ""));
-        tvMajor.setText("");   // sẽ cập nhật từ enrollment nếu có
-        tvGpa.setText("--");   // placeholder cho đến khi API trả về
-
-        fetchGpa(session.getAuthToken());
-    }
-
-    /**
-     * Gọi enrollment API, tính GPA tích lũy từ gradePoint + credits.
-     */
-    private void fetchGpa(String token) {
-        if (token == null || token.isEmpty()) return;
-
-        EnrollmentApiService api = ApiClient.getInstance(token).create(EnrollmentApiService.class);
-        api.getMyEnrollments().enqueue(new Callback<ApiResponse<List<EnrollmentResponse>>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<List<EnrollmentResponse>>> call,
-                                   Response<ApiResponse<List<EnrollmentResponse>>> response) {
-                if (!isAdded()) return;
-                if (response.isSuccessful() && response.body() != null
-                        && response.body().isSuccess()) {
-                    List<EnrollmentResponse> list = response.body().getData();
-                    if (list == null || list.isEmpty()) return;
-
-                    double totalPoints = 0.0;
-                    int totalCredits = 0;
-                    for (EnrollmentResponse e : list) {
-                        if (e.gradePoint != null && e.credits != null && e.credits > 0) {
-                            totalPoints += e.gradePoint * e.credits;
-                            totalCredits += e.credits;
-                        }
-                    }
-                    if (totalCredits > 0) {
-                        double gpa = totalPoints / totalCredits;
-                        tvGpa.setText(String.format(Locale.getDefault(), "%.2f", gpa));
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<List<EnrollmentResponse>>> call, Throwable t) {
-                // GPA giữ nguyên "--"
-            }
-        });
+        tvMajor.setText("");
+        tvGpa.setText("--");
     }
 
     private void setupCardNavigation() {
-        cardGrades.setOnClickListener(v -> navigateTo(new GradesFragment()));
+        cardGrades.setOnClickListener(v      -> navigateTo(new GradesFragment()));
         cardLeaderboard.setOnClickListener(v -> navigateTo(new LeaderboardFragment()));
         cardScholarship.setOnClickListener(v -> navigateTo(new ScholarshipFragment()));
-        cardWarnings.setOnClickListener(v -> navigateTo(new WarningsFragment()));
+        cardWarnings.setOnClickListener(v    -> navigateTo(new WarningsFragment()));
     }
 
     private void navigateTo(Fragment fragment) {

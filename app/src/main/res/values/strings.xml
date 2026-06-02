@@ -6,7 +6,7 @@
     <!-- ========================= -->
     <string name="app_name">UTC2 App Reborn</string>
     <string name="utc2_subtitle">UTC2 - Phân hiệu TP.HCM</string>
-   
+
     <!-- ========================= -->
     <!-- LOGIN / AUTH -->
     <!-- ========================= -->
@@ -161,6 +161,9 @@
     <string name="label_serious_upper">NGHIÊM TRỌNG</string>
     <string name="label_total_upper">TỔNG CỘNG</string>
     <string name="label_serious">Nghiêm trọng</string>
+    <string name="label_unresolved_upper">CHƯA GIẢI QUYẾT</string>
+    <string name="label_unresolved">Chưa giải quyết</string>
+    <string name="label_resolved">Đã giải quyết</string>
 
     <!-- ========================= -->
     <!-- PROFILE -->

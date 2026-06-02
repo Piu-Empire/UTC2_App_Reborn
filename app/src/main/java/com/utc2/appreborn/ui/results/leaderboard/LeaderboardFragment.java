@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,10 +38,12 @@ public class LeaderboardFragment extends Fragment {
 
     private AcademicResultViewModel viewModel;
 
-    // Danh sách kỳ/năm sẽ load từ API
     private final List<String> periodLabels = new ArrayList<>();
     private final List<SemesterResponse> semesters = new ArrayList<>();
     private String currentPeriod = "Năm học";
+
+    // Bug fix: giữ reference LiveData hiện tại để remove observer trước khi add mới
+    private LiveData<List<LeaderboardEntry>> currentLiveData;
 
     @Nullable
     @Override
@@ -70,7 +73,6 @@ public class LeaderboardFragment extends Fragment {
 
         viewModel = new ViewModelProvider(requireActivity()).get(AcademicResultViewModel.class);
 
-        // Load kỳ học để build filter
         viewModel.getSemesters().observe(getViewLifecycleOwner(), semList -> {
             semesters.clear();
             periodLabels.clear();
@@ -83,7 +85,6 @@ public class LeaderboardFragment extends Fragment {
                 }
             }
             setupPeriodFilter();
-            // Load leaderboard theo năm học mặc định
             loadLeaderboard(null, getCurrentAcademicYear());
         });
     }
@@ -108,14 +109,10 @@ public class LeaderboardFragment extends Fragment {
                         currentPeriod = periodLabels.get(which);
                         tvSelectedPeriod.setText(currentPeriod);
                         if (which == 0) {
-                            // "Năm học" — lấy năm hiện tại
                             loadLeaderboard(null, getCurrentAcademicYear());
                         } else {
-                            // Kỳ học cụ thể — tìm semesterId tương ứng
                             SemesterResponse sem = findSemesterByLabel(currentPeriod);
-                            if (sem != null) {
-                                loadLeaderboard(sem.semesterId, null);
-                            }
+                            if (sem != null) loadLeaderboard(sem.semesterId, null);
                         }
                         dialog.dismiss();
                     })
@@ -131,12 +128,16 @@ public class LeaderboardFragment extends Fragment {
         return null;
     }
 
+    // Bug fix: remove observer cũ trước khi observe LiveData mới
     private void loadLeaderboard(Long semesterId, String academicYear) {
-        viewModel.getLeaderboard(semesterId, academicYear)
-                .observe(getViewLifecycleOwner(), entries -> {
-                    leaderboardAdapter.updateList(entries != null ? entries : new ArrayList<>());
-                    updateMyStats(entries);
-                });
+        if (currentLiveData != null) {
+            currentLiveData.removeObservers(getViewLifecycleOwner());
+        }
+        currentLiveData = viewModel.getLeaderboard(semesterId, academicYear);
+        currentLiveData.observe(getViewLifecycleOwner(), entries -> {
+            leaderboardAdapter.updateList(entries != null ? entries : new ArrayList<>());
+            updateMyStats(entries);
+        });
     }
 
     private void updateMyStats(List<LeaderboardEntry> entries) {

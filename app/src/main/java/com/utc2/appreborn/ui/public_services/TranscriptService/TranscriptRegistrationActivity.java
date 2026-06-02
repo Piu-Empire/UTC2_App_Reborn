@@ -118,7 +118,17 @@ public class TranscriptRegistrationActivity extends AppCompatActivity {
                 return;
             }
 
-            int quantity = Integer.parseInt(quantityStr);
+            int quantity;
+            try {
+                quantity = Integer.parseInt(quantityStr);
+                if (quantity < 1) {
+                    edtQuantity.setError("Số lượng tối thiểu là 1");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                edtQuantity.setError("Số lượng không hợp lệ");
+                return;
+            }
             String token = SessionManager.getInstance(this).getAuthToken();
             PublicServicesApiService servicesApi = ApiClient.getInstance(token).create(PublicServicesApiService.class);
 

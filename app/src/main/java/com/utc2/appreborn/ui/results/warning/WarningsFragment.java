@@ -27,9 +27,9 @@ import java.util.List;
 
 public class WarningsFragment extends Fragment {
 
-    private View     btnBack;
-    private TextView tvCountSerious;
-    private TextView tvCountTotal;
+    private View      btnBack;
+    private TextView  tvCountSerious;   // hiện số chưa giải quyết
+    private TextView  tvCountTotal;
     private ChipGroup chipGroupFilter;
     private RecyclerView recyclerView;
     private WarningAdapter warningAdapter;
@@ -49,9 +49,9 @@ public class WarningsFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        btnBack         = view.findViewById(R.id.btn_back);
-        tvCountSerious  = view.findViewById(R.id.tv_count_serious);
-        tvCountTotal    = view.findViewById(R.id.tv_count_total);
+        btnBack        = view.findViewById(R.id.btn_back);
+        tvCountSerious = view.findViewById(R.id.tv_count_serious);
+        tvCountTotal   = view.findViewById(R.id.tv_count_total);
         chipGroupFilter = view.findViewById(R.id.chip_group_filter);
         recyclerView    = view.findViewById(R.id.recycler_warnings);
 
@@ -103,7 +103,11 @@ public class WarningsFragment extends Fragment {
     private void applyFilter(int chipId) {
         List<AcademicWarning> filtered = new ArrayList<>();
         for (AcademicWarning w : allWarnings) {
-            if (chipId == R.id.chip_all || w.isSerious()) {
+            if (chipId == R.id.chip_all) {
+                filtered.add(w);
+            } else if (chipId == R.id.chip_serious && w.isActive()) {
+                filtered.add(w);
+            } else if (chipId == R.id.chip_resolved && w.isResolved()) {
                 filtered.add(w);
             }
         }
@@ -111,11 +115,11 @@ public class WarningsFragment extends Fragment {
     }
 
     private void updateStatCards() {
-        int serious = 0;
+        int unresolved = 0;
         for (AcademicWarning w : allWarnings) {
-            if (w.isSerious()) serious++;
+            if (w.isActive()) unresolved++;
         }
-        tvCountSerious.setText(String.valueOf(serious));
+        tvCountSerious.setText(String.valueOf(unresolved));
         tvCountTotal.setText(String.valueOf(allWarnings.size()));
     }
 

@@ -203,6 +203,11 @@ public class PublicServiceFragment extends Fragment {
     private void bindHistory(List<ServiceRequestResponse> data) {
         historyList.clear();
 
+        SessionManager session = SessionManager.getInstance(requireContext());
+        String fullName   = session.getFullName();
+        String studentCode = session.getStudentCode();
+        String className   = session.getClassName();
+
         for (ServiceRequestResponse r : data) {
             long submittedMillis = parseIsoToMillis(r.submittedAt);
             String type  = r.serviceType != null ? r.serviceType : "";
@@ -216,7 +221,7 @@ public class PublicServiceFragment extends Fragment {
                             getString(R.string.reissue_card_title),
                             desc, submittedMillis, status,
                             BaseService.TYPE_CARD_REISSUE,
-                            "", "", "");
+                            fullName, studentCode, className);
                     break;
 
                 case BaseService.TYPE_TRANSCRIPT:
@@ -224,7 +229,7 @@ public class PublicServiceFragment extends Fragment {
                             getString(R.string.transcript_registration_title),
                             desc, submittedMillis, status,
                             BaseService.TYPE_TRANSCRIPT,
-                            "", "", "", "", "", "");
+                            fullName, studentCode, className, "", "", "");
                     break;
 
                 case BaseService.TYPE_CONFIRMATION:
@@ -232,7 +237,7 @@ public class PublicServiceFragment extends Fragment {
                             getString(R.string.student_confirmation_title),
                             desc, submittedMillis, status,
                             BaseService.TYPE_CONFIRMATION,
-                            "", "", "");
+                            fullName, studentCode, className);
                     break;
 
                 case BaseService.TYPE_LOAN_SUPPORT:
@@ -240,7 +245,7 @@ public class PublicServiceFragment extends Fragment {
                             getString(R.string.loan_support_title),
                             desc, submittedMillis, status,
                             BaseService.TYPE_LOAN_SUPPORT,
-                            "", "", "");
+                            fullName, studentCode, className);
                     break;
 
                 default:

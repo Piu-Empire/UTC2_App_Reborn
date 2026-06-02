@@ -20,10 +20,8 @@ import java.util.List;
 /**
  * WarningAdapter
  *
- * - NGHIÊM TRỌNG : nền đỏ nhạt + stroke đỏ nhạt + badge ⚠ góc trên phải
- * - Thường        : nền trắng  + stroke xám nhạt, không badge
- *
- * Dùng MaterialCardView (item_warning.xml) để setStrokeColor() hoạt động đúng.
+ * - ACTIVE   (Chưa giải quyết): nền đỏ nhạt + stroke đỏ nhạt
+ * - RESOLVED (Đã giải quyết)  : nền xanh nhạt + stroke xanh nhạt
  */
 public class WarningAdapter extends RecyclerView.Adapter<WarningAdapter.WarningViewHolder> {
 
@@ -57,7 +55,6 @@ public class WarningAdapter extends RecyclerView.Adapter<WarningAdapter.WarningV
         return warningList.size();
     }
 
-    // ─────────────────────────────────────────
     static class WarningViewHolder extends RecyclerView.ViewHolder {
 
         private final MaterialCardView cardRoot;
@@ -86,22 +83,22 @@ public class WarningAdapter extends RecyclerView.Adapter<WarningAdapter.WarningV
                 tvSubTitle.setVisibility(View.GONE);
             }
 
-            if (warning.isSerious()) {
-                // Nền đỏ nhạt + stroke đỏ nhạt + badge hiện
+            if (warning.isActive()) {
+                // Chưa giải quyết: nền đỏ nhạt
                 cardRoot.setCardBackgroundColor(Color.parseColor("#FFEBEE"));
                 cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FFCDD2")));
                 cardRoot.setStrokeWidth(dpToPx(1.5f));
-                ivSeriousBadge.setVisibility(View.VISIBLE);
             } else {
-                // Nền trắng + stroke xám + không badge
-                cardRoot.setCardBackgroundColor(Color.WHITE);
-                cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
+                // Đã giải quyết: nền xanh nhạt
+                cardRoot.setCardBackgroundColor(Color.parseColor("#E8F5E9"));
+                cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#C8E6C9")));
                 cardRoot.setStrokeWidth(dpToPx(1f));
-                ivSeriousBadge.setVisibility(View.GONE);
             }
+
+            // Badge ẩn đi — không còn dùng
+            if (ivSeriousBadge != null) ivSeriousBadge.setVisibility(View.GONE);
         }
 
-        /** Chuyển dp sang px dựa trên displayMetrics của view context */
         private int dpToPx(float dp) {
             float density = itemView.getContext()
                     .getResources().getDisplayMetrics().density;
