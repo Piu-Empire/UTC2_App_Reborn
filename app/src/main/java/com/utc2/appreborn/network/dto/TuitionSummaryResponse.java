@@ -9,8 +9,22 @@ public class TuitionSummaryResponse {
     public String studentId;
     @SerializedName("fullName")
     public String fullName;
+    /**
+     * FIX: Backend trả BigDecimal → dùng String để tránh mất precision.
+     * Dùng helper getTotalDebtAsDouble() khi cần hiển thị số.
+     */
     @SerializedName("totalDebt")
-    public Double totalDebt;
+    public String totalDebt;
     @SerializedName("semesters")
     public List<TuitionResponse> semesters;
+
+    /** Helper: lấy totalDebt dưới dạng double, trả 0.0 nếu null/lỗi. */
+    public double getTotalDebtAsDouble() {
+        if (totalDebt == null || totalDebt.isEmpty()) return 0.0;
+        try {
+            return new java.math.BigDecimal(totalDebt).doubleValue();
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
+    }
 }
