@@ -76,6 +76,13 @@ public class ScheduleDayManager {
         }
 
         scheduleAdapter = new ScheduleAdapter(continuousScheduleList);
+        // mở Bottom Sheet chi tiết khi bấm vào item
+        scheduleAdapter.setOnItemClickListener(item -> {
+            if (fragment != null && fragment.getParentFragmentManager() != null) {
+                ScheduleDetailSheet sheet = ScheduleDetailSheet.newInstance(item);
+                sheet.show(fragment.getParentFragmentManager(), "schedule_detail");
+            }
+        });
         recyclerViewSchedule.setAdapter(scheduleAdapter);
 
         View btnGoToday = rootView.findViewById(R.id.btnGoToday);
@@ -374,6 +381,7 @@ public class ScheduleDayManager {
         item.setEndPeriod(s.getEndPeriod());
         item.setTotalPeriodsStudied(s.getTotalPeriodsStudied());
         item.setStudentCount(s.getStudentCount());
+        item.setScheduleType(s.getScheduleType());
         item.setDisplayDate(DateUtils.clone(d));
         return item;
     }

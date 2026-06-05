@@ -45,5 +45,7 @@ public interface ScheduleApiService {
         public String endDate;
         public String room;
         public String building;
+        /** 1 = Lịch học, 2 = Lịch thi, 3 = Lịch thi lại */
+        public int scheduleType;
     }
 }

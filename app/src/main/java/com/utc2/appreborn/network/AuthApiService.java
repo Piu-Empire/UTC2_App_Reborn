@@ -23,4 +23,12 @@ public interface AuthApiService {
     /** POST /api/v1/auth/logout  (cần Bearer token) */
     @POST("api/v1/auth/logout")
     Call<ApiResponse<Void>> logout(@Header("Authorization") String authHeader);
+
+    /** POST /api/v1/auth/forgot-password → gửi OTP về email */
+    @POST("api/v1/auth/forgot-password")
+    Call<ApiResponse<String>> forgotPassword(@Body ForgotPasswordRequest body);
+
+    /** POST /api/v1/auth/reset-password → đặt lại mật khẩu bằng OTP */
+    @POST("api/v1/auth/reset-password")
+    Call<ApiResponse<String>> resetPassword(@Body ResetPasswordRequest body);
 }

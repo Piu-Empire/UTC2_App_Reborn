@@ -26,6 +26,8 @@ public class ScheduleItem {
     private String semester = "Học kỳ 2 (2025 - 2026)";
     private int studentCount = 89;
     private int remainingPeriods = 12;
+    /** 1 = Lịch học, 2 = Lịch thi, 3 = Lịch thi lại */
+    private int scheduleType = 1;
 
     // khởi tạo thông tin môn học và tính tổng tuần học
     public ScheduleItem(String subjectCode, String subjectName, String type, String lecturer,
@@ -36,7 +38,6 @@ public class ScheduleItem {
         this.subjectName = subjectName;
         this.type = type;
         this.lecturer = lecturer;
-        this.dayOfWeek = dayOfWeek;
         this.startPeriod = startPeriod;
         this.endPeriod = endPeriod;
         this.totalPeriodsStudied = totalPeriodsStudied;
@@ -46,8 +47,13 @@ public class ScheduleItem {
         this.endDate = endDate;
         this.room = room;
         this.building = building;
+
+        // Map dayOfWeek properly: API sends 2 for Monday, we need 0 for Monday
+        int mappedDay = (dayOfWeek == 8 || dayOfWeek == 1) ? 6 : (dayOfWeek - 2);
+        this.dayOfWeek = Math.max(0, mappedDay);
         this.location = (building != null ? building : "") + " - " + (room != null ? room : "");
         this.totalWeeks = computeTotalWeeks();
+        this.scheduleType = 1; // default
     }
 
     // tạo đối tượng rỗng để thiết lập dữ liệu sau này
@@ -212,6 +218,23 @@ public class ScheduleItem {
         this.remainingPeriods = remainingPeriods;
     }
 
+    public int getScheduleType() {
+        return scheduleType;
+    }
+
+    public void setScheduleType(int scheduleType) {
+        this.scheduleType = scheduleType;
+        
+        // Nếu là lịch thi, dayOfWeek phải được tính toán động từ ngày thi thực tế
+        if ((scheduleType == 2 || scheduleType == 3) && this.startDate != null) {
+            Calendar examDate = DateUtils.parseDate(this.startDate);
+            if (examDate != null) {
+                int calDay = examDate.get(Calendar.DAY_OF_WEEK);
+                this.dayOfWeek = (calDay == Calendar.SUNDAY) ? 6 : (calDay - 2);
+            }
+        }
+    }
+
     // tự động cập nhật chuỗi văn bản vị trí lớp học
     private void updateLocation() {
         this.location = (building != null ? building : "") + " - " + (room != null ? room : "");
@@ -276,6 +299,12 @@ public class ScheduleItem {
         Calendar end = DateUtils.parseDate(this.endDate);
         if (start == null || end == null) return true;
         Calendar target = DateUtils.getStartOfDay(date);
+        
+        // Lịch thi/thi lại: diễn ra vào đúng ngày start = end
+        if (this.scheduleType == 2 || this.scheduleType == 3) {
+            return target.equals(DateUtils.getStartOfDay(start));
+        }
+        
         if (target.before(start) || target.after(end)) return false;
         int calDay = target.get(Calendar.DAY_OF_WEEK);
         int mappedDay = (calDay == Calendar.SUNDAY) ? 6 : calDay - 2;
@@ -287,6 +316,17 @@ public class ScheduleItem {
         Calendar itemStart = DateUtils.parseDate(this.startDate);
         Calendar itemEnd = DateUtils.parseDate(this.endDate);
         if (itemStart == null || itemEnd == null) return true;
+
+        // Lịch thi/thi lại: hiển thị nếu ngày thi rơi vào trong tuần
+        if (this.scheduleType == 2 || this.scheduleType == 3) {
+            Calendar startOfWeek = DateUtils.getStartOfDay(weekStart);
+            Calendar endOfWeek = (Calendar) startOfWeek.clone();
+            endOfWeek.add(Calendar.DAY_OF_MONTH, 6);
+            Calendar examDate = DateUtils.getStartOfDay(itemStart);
+            return !examDate.before(startOfWeek) && !examDate.after(endOfWeek);
+        }
+
+        // Lịch học thường: kiểm tra ngày học cụ thể trong tuần có nằm trong khoảng thời gian không
         Calendar exactClassDate = (Calendar) weekStart.clone();
         exactClassDate.add(Calendar.DAY_OF_MONTH, this.dayOfWeek);
         exactClassDate = DateUtils.getStartOfDay(exactClassDate);

@@ -108,7 +108,7 @@ public class ScheduleRepository {
         List<ScheduleItem> result = new ArrayList<>();
         if (raw == null) return result;
         for (ScheduleApiService.ScheduleItemResponse r : raw) {
-            result.add(new ScheduleItem(
+            ScheduleItem item = new ScheduleItem(
                     r.subjectCode,
                     r.subjectName,
                     r.type,
@@ -123,7 +123,9 @@ public class ScheduleRepository {
                     r.endDate,
                     r.room,
                     r.building
-            ));
+            );
+            item.setScheduleType(r.scheduleType > 0 ? r.scheduleType : 1);
+            result.add(item);
         }
         return result;
     }
