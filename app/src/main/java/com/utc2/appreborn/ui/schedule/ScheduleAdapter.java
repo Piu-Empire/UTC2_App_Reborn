@@ -8,6 +8,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -23,13 +24,23 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private static final int TYPE_SUBJECT_ITEM = 2;
     private static final int TYPE_EMPTY = 3;
 
+    public interface OnItemClickListener {
+        void onItemClick(ScheduleItem item);
+    }
+
     private List<ScheduleItem> scheduleList;
     private static final String TAG_ANIMATED = "animated";
     private boolean animationEnabled = true;
+    private OnItemClickListener onItemClickListener;
 
     // khởi tạo bộ chuyển đổi với danh sách dữ liệu lịch
     public ScheduleAdapter(List<ScheduleItem> scheduleList) {
         this.scheduleList = scheduleList;
+    }
+
+    // gán listener xử lý sự kiện bấm item
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.onItemClickListener = listener;
     }
 
     // phân loại các kiểu hiển thị dựa trên mã môn học
@@ -105,6 +116,13 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 sHolder.tvEndPeriod.setText("-");
                 sHolder.tvSubjectName.setText(ScheduleLanguage.Label.noClass(context));
                 sHolder.itemView.findViewById(R.id.layoutContent).setAlpha(0.4f);
+
+                // Reset màu viền về mặc định cho ô trống
+                if (sHolder.cardView != null) {
+                    sHolder.cardView.setStrokeColor(ContextCompat.getColor(context, R.color.schedule_study_stroke));
+                }
+                sHolder.itemView.setOnClickListener(null);
+
             } else {
                 sHolder.itemView.findViewById(R.id.layoutContent).setAlpha(1.0f);
                 sHolder.tvStartTime.setText(schedule.getStartTime() != null ? schedule.getStartTime() : "00:00");
@@ -121,13 +139,57 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 String endD = schedule.getEndDate() != null ? schedule.getEndDate() : "06/06/2026";
                 sHolder.tvDateRange.setText(startD + " — " + endD);
                 sHolder.tvStudentCount.setText(String.valueOf(schedule.getStudentCount() > 0 ? schedule.getStudentCount() : 89));
-                sHolder.tvRemainingPeriods.setText(
-                        ScheduleLanguage.Format.remainingPeriods(
-                                context,
-                                schedule.getRemainingPeriods(schedule.getDisplayDate())
-                        )
-                );
+                if (schedule.getScheduleType() == 2) {
+                    sHolder.tvRemainingPeriods.setText("Thi");
+                } else if (schedule.getScheduleType() == 3) {
+                    sHolder.tvRemainingPeriods.setText("Thi lại");
+                } else {
+                    sHolder.tvRemainingPeriods.setText(
+                            ScheduleLanguage.Format.remainingPeriods(
+                                    context,
+                                    schedule.getRemainingPeriods(schedule.getDisplayDate())
+                            )
+                    );
+                }
+
+                // Áp màu viền theo loại lịch
+                applyTypeColor(sHolder, context, schedule.getScheduleType());
+
+                // Click listener mở Bottom Sheet chi tiết
+                sHolder.itemView.setOnClickListener(v -> {
+                    if (onItemClickListener != null) {
+                        onItemClickListener.onItemClick(schedule);
+                    }
+                });
             }
+        }
+    }
+
+    // đổi màu viền card và indicator thời gian theo loại lịch
+    private void applyTypeColor(ScheduleViewHolder h, android.content.Context ctx, int scheduleType) {
+        int strokeColorRes;
+        int timeIndicatorColorRes;
+
+        switch (scheduleType) {
+            case 2: // Lịch thi
+                strokeColorRes        = R.color.schedule_exam_stroke;
+                timeIndicatorColorRes = R.color.schedule_exam;
+                break;
+            case 3: // Lịch thi lại
+                strokeColorRes        = R.color.schedule_reexam_stroke;
+                timeIndicatorColorRes = R.color.schedule_reexam;
+                break;
+            default: // Lịch học
+                strokeColorRes        = R.color.schedule_study_stroke;
+                timeIndicatorColorRes = R.color.indicator_time_line;
+                break;
+        }
+
+        if (h.cardView != null) {
+            h.cardView.setStrokeColor(ContextCompat.getColor(ctx, strokeColorRes));
+        }
+        if (h.viewTimeIndicator != null) {
+            h.viewTimeIndicator.setBackgroundColor(ContextCompat.getColor(ctx, timeIndicatorColorRes));
         }
     }
 
@@ -191,6 +253,8 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView tvStartTime, tvEndTime, tvStartPeriod, tvEndPeriod;
         TextView tvClassName, tvSemester, tvSubjectName, tvLecturer;
         TextView tvLocation, tvDateRange, tvStudentCount, tvRemainingPeriods;
+        com.google.android.material.card.MaterialCardView cardView;
+        View viewTimeIndicator;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -206,6 +270,11 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             tvDateRange = itemView.findViewById(R.id.tvDateRange);
             tvStudentCount = itemView.findViewById(R.id.tvStudentCount);
             tvRemainingPeriods = itemView.findViewById(R.id.tvRemainingPeriods);
+            // root item_schedule là MaterialCardView
+            if (itemView instanceof com.google.android.material.card.MaterialCardView) {
+                cardView = (com.google.android.material.card.MaterialCardView) itemView;
+            }
+            viewTimeIndicator = itemView.findViewById(R.id.viewTimeIndicator);
         }
     }
 }

@@ -77,15 +77,40 @@ public class ScheduleCanvasView extends ViewGroup {
             if (tvSubjectName != null) tvSubjectName.setText(item.getSubjectName());
             if (tvLecturer != null)
                 tvLecturer.setText(ScheduleLanguage.Format.lecturer(getContext(), item.getLecturer()));
-            if (tvLocation != null)
-                tvLocation.setText(item.getRoom() != null ? item.getRoom() : "P104C2");
+            if (tvLocation != null) {
+                String roomText = item.getRoom() != null ? item.getRoom() : "P104C2";
+                if (item.getScheduleType() == 2) {
+                    roomText += " (Thi)";
+                } else if (item.getScheduleType() == 3) {
+                    roomText += " (Thi lại)";
+                }
+                tvLocation.setText(roomText);
+            }
             if (tvDateRange != null)
                 tvDateRange.setText(ScheduleLanguage.Format.dateRangeShort(item.getStartDate(), item.getEndDate()));
             if (tvStudentCount != null)
                 tvStudentCount.setText(String.valueOf(item.getStudentCount() > 0 ? item.getStudentCount() : 89));
             if (tvRemainingPeriods != null) {
-                Calendar date = (viewDate != null) ? viewDate : Calendar.getInstance();
-                tvRemainingPeriods.setText(ScheduleLanguage.Format.remainingPeriodsShort(getContext(), item.getRemainingPeriods(date)));
+                if (item.getScheduleType() == 2) {
+                    tvRemainingPeriods.setText("THI");
+                } else if (item.getScheduleType() == 3) {
+                    tvRemainingPeriods.setText("THI LẠI");
+                } else {
+                    Calendar date = (viewDate != null) ? viewDate : Calendar.getInstance();
+                    tvRemainingPeriods.setText(ScheduleLanguage.Format.remainingPeriodsShort(getContext(), item.getRemainingPeriods(date)));
+                }
+            }
+            
+            // Đổi màu thẻ theo loại lịch
+            if (childView instanceof com.google.android.material.card.MaterialCardView) {
+                com.google.android.material.card.MaterialCardView card = (com.google.android.material.card.MaterialCardView) childView;
+                if (item.getScheduleType() == 2) {
+                    card.setStrokeColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.schedule_exam_stroke));
+                    card.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.schedule_exam_badge_bg));
+                } else if (item.getScheduleType() == 3) {
+                    card.setStrokeColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.schedule_reexam_stroke));
+                    card.setCardBackgroundColor(androidx.core.content.ContextCompat.getColor(getContext(), R.color.schedule_reexam_badge_bg));
+                }
             }
             childView.setTag(item);
             addView(childView);

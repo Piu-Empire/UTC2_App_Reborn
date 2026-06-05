@@ -5,6 +5,9 @@
     <!-- Quyền truy cập Internet -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    
+    <!-- Quyền lưu trữ (xuất ảnh Lịch) -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
     <!-- Queries giúp app tương tác với các ứng dụng khác (trình duyệt, app Google) -->
     <queries>
