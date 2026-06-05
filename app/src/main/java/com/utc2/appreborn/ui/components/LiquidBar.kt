@@ -46,19 +46,19 @@ private data class NavDimensions(
 
 @Composable
 private fun rememberNavDimensions(maxWidth: Dp): NavDimensions {
-    // Tự động điều chỉnh kích thước để tương thích nhiều màn hình
+    // Giữ tỷ lệ tĩnh 1.0f để không bị phình to khi xoay ngang
     return remember(maxWidth) {
-        val scaleFactor = (maxWidth.value / 360f).coerceIn(0.8f, 1.4f)
-        val barH = (56 * scaleFactor).dp
+        val scaleFactor = 1.0f
+        val barH = 56.dp
 
         NavDimensions(
             barHeight = barH,
-            containerHeight = (85 * scaleFactor).dp,
-            ballSize = (48 * scaleFactor).dp,
-            ballRadius = ((48 * scaleFactor) / 2).dp,
-            iconActiveSize = (22 * scaleFactor).dp,
-            iconNormalSize = (18 * scaleFactor).dp,
-            labelSizeSp = (8 * scaleFactor),
+            containerHeight = 80.dp, // Khớp với 80dp trong activity_main.xml
+            ballSize = 48.dp,
+            ballRadius = 24.dp,
+            iconActiveSize = 22.dp,
+            iconNormalSize = 18.dp,
+            labelSizeSp = 10f,
             dipDepth = (barH.value * 0.55f).dp,
             scaleFactor = scaleFactor
         )
