@@ -161,11 +161,26 @@
                 </LinearLayout>
 
                 <!-- Danh sách học phần -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvCourses"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:nestedScrollingEnabled="false"/>
+                    android:minHeight="200dp">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rvCourses"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"/>
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="32dp"
+                        android:indeterminateTint="#FFC107"
+                        android:visibility="gone"/>
+                </FrameLayout>
 
                 <!-- Khung "Đã chọn" -->
                 <LinearLayout

@@ -12,6 +12,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -52,6 +53,8 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     // Danh sách semesterId chưa đóng — dùng để gọi pay() sau khi xác nhận QR
     private final List<Long> unpaidSemesterIds = new ArrayList<>();
 
+    private ProgressBar progressBar;
+
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
@@ -75,6 +78,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         rvItems = findViewById(R.id.rvItems);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
         btnPay = findViewById(R.id.btnPay);
+        progressBar = findViewById(R.id.progressBar);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnPay.setOnClickListener(v -> {
@@ -104,6 +108,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     }
 
     private void loadData() {
+        if (progressBar != null) progressBar.setVisibility(android.view.View.VISIBLE);
         String token = SessionManager.getInstance(this).getAuthToken();
         tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
 
@@ -111,6 +116,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ApiResponse<TuitionSummaryResponse>> call,
                                    Response<ApiResponse<TuitionSummaryResponse>> response) {
+                if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                 if (response.isSuccessful() && response.body() != null
                         && response.body().isSuccess()) {
                     TuitionSummaryResponse summary = response.body().getData();
@@ -150,6 +156,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<TuitionSummaryResponse>> call, Throwable t) {
+                if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
                 Toast.makeText(SubjectTuitionActivity.this,
                         "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
