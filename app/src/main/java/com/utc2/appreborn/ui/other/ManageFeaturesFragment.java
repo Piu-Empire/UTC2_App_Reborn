@@ -73,7 +73,7 @@ public class ManageFeaturesFragment extends Fragment {
                 pendingListener.onFavoritesChanged(new ArrayList<>(activeFavorites));
                 pendingListener = null;
             }
-            Toast.makeText(requireContext(), "Đã lưu mục thường dùng", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Đã lưu mục thường dùng");
             popBack();
         });
     }

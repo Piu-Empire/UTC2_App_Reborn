@@ -57,9 +57,7 @@ public class AssessmentFragment extends Fragment {
                 } catch (SecurityException ignored) {}
                 viewModel.addEvidenceUri(pendingEvidenceCriteriaId, uri.toString());
                 adapter.notifyEvidenceUpdated(pendingEvidenceCriteriaId);
-                Toast.makeText(requireContext(),
-                        R.string.assessment_toast_evidence_attached,
-                        Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), R.string.assessment_toast_evidence_attached);
                 pendingEvidenceCriteriaId = -1;
             });
 
@@ -139,9 +137,7 @@ public class AssessmentFragment extends Fragment {
                     public void onRemoveEvidence(int criteriaId, int fileIndex) {
                         viewModel.removeEvidenceUri(criteriaId, fileIndex);
                         adapter.notifyEvidenceUpdated(criteriaId);
-                        Toast.makeText(requireContext(),
-                                R.string.assessment_toast_evidence_removed,
-                                Toast.LENGTH_SHORT).show();
+                        com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), R.string.assessment_toast_evidence_removed);
                     }
                 });
         binding.rvCriteria.setLayoutManager(new LinearLayoutManager(requireContext()));

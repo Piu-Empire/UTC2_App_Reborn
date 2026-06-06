@@ -88,7 +88,7 @@ public class CardReissueActivity extends AppCompatActivity {
 
         btnConfirm.setOnClickListener(v -> {
             if (!NetworkUtils.isNetworkAvailable(this)) {
-                Toast.makeText(this, "Không có mạng, không thể gửi đơn đăng ký!", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Không có mạng, không thể gửi đơn đăng ký!");
                 return;
             }
 
@@ -105,20 +105,16 @@ public class CardReissueActivity extends AppCompatActivity {
                                                Response<ApiResponse<ServiceRequestResponse>> response) {
                             if (response.isSuccessful() && response.body() != null
                                     && response.body().isSuccess()) {
-                                Toast.makeText(CardReissueActivity.this,
-                                        getString(R.string.cardReissue_registration_success),
-                                        Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(CardReissueActivity.this, getString(R.string.cardReissue_registration_success));
                                 finish();
                             } else {
-                                Toast.makeText(CardReissueActivity.this,
-                                        "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(CardReissueActivity.this, "Gửi thất bại, thử lại sau.");
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
-                            Toast.makeText(CardReissueActivity.this,
-                                    "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(CardReissueActivity.this, "Lỗi kết nối: " + t.getMessage());
                         }
                     });
         });

@@ -244,13 +244,13 @@ public class DormitoryActivity extends AppCompatActivity {
         try {
             roomId = Long.parseLong(room.getId());
         } catch (NumberFormatException e) {
-            Toast.makeText(this, getString(R.string.dorm_id_invalid), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_id_invalid));
             return;
         }
         dormRepo.registerRoom(roomId, userId, 8, (reg, error) -> {
             if (error != null) {
                 Log.w(TAG, "DormitoryException: " + error.getMessage());
-                Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, error.getMessage());
                 return;
             }
             currentRegId = reg.registrationId;
@@ -263,7 +263,7 @@ public class DormitoryActivity extends AppCompatActivity {
                         room.getRoomType().getLabel()));
             txtTotal.setText(getString(R.string.dorm_tong_tien,
                     String.format("%,d", reg.totalPrice)));
-            Toast.makeText(this, getString(R.string.dorm_register_success), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_register_success));
             Log.d(TAG, "handleRegisterClick() done – roomId: " + room.getId());
         });
     }
@@ -275,12 +275,12 @@ public class DormitoryActivity extends AppCompatActivity {
             dormRepo.cancelRegistration(currentRegId, error -> {
                 if (error != null) {
                     Log.w(TAG, "Cancel error: " + error.getMessage());
-                    Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(this, error.getMessage());
                     return;
                 }
                 currentRegId = -1;
                 layoutSelected.setVisibility(View.GONE);
-                Toast.makeText(this, getString(R.string.dorm_cancel_success), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_cancel_success));
                 Log.d(TAG, "handleCancelClick() done.");
             });
         });
@@ -427,15 +427,15 @@ public class DormitoryActivity extends AppCompatActivity {
     private void handleLookupSearch() {
         // Validate: BẮT BUỘC phải chọn đủ cả 2
         if (selectedRoomId == null && selectedBuilding == null) {
-            Toast.makeText(this, getString(R.string.dorm_select_both), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_select_both));
             return;
         }
         if (selectedRoomId == null) {
-            Toast.makeText(this, getString(R.string.dorm_select_room), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_select_room));
             return;
         }
         if (selectedBuilding == null) {
-            Toast.makeText(this, getString(R.string.dorm_select_building), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_select_building));
             return;
         }
 
@@ -444,9 +444,7 @@ public class DormitoryActivity extends AppCompatActivity {
             RoomDetail detail = lookupRepo.findById(selectedRoomId);
             String roomBuilding = detail.getRoom().getBuilding(); // "A", "B", "C"
             if (!roomBuilding.equalsIgnoreCase(selectedBuilding)) {
-                Toast.makeText(this,
-                        getString(R.string.dorm_wrong_building, selectedBuilding),
-                        Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_wrong_building, selectedBuilding));
                 cardRoomInfo.setVisibility(View.GONE);
                 cardOccupants.setVisibility(View.GONE);
                 return;
@@ -456,13 +454,13 @@ public class DormitoryActivity extends AppCompatActivity {
 
         } catch (DormitoryException e) {
             Log.w(TAG, "DormitoryException: " + e.getMessage());
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, e.getMessage());
             cardRoomInfo.setVisibility(View.GONE);
             cardOccupants.setVisibility(View.GONE);
 
         } catch (Exception e) {
             Log.e(TAG, "Unexpected error khi tra phòng", e);
-            Toast.makeText(this, getString(R.string.dorm_unknown_error), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.dorm_unknown_error));
 
         } finally {
             Log.d(TAG, "handleLookupSearch() done");

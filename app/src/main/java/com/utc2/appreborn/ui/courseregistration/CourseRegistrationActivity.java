@@ -196,16 +196,16 @@ public class CourseRegistrationActivity extends AppCompatActivity {
 
     private void handleRegisterClick(Course course) {
         if (confirmedIds.contains(course.getId())) {
-            Toast.makeText(this, getString(R.string.course_confirmed), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.course_confirmed));
             return;
         }
         try {
             courseRepo.registerCourse(course.getId());
             updateSelectedPanel();
             refreshAdapterPending();
-            Toast.makeText(this, getString(R.string.course_added, course.getName()), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.course_added, course.getName()));
         } catch (CourseException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, e.getMessage());
         }
     }
 
@@ -236,7 +236,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
         btnConfirm.setOnClickListener(v -> {
             Map<String, CourseRegistration> pending = courseRepo.getRegistrations();
             if (pending.isEmpty()) {
-                Toast.makeText(this, getString(R.string.course_gio_trong), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.course_gio_trong));
                 return;
             }
             for (String id : pending.keySet()) {
@@ -246,7 +246,7 @@ public class CourseRegistrationActivity extends AppCompatActivity {
             courseRepo.clearPendingRegistrations();
             layoutSelected.setVisibility(View.GONE);
             courseAdapter.setRegisteredIds(new ArrayList<>(confirmedIds));
-            Toast.makeText(this, getString(R.string.course_xac_nhan_success), Toast.LENGTH_LONG).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.course_xac_nhan_success));
         });
     }
 

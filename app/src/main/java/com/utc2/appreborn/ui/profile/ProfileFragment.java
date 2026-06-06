@@ -99,7 +99,7 @@ public class ProfileFragment extends Fragment {
 
     private void showToast(String msg) {
         if (isAdded()) {
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), msg);
         }
     }
 }

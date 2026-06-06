@@ -65,8 +65,7 @@ public class InvoiceActivity extends AppCompatActivity {
         networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
             @Override public void onNetworkAvailable() {}
             @Override public void onNetworkLost() {
-                Toast.makeText(InvoiceActivity.this,
-                        "Mất kết nối mạng!", Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(InvoiceActivity.this, "Mất kết nối mạng!");
             }
         });
         networkUtils.register();

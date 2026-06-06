@@ -76,14 +76,14 @@ public class InfoFragment extends Fragment {
                         && response.body().isSuccess()) {
                     bindProfile(response.body().getData());
                 } else {
-                    Toast.makeText(getContext(), "Không tải được thông tin", Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(getContext(), "Không tải được thông tin");
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<ProfileResponse>> call, Throwable t) {
                 if (!isAdded()) return;
-                Toast.makeText(getContext(), "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(getContext(), "Lỗi kết nối: " + t.getMessage());
             }
         });
     }

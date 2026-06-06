@@ -171,8 +171,7 @@ public class QrFragment extends Fragment {
         if (qr != null) {
             binding.ivQrCode.setImageBitmap(qr);
         } else {
-            Toast.makeText(requireContext(),
-                    "Không thể tạo mã QR", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Không thể tạo mã QR");
         }
     }
 
@@ -251,8 +250,7 @@ public class QrFragment extends Fragment {
                 requireContext().getSystemService(Context.CLIPBOARD_SERVICE);
         if (cm != null) {
             cm.setPrimaryClip(ClipData.newPlainText("MSSV", studentCode));
-            Toast.makeText(requireContext(),
-                    "Đã sao chép: " + studentCode, Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Đã sao chép: " + studentCode);
         }
     }
 
@@ -267,17 +265,16 @@ public class QrFragment extends Fragment {
         Uri uri = requireContext().getContentResolver()
                 .insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
         if (uri == null) {
-            Toast.makeText(requireContext(), "Lưu thất bại", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Lưu thất bại");
             return;
         }
         try (OutputStream out =
                      requireContext().getContentResolver().openOutputStream(uri)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-            Toast.makeText(requireContext(),
-                    "Đã lưu ảnh QR vào thư viện", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Đã lưu ảnh QR vào thư viện");
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(requireContext(), "Lỗi khi lưu ảnh", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Lỗi khi lưu ảnh");
         }
     }
 
@@ -308,7 +305,7 @@ public class QrFragment extends Fragment {
             startActivity(Intent.createChooser(intent, "Chia sẻ mã QR"));
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(requireContext(), "Lỗi khi chia sẻ", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Lỗi khi chia sẻ");
         }
     }
 }

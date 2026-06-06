@@ -20,6 +20,11 @@ import com.utc2.appreborn.ui.results.AcademicResultsFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
 import com.utc2.appreborn.utils.LocaleHelper;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import com.utc2.appreborn.utils.FcmPermissionHelper;
+import com.utc2.appreborn.utils.SessionManager;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final String TAG_HOME     = "tag_home";
@@ -29,6 +34,15 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG_PROFILE  = "tag_profile";
     public static final String TAG_RESULT   = "tag_result";
     public static final String TAG_REGISTER = "tag_register";
+
+    private final ActivityResultLauncher<String> fcmPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                if (isGranted) {
+                    FcmPermissionHelper.registerToken(this);
+                } else {
+                    // Xử lý khi user từ chối
+                }
+            });
 
     // ── Áp locale trước khi Activity inflate layout ───────────
     @Override
@@ -46,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setupLiquidBar();
+
+        if (SessionManager.getInstance(this).isLoggedIn()) {
+            FcmPermissionHelper.requestIfNeeded(this, fcmPermissionLauncher);
+        }
     }
 
     // ─────────────────────────────────────────────────────────

@@ -78,7 +78,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
             if (NetworkUtils.isNetworkAvailable(this)) {
                 showPaymentDialog();
             } else {
-                Toast.makeText(this, "Cần kết nối mạng để tạo mã QR thanh toán!", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Cần kết nối mạng để tạo mã QR thanh toán!");
             }
         });
     }
@@ -92,9 +92,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
             @Override
             public void onNetworkLost() {
-                Toast.makeText(DormitoryTuitionActivity.this,
-                        "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.",
-                        Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.");
             }
         });
         networkUtils.register();
@@ -145,15 +143,13 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                     calculateTotal();
                     setupRecyclerView();
                 } else {
-                    Toast.makeText(DormitoryTuitionActivity.this,
-                            "Không tải được dữ liệu KTX", Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, "Không tải được dữ liệu KTX");
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<List<DormRegistrationResponse>>> call, Throwable t) {
-                Toast.makeText(DormitoryTuitionActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, "Lỗi kết nối: " + t.getMessage());
             }
         });
     }
@@ -211,7 +207,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                 return;
             }
             btnConfirm.setEnabled(false);
-            Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.msg_checking_transaction));
 
             // Gọi POST /api/v1/dormitory/pay/{dormRegId}
             dormApi.pay(unpaidDormRegId).enqueue(new Callback<ApiResponse<DormRegistrationResponse>>() {
@@ -220,12 +216,10 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                                        Response<ApiResponse<DormRegistrationResponse>> response) {
                     if (dialog.isShowing()) dialog.dismiss();
                     if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        Toast.makeText(DormitoryTuitionActivity.this,
-                                getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+                        com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, getString(R.string.msg_payment_success));
                         loadDormData(); // reload lại
                     } else {
-                        Toast.makeText(DormitoryTuitionActivity.this,
-                                "Lỗi xác nhận thanh toán KTX", Toast.LENGTH_SHORT).show();
+                        com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, "Lỗi xác nhận thanh toán KTX");
                         btnConfirm.setEnabled(true);
                     }
                 }
@@ -233,8 +227,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ApiResponse<DormRegistrationResponse>> call, Throwable t) {
                     if (dialog.isShowing()) dialog.dismiss();
-                    Toast.makeText(DormitoryTuitionActivity.this,
-                            "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(DormitoryTuitionActivity.this, "Lỗi kết nối: " + t.getMessage());
                     btnConfirm.setEnabled(true);
                 }
             });

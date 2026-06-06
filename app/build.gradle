@@ -1,7 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
-    // 🗑️ Đã xóa plugin google-services để bỏ Firebase hoàn toàn
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -61,6 +61,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-messaging'
 
     // 🔑 THAY THẾ FIREBASE BẰNG GOOGLE SIGN-IN & GMAIL API
     implementation 'com.google.android.gms:play-services-auth:21.0.0'

@@ -67,7 +67,7 @@ public class TuitionFragment extends Fragment {
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             startActivity(new Intent(requireContext(), targetActivity));
         } else {
-            Toast.makeText(requireContext(), "Vui lòng kết nối mạng để xem thông tin học phí!", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Vui lòng kết nối mạng để xem thông tin học phí!");
         }
     }
 }

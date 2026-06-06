@@ -19,6 +19,7 @@ import android.widget.Toast;
 import androidx.core.content.ContextCompat;
 
 import com.utc2.appreborn.R;
+import com.utc2.appreborn.utils.CustomToastHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -34,7 +35,7 @@ public class ScheduleExportHelper {
 
         if (weekContainer == null || timeColumn == null || weekContentLayout == null ||
             weekContainer.getWidth() == 0 || weekContainer.getHeight() == 0) {
-            Toast.makeText(activity, "Không thể tải lịch: Giao diện chưa sẵn sàng", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(activity, "Không thể tải lịch: Giao diện chưa sẵn sàng");
             return;
         }
 
@@ -107,7 +108,7 @@ public class ScheduleExportHelper {
 
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(activity, "Đã xảy ra lỗi khi tải ảnh!", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(activity, "Đã xảy ra lỗi khi tải ảnh!");
         }
     }
 
@@ -138,13 +139,13 @@ public class ScheduleExportHelper {
                 bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.flush();
                 fos.close();
-                Toast.makeText(context, "Đã lưu ảnh Lịch học thành công vào Thư viện!", Toast.LENGTH_LONG).show();
+                CustomToastHelper.showSuccessToast((Activity) context, "Đã lưu ảnh Lịch học thành công vào Thư viện!");
             } else {
-                Toast.makeText(context, "Không thể lưu ảnh (chưa cấp quyền hoặc lỗi bộ nhớ)", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(context, "Không thể lưu ảnh (chưa cấp quyền hoặc lỗi bộ nhớ)");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Lỗi khi lưu hình ảnh: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(context, "Lỗi khi lưu hình ảnh: " + e.getMessage());
         }
     }
 }

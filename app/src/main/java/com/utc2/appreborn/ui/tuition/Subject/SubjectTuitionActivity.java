@@ -85,7 +85,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
             if (NetworkUtils.isNetworkAvailable(this)) {
                 showPaymentDialog();
             } else {
-                Toast.makeText(this, "Vui lòng kết nối mạng để tạo mã thanh toán!", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Vui lòng kết nối mạng để tạo mã thanh toán!");
             }
         });
     }
@@ -99,9 +99,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
             @Override
             public void onNetworkLost() {
-                Toast.makeText(SubjectTuitionActivity.this,
-                        "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.",
-                        Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectTuitionActivity.this, "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.");
             }
         });
         networkUtils.register();
@@ -149,16 +147,14 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                     calculateTotal();
                     setupRecyclerView();
                 } else {
-                    Toast.makeText(SubjectTuitionActivity.this,
-                            "Không tải được học phí", Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectTuitionActivity.this, "Không tải được học phí");
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<TuitionSummaryResponse>> call, Throwable t) {
                 if (progressBar != null) progressBar.setVisibility(android.view.View.GONE);
-                Toast.makeText(SubjectTuitionActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectTuitionActivity.this, "Lỗi kết nối: " + t.getMessage());
             }
         });
     }
@@ -209,7 +205,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
         btnConfirm.setOnClickListener(v -> {
             btnConfirm.setEnabled(false);
-            Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.msg_checking_transaction));
             // Gọi pay API cho từng kỳ chưa đóng
             confirmPaymentToServer(dialog);
         });
@@ -231,7 +227,7 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         if (index >= ids.size()) {
             // Tất cả kỳ đã gọi pay xong
             if (dialog.isShowing()) dialog.dismiss();
-            Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, getString(R.string.msg_payment_success));
             // Reload lại data
             loadData();
             return;
@@ -246,16 +242,14 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                     callPayRecursive(dialog, ids, index + 1);
                 } else {
                     if (dialog.isShowing()) dialog.dismiss();
-                    Toast.makeText(SubjectTuitionActivity.this,
-                            "Lỗi xác nhận thanh toán kỳ " + semId, Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectTuitionActivity.this, "Lỗi xác nhận thanh toán kỳ " + semId);
                 }
             }
 
             @Override
             public void onFailure(Call<ApiResponse<TuitionResponse>> call, Throwable t) {
                 if (dialog.isShowing()) dialog.dismiss();
-                Toast.makeText(SubjectTuitionActivity.this,
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectTuitionActivity.this, "Lỗi kết nối: " + t.getMessage());
             }
         });
     }
