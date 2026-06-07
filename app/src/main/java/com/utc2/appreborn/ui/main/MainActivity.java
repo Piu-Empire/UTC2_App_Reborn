@@ -18,6 +18,8 @@ import com.utc2.appreborn.ui.public_services.PublicServiceFragment;
 import com.utc2.appreborn.ui.schedule.ScheduleFragment;
 import com.utc2.appreborn.ui.results.AcademicResultsFragment;
 import com.utc2.appreborn.ui.tuition.TuitionFragment;
+import com.utc2.appreborn.ui.aichat.AiChatFragment;
+import com.utc2.appreborn.ui.components.FloatingAiButtonKt;
 import com.utc2.appreborn.utils.LocaleHelper;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -34,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
     public static final String TAG_PROFILE  = "tag_profile";
     public static final String TAG_RESULT   = "tag_result";
     public static final String TAG_REGISTER = "tag_register";
+    public static final String TAG_AI_CHAT  = "tag_ai_chat";
+
+    private com.utc2.appreborn.ui.components.LiquidBarController liquidBarController;
 
     private final ActivityResultLauncher<String> fcmPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         setupLiquidBar();
+        setupFloatingAiButton();
 
         if (SessionManager.getInstance(this).isLoggedIn()) {
             FcmPermissionHelper.requestIfNeeded(this, fcmPermissionLauncher);
@@ -72,9 +78,29 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupLiquidBar() {
         ComposeView bottomBarCompose = findViewById(R.id.bottom_bar_compose);
-        LiquidBarKt.setupLiquidBottomBar(bottomBarCompose, navId -> {
+        liquidBarController = LiquidBarKt.setupLiquidBottomBar(bottomBarCompose, navId -> {
+            if (liquidBarController != null) {
+                liquidBarController.setSelectedId(navId);
+            }
             handleBottomNavSelection(navId);
             return null;
+        });
+    }
+
+    private void setupFloatingAiButton() {
+        ComposeView floatingAiCompose = findViewById(R.id.floating_ai_compose);
+        FloatingAiButtonKt.setupFloatingAiButton(floatingAiCompose, () -> {
+            pushFragment(new AiChatFragment(), TAG_AI_CHAT);
+            return null; // For Kotlin Unit
+        });
+
+        getSupportFragmentManager().addOnBackStackChangedListener(() -> {
+            androidx.fragment.app.Fragment currentFragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (currentFragment instanceof AiChatFragment) {
+                floatingAiCompose.setVisibility(android.view.View.GONE);
+            } else {
+                floatingAiCompose.setVisibility(android.view.View.VISIBLE);
+            }
         });
     }
 
@@ -144,5 +170,60 @@ public class MainActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment, tag)
                 .addToBackStack(tag)
                 .commit();
+    }
+
+    public void navigateFromChat(String route) {
+        switch (route) {
+            case TAG_SCHEDULE:
+                if (liquidBarController != null) liquidBarController.setSelectedId(R.id.nav_schedule);
+                switchTab(ScheduleFragment.class, TAG_SCHEDULE);
+                break;
+            case TAG_RESULT:
+                if (liquidBarController != null) liquidBarController.setSelectedId(R.id.nav_result);
+                switchTab(AcademicResultsFragment.class, TAG_RESULT);
+                break;
+            case TAG_REGISTER:
+                if (liquidBarController != null) liquidBarController.setSelectedId(R.id.nav_register);
+                switchTab(CourseRegistrationFragment.class, TAG_REGISTER);
+                break;
+            case TAG_HOME:
+                if (liquidBarController != null) liquidBarController.setSelectedId(R.id.nav_home);
+                switchTab(HomeFragment.class, TAG_HOME);
+                break;
+            case TAG_PROFILE:
+                if (liquidBarController != null) liquidBarController.setSelectedId(R.id.nav_profile);
+                switchTab(ProfileFragment.class, TAG_PROFILE);
+                break;
+            case "frag_tuition":
+                pushFragment(new com.utc2.appreborn.ui.tuition.TuitionFragment(), "TuitionFragment");
+                break;
+            case "frag_public_service":
+                pushFragment(new com.utc2.appreborn.ui.public_services.PublicServiceFragment(), "PublicServiceFragment");
+                break;
+            case "frag_assessment":
+                pushFragment(new com.utc2.appreborn.ui.assessment.AssessmentFragment(), "AssessmentFragment");
+                break;
+            case "activity_dormitory":
+                startActivity(new Intent(this, com.utc2.appreborn.ui.dormitory.DormitoryActivity.class));
+                break;
+            case "activity_support":
+                startActivity(new Intent(this, com.utc2.appreborn.ui.profile.SupportActivity.class));
+                break;
+            case "frag_other_features":
+                pushFragment(new com.utc2.appreborn.ui.other.OtherFeaturesFragment(), com.utc2.appreborn.ui.other.OtherFeaturesFragment.TAG);
+                break;
+            case "frag_info":
+                pushFragment(new com.utc2.appreborn.ui.profile.InfoFragment(), "InfoFragment");
+                break;
+            case "frag_qr":
+                pushFragment(com.utc2.appreborn.ui.home.QrFragment.newInstance("", ""), com.utc2.appreborn.ui.home.QrFragment.TAG);
+                break;
+            case "frag_notification":
+                pushFragment(new com.utc2.appreborn.ui.notification.NotificationFragment(), com.utc2.appreborn.ui.notification.NotificationFragment.TAG);
+                break;
+            case "frag_search":
+                pushFragment(new com.utc2.appreborn.ui.search.SearchFragment(), com.utc2.appreborn.ui.search.SearchFragment.TAG);
+                break;
+        }
     }
 }

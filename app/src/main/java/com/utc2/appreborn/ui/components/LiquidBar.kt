@@ -89,7 +89,12 @@ fun getLiquidShape(offset: Float, radius: Float, dipDepth: Float) = GenericShape
     close()
 }
 
-fun setupLiquidBottomBar(composeView: ComposeView, onItemSelected: (Int) -> Unit) {
+class LiquidBarController {
+    var selectedId by mutableIntStateOf(R.id.nav_home)
+}
+
+fun setupLiquidBottomBar(composeView: ComposeView, onItemSelected: (Int) -> Unit): LiquidBarController {
+    val controller = LiquidBarController()
     // Thiết lập môi trường Compose để nhúng vào giao diện XML
     composeView.apply {
         setBackgroundColor(android.graphics.Color.TRANSPARENT)
@@ -99,14 +104,16 @@ fun setupLiquidBottomBar(composeView: ComposeView, onItemSelected: (Int) -> Unit
                     .fillMaxSize()
                     .background(Color.Transparent)
             ) {
-                LiquidBottomNavigation(onItemSelected)
+                LiquidBottomNavigation(controller.selectedId, onItemSelected)
             }
         }
     }
+    return controller
 }
 
 @Composable
 fun LiquidBottomNavigation(
+    selectedId: Int,
     onItemSelected: (Int) -> Unit
 ) {
     // Khai báo danh sách các mục hiển thị trên thanh điều hướng
@@ -120,7 +127,8 @@ fun LiquidBottomNavigation(
         )
     }
 
-    var selectedIndex by remember { mutableIntStateOf(0) }
+    val selectedIndex = items.indexOfFirst { it.id == selectedId }.coerceAtLeast(0)
+
     val navBgColor = colorResource(R.color.black)
     val iconActiveColor = colorResource(R.color.indicator_location)
     val iconNormalColor = colorResource(R.color.white)
@@ -232,7 +240,6 @@ fun LiquidBottomNavigation(
                                 interactionSource = remember { MutableInteractionSource() },
                                 indication = null
                             ) {
-                                selectedIndex = index
                                 onItemSelected(item.id)
                             },
                         contentAlignment = Alignment.Center
