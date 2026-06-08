@@ -247,6 +247,14 @@ public class CourseRegistrationFragment extends Fragment {
 
             CourseStorage.saveConfirmedIds(requireContext(), confirmedIds);
 
+            // Lưu credits: đọc map hiện tại rồi cập nhật thêm các môn vừa xác nhận
+            java.util.Map<String, Integer> creditsMap = CourseStorage.loadCreditsMap(requireContext());
+            for (String id : confirmedIds) {
+                Course c = courseRepo.findById(id);
+                if (c != null) creditsMap.put(id, c.getCredits());
+            }
+            CourseStorage.saveCreditsMap(requireContext(), creditsMap);
+
             courseRepo.clearPendingRegistrations();
             layoutSelected.setVisibility(View.GONE);
             layoutSelectedItems.removeAllViews();

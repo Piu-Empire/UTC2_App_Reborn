@@ -4,6 +4,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.concurrent.TimeUnit;
@@ -22,8 +24,13 @@ import java.util.concurrent.TimeUnit;
 public class ApiClient {
 
     // ⚠️ Đổi BASE_URL sang địa chỉ server thực tế của bạn
-    private static final String BASE_URL = "http://10.0.2.2:8080/"; // emulator trỏ localhost
+    private static final String BASE_URL = "http://10.11.2.61:8080/"; // emulator trỏ localhost
     // private static final String BASE_URL = "https://api.yourdomain.com/";
+
+    // Gson lenient: cho phép parse JSON number → String field (BigDecimal từ backend)
+    private static final Gson LENIENT_GSON = new GsonBuilder()
+            .setLenient()
+            .create();
 
     // FIX WARN 4: dùng chung một OkHttpClient (quản lý thread pool, connection pool)
     private static final OkHttpClient SHARED_HTTP_CLIENT = buildHttpClient();
@@ -65,7 +72,7 @@ public class ApiClient {
             authedInstance = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(authedClient)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(LENIENT_GSON))
                     .build();
         }
         return authedInstance;
@@ -85,7 +92,7 @@ public class ApiClient {
             publicInstance = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .client(publicClient)
-                    .addConverterFactory(GsonConverterFactory.create())
+                    .addConverterFactory(GsonConverterFactory.create(LENIENT_GSON))
                     .build();
         }
         return publicInstance;

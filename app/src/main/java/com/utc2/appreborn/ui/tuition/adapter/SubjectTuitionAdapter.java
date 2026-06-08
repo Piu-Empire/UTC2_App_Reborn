@@ -12,11 +12,10 @@ import com.utc2.appreborn.ui.tuition.model.SubjectTuition;
 import com.utc2.appreborn.ui.tuition.model.Tuition;
 
 import java.util.List;
-import java.util.Locale; // Import thêm cái này
+import java.util.Locale;
 
 public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAdapter.ViewHolder> {
 
-    // Sửa cảnh báo 'final'
     private final List<SubjectTuition> subjectList;
 
     public SubjectTuitionAdapter(List<SubjectTuition> subjectList) {
@@ -26,7 +25,8 @@ public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_subject_tuition, parent, false);
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.item_subject_tuition, parent, false);
         return new ViewHolder(view);
     }
 
@@ -34,22 +34,28 @@ public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         SubjectTuition item = subjectList.get(position);
 
-        // Lấy tên môn học từ lớp cha
         holder.tvName.setText(item.getName());
-
-        // Lấy thông tin tín chỉ (details) từ lớp cha
         holder.tvDetails.setText(item.getDetails());
 
-        // Định dạng tiền tệ từ kiểu long của lớp cha
-        holder.tvAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", item.getAmount()));
+        boolean unpaid = Tuition.STATUS_UNPAID.equals(item.getStatus())
+                || Tuition.STATUS_PARTIAL.equals(item.getStatus());
 
-        // Xử lý hiển thị trạng thái — mapping FEE.status (String)
-        if (Tuition.STATUS_UNPAID.equals(item.getStatus()) || Tuition.STATUS_PARTIAL.equals(item.getStatus())) {
-            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.status_unpaid));
+        if (unpaid) {
+            // Còn nợ → hiện số tiền CẦN ĐÓNG (remaining)
+            holder.tvAmount.setText(String.format(Locale.getDefault(),
+                    "%,.0f VND", item.getRemainingAmount()));
+            holder.tvAmount.setTextColor(Color.RED);
+            holder.tvStatus.setText(
+                    holder.itemView.getContext().getString(R.string.status_unpaid));
             holder.tvStatus.setTextColor(Color.RED);
         } else {
-            holder.tvStatus.setText(holder.itemView.getContext().getString(R.string.status_paid));
-            holder.tvStatus.setTextColor(Color.GREEN);
+            // Đã đóng đủ → hiện TỔNG HỌC PHÍ (total) để user biết đã đóng bao nhiêu
+            holder.tvAmount.setText(String.format(Locale.getDefault(),
+                    "%,.0f VND", item.getTotalAmount()));
+            holder.tvAmount.setTextColor(Color.parseColor("#4CAF50")); // green
+            holder.tvStatus.setText(
+                    holder.itemView.getContext().getString(R.string.status_paid));
+            holder.tvStatus.setTextColor(Color.parseColor("#4CAF50"));
         }
     }
 
@@ -63,10 +69,10 @@ public class SubjectTuitionAdapter extends RecyclerView.Adapter<SubjectTuitionAd
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            tvName = itemView.findViewById(R.id.tvSubjectName);
+            tvName    = itemView.findViewById(R.id.tvSubjectName);
             tvDetails = itemView.findViewById(R.id.tvSubjectDetails);
-            tvAmount = itemView.findViewById(R.id.tvAmount);
-            tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvAmount  = itemView.findViewById(R.id.tvAmount);
+            tvStatus  = itemView.findViewById(R.id.tvStatus);
         }
     }
 }

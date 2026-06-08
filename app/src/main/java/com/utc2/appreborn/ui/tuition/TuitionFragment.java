@@ -60,7 +60,8 @@ public class TuitionFragment extends Fragment {
         // Kiểm tra mạng tức thời khi người dùng nhấn chọn chức năng
         cardTuitionSubject.setOnClickListener(v -> checkNetworkAndNavigate(SubjectTuitionActivity.class));
         cardDormitory.setOnClickListener(v -> checkNetworkAndNavigate(DormitoryTuitionActivity.class));
-        cardInvoice.setOnClickListener(v -> checkNetworkAndNavigate(InvoiceActivity.class));
+        // Invoice mở luôn không cần check mạng vì có local data
+        cardInvoice.setOnClickListener(v -> startActivity(new Intent(requireContext(), InvoiceActivity.class)));
     }
 
     private void checkNetworkAndNavigate(Class<?> targetActivity) {

@@ -15,17 +15,22 @@ import com.google.gson.annotations.SerializedName;
  *       ? new BigDecimal(t.remainingAmount).doubleValue() : 0.0;
  */
 public class TuitionResponse {
-    @SerializedName("id")              public Long   id;
-    @SerializedName("studentId")       public String studentId;
-    @SerializedName("fullName")        public String fullName;
-    @SerializedName("semesterId")      public Long   semesterId;
-    @SerializedName("totalAmount")     public String totalAmount;     // BigDecimal → String
-    @SerializedName("paidAmount")      public String paidAmount;      // BigDecimal → String
-    @SerializedName("remainingAmount") public String remainingAmount; // BigDecimal → String
-    @SerializedName("dueDate")         public String dueDate;
-    @SerializedName("paidAt")          public String paidAt;
-    @SerializedName("status")          public String status;
-    @SerializedName("paymentMethod")   public String paymentMethod;
+    @SerializedName("id")              public Long    id;
+    @SerializedName("studentId")       public String  studentId;
+    @SerializedName("fullName")        public String  fullName;
+    @SerializedName("semesterId")      public Long    semesterId;
+    @SerializedName("semesterName")    public String  semesterName;
+    /** FK → dormitory_registration — chỉ có giá trị khi feeType = DORMITORY */
+    @SerializedName("dormRegId")       public Long    dormRegId;
+    /** ADD: tổng tín chỉ kỳ này — để hiển thị "X TC" trên màn hình thanh toán */
+    @SerializedName("totalCredits")    public Integer totalCredits;
+    @SerializedName("totalAmount")     public String  totalAmount;     // BigDecimal → String
+    @SerializedName("paidAmount")      public String  paidAmount;      // BigDecimal → String
+    @SerializedName("remainingAmount") public String  remainingAmount; // BigDecimal → String
+    @SerializedName("dueDate")         public String  dueDate;
+    @SerializedName("paidAt")          public String  paidAt;
+    @SerializedName("status")          public String  status;
+    @SerializedName("paymentMethod")   public String  paymentMethod;
 
     /** Helper: lấy remainingAmount dưới dạng double, trả 0.0 nếu null/lỗi. */
     public double getRemainingAmountAsDouble() {

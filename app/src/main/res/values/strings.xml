@@ -373,7 +373,7 @@
         Dùng App Ngân hàng hoặc Ví điện tử\nđể quét mã chuyển khoản
     </string>
 
-    <string name="btn_confirm_paid">XÁC NHẬN ĐÀ TRẢ TIỀN</string>
+    <string name="btn_confirm_paid">XÁC NHẬN ĐÃ TRẢ TIỀN</string>
 
     <string name="msg_checking_transaction">
         Hệ thống đang kiểm tra giao dịch...
