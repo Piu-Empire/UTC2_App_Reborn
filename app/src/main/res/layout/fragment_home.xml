@@ -220,7 +220,7 @@
                 android:orientation="vertical"
                 android:clipChildren="false"
                 android:clipToPadding="false"
-                android:paddingBottom="16dp">
+                android:paddingBottom="120dp">
 
                 <!-- Features -->
                 <TextView
@@ -249,7 +249,7 @@
                     android:id="@+id/iv_campus_banner"
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="40dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bg_campus_banner"
                     android:contentDescription="@string/cd_campus_banner" />
@@ -263,7 +263,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="28dp"
                     android:layout_marginBottom="10dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
