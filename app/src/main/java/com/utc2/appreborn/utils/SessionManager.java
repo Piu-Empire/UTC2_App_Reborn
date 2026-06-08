@@ -27,8 +27,9 @@ public class SessionManager {
     private static final String KEY_USER_ID      = "user_id";      // USER.user_id (BIGINT)
     private static final String KEY_EMAIL        = "email";         // USER.email
     private static final String KEY_STUDENT_CODE = "student_code"; // STUDENT_PROFILE.student_code (MSSV)
-    private static final String KEY_CLASS_NAME   = "class_name";
     private static final String KEY_FULL_NAME    = "full_name";    // USER_PROFILE.full_name
+    private static final String KEY_CLASS_NAME   = "class_name";   // STUDENT_PROFILE.class_name
+    private static final String KEY_ADVISOR_NAME = "advisor_name"; // tên CVHT
 
     private static SessionManager instance;
     private final SharedPreferences sharedPreferences;
@@ -111,20 +112,21 @@ public class SessionManager {
      * Gọi sau khi đăng nhập thành công và nhận response từ server.
      */
     public void saveProfile(String fullName, String studentCode) {
-        saveProfile(fullName, studentCode, "");
-    }
-
-    public void saveProfile(String fullName, String studentCode, String className) {
         sharedPreferences.edit()
                 .putString(KEY_FULL_NAME,    fullName    != null ? fullName    : "")
                 .putString(KEY_STUDENT_CODE, studentCode != null ? studentCode : "")
-                .putString(KEY_CLASS_NAME,   className   != null ? className   : "")
                 .apply();
     }
 
-    public String getClassName() {
-        return sharedPreferences.getString(KEY_CLASS_NAME, "");
+    public void saveProfileExtra(String className, String advisorName) {
+        sharedPreferences.edit()
+                .putString(KEY_CLASS_NAME,   className   != null ? className   : "")
+                .putString(KEY_ADVISOR_NAME, advisorName != null ? advisorName : "")
+                .apply();
     }
+
+    public String getClassName()   { return sharedPreferences.getString(KEY_CLASS_NAME,   ""); }
+    public String getAdvisorName() { return sharedPreferences.getString(KEY_ADVISOR_NAME, ""); }
 
     /** USER_PROFILE.full_name — trả về "" nếu chưa fetch về */
     public String getFullName() {

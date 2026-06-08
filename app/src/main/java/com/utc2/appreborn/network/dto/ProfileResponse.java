@@ -30,5 +30,6 @@ public class ProfileResponse {
     @SerializedName("status")         public String status;
     @SerializedName("avatarUrl")      public String avatarUrl;
     @SerializedName("studentCardUrl") public String studentCardUrl;
+    @SerializedName("advisorName")    public String advisorName;
     @SerializedName("role")           public String role;
 }

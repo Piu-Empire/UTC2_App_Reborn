@@ -25,6 +25,7 @@ public class AssessmentCriteria {
 
     // Điểm readonly các cột khác (đọc từ DB)
     private float tapTheScore;
+    private float boMonScore;
     private float khoaScore;
     private float truongScore;
 
@@ -75,6 +76,7 @@ public class AssessmentCriteria {
     public boolean hasEvidence()          { return !evidenceUris.isEmpty(); }
     public int     evidenceCount()        { return evidenceUris.size(); }
     public float   getTapTheScore()       { return tapTheScore; }
+    public float   getBoMonScore()        { return boMonScore; }
     public float   getKhoaScore()         { return khoaScore; }
     public float   getTruongScore()       { return truongScore; }
 
@@ -82,6 +84,7 @@ public class AssessmentCriteria {
 
     public void setCurrentScore(float v) { this.currentScore = v; }
     public void setTapTheScore(float v)  { this.tapTheScore = v; }
+    public void setBoMonScore(float v)   { this.boMonScore = v; }
     public void setKhoaScore(float v)    { this.khoaScore = v; }
     public void setTruongScore(float v)  { this.truongScore = v; }
 

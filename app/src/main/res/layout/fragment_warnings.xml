@@ -152,11 +152,11 @@
             app:checkedIconEnabled="false"/>
 
         <com.google.android.material.chip.Chip
-            android:id="@+id/chip_resolved"
+            android:id="@+id/chip_expired"
             style="@style/Widget.Material3.Chip.Filter"
             android:layout_width="wrap_content"
             android:layout_height="48dp"
-            android:text="@string/label_resolved"
+            android:text="@string/label_expired"
             android:textSize="13sp"
             app:checkedIconEnabled="false"/>
 

@@ -107,7 +107,7 @@ public class WarningsFragment extends Fragment {
                 filtered.add(w);
             } else if (chipId == R.id.chip_serious && w.isActive()) {
                 filtered.add(w);
-            } else if (chipId == R.id.chip_resolved && w.isResolved()) {
+            } else if (chipId == R.id.chip_expired && w.isExpired()) {
                 filtered.add(w);
             }
         }

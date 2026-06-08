@@ -12,4 +12,6 @@ public class AcademicWarningResponse {
     @SerializedName("issuedAt")    public String issuedAt;
     @SerializedName("resolvedAt")  public String resolvedAt;
     @SerializedName("status")      public String status;
+    @com.google.gson.annotations.SerializedName("approved")
+    public Boolean approved;
 }

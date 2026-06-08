@@ -7,8 +7,8 @@ package com.utc2.appreborn.model;
  */
 public class AcademicWarning {
 
-    public static final String STATUS_ACTIVE   = "ACTIVE";
-    public static final String STATUS_RESOLVED = "RESOLVED";
+    public static final String STATUS_ACTIVE  = "ACTIVE";
+    public static final String STATUS_EXPIRED = "EXPIRED";
 
     public static final int ICON_BOOK  = 1;
     public static final int ICON_CLOCK = 2;
@@ -37,6 +37,6 @@ public class AcademicWarning {
     public String getStatus()   { return status; }
     public int    getIconType() { return iconType; }
 
-    public boolean isActive()   { return STATUS_ACTIVE.equals(status); }
-    public boolean isResolved() { return STATUS_RESOLVED.equals(status); }
+    public boolean isActive()  { return STATUS_ACTIVE.equals(status); }
+    public boolean isExpired() { return STATUS_EXPIRED.equals(status); }
 }

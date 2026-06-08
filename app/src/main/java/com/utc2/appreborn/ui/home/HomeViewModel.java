@@ -118,7 +118,8 @@ public class HomeViewModel extends AndroidViewModel {
                         && response.body().isSuccess()) {
                     ProfileResponse p = response.body().getData();
                     // Cache vào SessionManager — ProfileFragment, QrFragment sẽ đọc từ đây
-                    sessionManager.saveProfile(p.fullName, p.studentId, p.className);
+                    sessionManager.saveProfile(p.fullName, p.studentId);
+                    sessionManager.saveProfileExtra(p.className, p.advisorName);
                     // Notify LiveData để HomeFragment cập nhật tên ngay
                     studentRepository.updateFromCache();
                 } else {

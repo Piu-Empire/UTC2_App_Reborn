@@ -110,9 +110,10 @@
     <string name="label_serious_upper">SERIOUS</string>
     <string name="label_total_upper">TOTAL</string>
     <string name="label_serious">Serious</string>
-    <string name="label_unresolved_upper">UNRESOLVED</string>
-    <string name="label_unresolved">Unresolved</string>
+    <string name="label_unresolved_upper">ACTIVE</string>
+    <string name="label_unresolved">Active</string>
     <string name="label_resolved">Resolved</string>
+    <string name="label_expired">Expired</string>
 
     <string name="profile_title">Student Information</string>
     <string name="profile_btn_info">Personal Info ></string>

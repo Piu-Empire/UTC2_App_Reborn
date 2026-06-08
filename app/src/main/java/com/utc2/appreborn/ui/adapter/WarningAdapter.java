@@ -89,9 +89,9 @@ public class WarningAdapter extends RecyclerView.Adapter<WarningAdapter.WarningV
                 cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#FFCDD2")));
                 cardRoot.setStrokeWidth(dpToPx(1.5f));
             } else {
-                // Đã giải quyết: nền xanh nhạt
-                cardRoot.setCardBackgroundColor(Color.parseColor("#E8F5E9"));
-                cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#C8E6C9")));
+                // Hết hiệu lực: nền xám nhạt
+                cardRoot.setCardBackgroundColor(Color.parseColor("#F5F5F5"));
+                cardRoot.setStrokeColor(ColorStateList.valueOf(Color.parseColor("#E0E0E0")));
                 cardRoot.setStrokeWidth(dpToPx(1f));
             }
 

@@ -222,6 +222,8 @@ public class AcademicResultRepository {
         List<AcademicWarning> result = new ArrayList<>();
         if (raw == null) return result;
         for (AcademicWarningResponse r : raw) {
+            // Chỉ hiển thị warning đã duyệt (approved=true)
+            if (r.approved == null || !r.approved) continue;
             String status = r.status != null ? r.status : AcademicWarning.STATUS_ACTIVE;
             int icon = "FAILED_EXAM".equals(r.warningType) || "LOW_GPA".equals(r.warningType)
                     ? AcademicWarning.ICON_BOOK

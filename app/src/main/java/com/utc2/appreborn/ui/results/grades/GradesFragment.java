@@ -157,15 +157,20 @@ public class GradesFragment extends Fragment {
             tvPassedSubjects.setText("0/0");
             return;
         }
-        double totalPoints = 0;
-        int totalCredits = 0;
-        int passed = 0;
+        double totalPoints  = 0;
+        int    gpaCredits   = 0; // chỉ tính credits của môn có gradePoint
+        int    totalCredits = 0; // tổng credits tất cả môn (hiển thị)
+        int    passed       = 0;
         for (CourseGrade g : grades) {
-            totalPoints += g.getGpaScore() * g.getCredits();
             totalCredits += g.getCredits();
             if (g.isPassed()) passed++;
+            // Chỉ tính GPA với môn đã có gradePoint (không tính môn đang học)
+            if (g.getGpaScore() > 0) {
+                totalPoints += g.getGpaScore() * g.getCredits();
+                gpaCredits  += g.getCredits();
+            }
         }
-        double gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+        double gpa = gpaCredits > 0 ? totalPoints / gpaCredits : 0;
         tvCurrentGpa.setText(String.format(Locale.getDefault(), "%.2f", gpa));
         tvTotalCredits.setText(String.valueOf(totalCredits));
         tvPassedSubjects.setText(passed + "/" + grades.size());

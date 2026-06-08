@@ -212,7 +212,15 @@ public class PublicServiceFragment extends Fragment {
             long submittedMillis = parseIsoToMillis(r.submittedAt);
             String type  = r.serviceType != null ? r.serviceType : "";
             String desc  = r.description != null ? r.description : "";
-            String status = r.status     != null ? r.status      : BaseService.STATUS_PENDING;
+            // Normalize status: data cũ trong DB có thể dùng tiếng Việt
+            String rawStatus = r.status != null ? r.status : BaseService.STATUS_PENDING;
+            String status;
+            switch (rawStatus) {
+                case "hoàn thành": case "COMPLETED":  status = BaseService.STATUS_COMPLETED;  break;
+                case "đang xử lý": case "PROCESSING": status = BaseService.STATUS_PROCESSING; break;
+                case "từ chối":   case "REJECTED":   status = BaseService.STATUS_REJECTED;   break;
+                default:                              status = BaseService.STATUS_PENDING;    break;
+            }
 
             BaseService item;
             switch (type) {

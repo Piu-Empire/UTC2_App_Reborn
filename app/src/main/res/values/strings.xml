@@ -161,10 +161,10 @@
     <string name="label_serious_upper">NGHIÊM TRỌNG</string>
     <string name="label_total_upper">TỔNG CỘNG</string>
     <string name="label_serious">Nghiêm trọng</string>
-    <string name="label_unresolved_upper">CHƯA GIẢI QUYẾT</string>
-    <string name="label_unresolved">Chưa giải quyết</string>
+    <string name="label_unresolved_upper">ĐANG HIỆU LỰC</string>
+    <string name="label_unresolved">Đang hiệu lực</string>
     <string name="label_resolved">Đã giải quyết</string>
-
+    <string name="label_expired">Hết hiệu lực</string>
     <!-- ========================= -->
     <!-- PROFILE -->
     <!-- ========================= -->

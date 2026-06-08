@@ -8,11 +8,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.utc2.appreborn.data.local.AppDatabase;
-import com.utc2.appreborn.data.local.dao.AdvisorDao;
-import com.utc2.appreborn.data.local.dao.UserDao;
-import com.utc2.appreborn.data.local.entity.AdvisorEntity;
-import com.utc2.appreborn.data.local.entity.StudentProfileEntity;
 import com.utc2.appreborn.data.repository.AssessmentRepository;
 import com.utc2.appreborn.model.AssessmentCriteria;
 import com.utc2.appreborn.model.AssessmentPeriod;
@@ -30,8 +25,6 @@ public class AssessmentViewModel extends AndroidViewModel {
 
     // ─── Deps ─────────────────────────────────────────────────────────────────
     private final AssessmentRepository repository;
-    private final UserDao              userDao;
-    private final AdvisorDao           advisorDao;
     private final ExecutorService      executor = Executors.newSingleThreadExecutor();
 
     // ─── State ────────────────────────────────────────────────────────────────
@@ -57,8 +50,6 @@ public class AssessmentViewModel extends AndroidViewModel {
     public AssessmentViewModel(@NonNull Application application) {
         super(application);
         repository = AssessmentRepository.getInstance(application);
-        userDao    = AppDatabase.getInstance(application).userDao();
-        advisorDao = AppDatabase.getInstance(application).advisorDao();
         periods    = repository.getAssessmentPeriods(); // gọi API thật
 
         loadStudentInfo();
@@ -210,7 +201,20 @@ public class AssessmentViewModel extends AndroidViewModel {
     }
 
     private void applyStudentData(List<AssessmentCriteria> list, StudentAssessmentResponse data) {
-        if (data == null || data.items == null) return;
+        boolean hasData = data != null && data.items != null && !data.items.isEmpty();
+
+        // Reset về max nếu chưa có data (mặc định 100đ), về 0 nếu có data server
+        for (AssessmentCriteria c : list) {
+            int t = c.getViewType();
+            if (t == AssessmentCriteria.TYPE_CRITERIA) {
+                c.setCurrentScore(hasData ? 0f : c.getMaxScore());
+            } else if (t == AssessmentCriteria.TYPE_DEDUCTION) {
+                c.setCurrentScore(0f); // điểm trừ luôn mặc định 0
+            }
+        }
+
+        if (!hasData) return;
+
         for (StudentAssessmentResponse.Item item : data.items) {
             for (AssessmentCriteria c : list) {
                 if (c.getId() == item.criteriaId) {
@@ -227,6 +231,7 @@ public class AssessmentViewModel extends AndroidViewModel {
             for (AssessmentCriteria c : list) {
                 if (c.getId() == item.criteriaId) {
                     c.setTapTheScore(item.tapTheScore);
+                    c.setBoMonScore(item.boMonScore);
                     c.setKhoaScore(item.khoaScore);
                     c.setTruongScore(item.truongScore);
                     break;
@@ -238,33 +243,15 @@ public class AssessmentViewModel extends AndroidViewModel {
     private void loadStudentInfo() {
         SessionManager session = SessionManager.getInstance(getApplication());
 
-        // Hiển thị từ cache SessionManager ngay (đã được HomeViewModel fetch)
-        String cachedName = session.getFullName();
-        String cachedCode = session.getStudentCode();
-        studentName.setValue(!cachedName.isEmpty() ? cachedName : "Sinh viên");
-        studentCode.setValue(!cachedCode.isEmpty() ? cachedCode : "—");
-        studentClass.setValue("—");
-        advisorName.setValue("—");
+        String cachedName    = session.getFullName();
+        String cachedCode    = session.getStudentCode();
+        String cachedClass   = session.getClassName();
+        String cachedAdvisor = session.getAdvisorName();
 
-        long userId = session.getUserId();
-        if (userId <= 0) return; // chưa có userId thật, dùng cache là đủ
-
-        executor.execute(() -> {
-            try {
-                StudentProfileEntity profile = userDao.getStudentProfileByUserId(userId);
-                if (profile != null) {
-                    if (profile.fullName != null)    studentName.postValue(profile.fullName);
-                    if (profile.studentCode != null) studentCode.postValue(profile.studentCode);
-                    studentClass.postValue(profile.className != null ? profile.className : "—");
-
-                    if (profile.advisorId != null) {
-                        AdvisorEntity advisor = advisorDao.getAdvisorById(profile.advisorId);
-                        if (advisor != null) { advisorName.postValue(advisor.fullName); return; }
-                    }
-                }
-            } catch (Exception ignored) {}
-            advisorName.postValue("—");
-        });
+        studentName.setValue(!cachedName.isEmpty()    ? cachedName    : "Sinh viên");
+        studentCode.setValue(!cachedCode.isEmpty()    ? cachedCode    : "—");
+        studentClass.setValue(!cachedClass.isEmpty()  ? cachedClass   : "—");
+        advisorName.setValue(!cachedAdvisor.isEmpty() ? cachedAdvisor : "—");
     }
 
     @Override
