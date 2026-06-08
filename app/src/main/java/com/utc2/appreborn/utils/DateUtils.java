@@ -11,6 +11,8 @@ public class DateUtils {
     public static Calendar HK1_END;
     public static Calendar HK2_START;
     public static Calendar HK2_END;
+    public static Calendar HKH_START;
+    public static Calendar HKH_END;
     public static final String DATE_FORMAT_RANGE = "dd/MM/yyyy";
     public static final String DATE_FORMAT_DAY_MONTH = "dd/MM";
     public static final String DATE_FORMAT_DAY_NAME = "EEE";
@@ -157,6 +159,16 @@ public class DateUtils {
         HK2_END.set(Calendar.DAY_OF_MONTH, endDay);
     }
 
+    // cấu hình thời gian diễn ra cho học kỳ hè
+    public static void setSemesterHKH(int startMonth, int startDay, int endMonth, int endDay) {
+        HKH_START = Calendar.getInstance();
+        HKH_START.set(Calendar.MONTH, startMonth - 1);
+        HKH_START.set(Calendar.DAY_OF_MONTH, startDay);
+        HKH_END = Calendar.getInstance();
+        HKH_END.set(Calendar.MONTH, endMonth - 1);
+        HKH_END.set(Calendar.DAY_OF_MONTH, endDay);
+    }
+
     // hiển thị tháng hiện tại theo ngôn ngữ hệ thống
     public static String getCurrentMonthDisplay() {
         return "Tháng " + format(Calendar.getInstance(), "MM");
@@ -178,16 +190,15 @@ public class DateUtils {
 
     // xác định học kỳ hiện tại của sinh viên
     public static String getCurrentSemester() {
-        Calendar now = Calendar.getInstance();
-        if (HK2_START != null && HK2_END != null &&
-                !now.before(HK2_START) && !now.after(HK2_END)) {
-            return "HK II";
-        }
-        return "HK I";
+        return getSemesterByDate(Calendar.getInstance());
     }
 
     // tìm kiếm học kỳ tương ứng với ngày bất kỳ
     public static String getSemesterByDate(Calendar cal) {
+        if (HKH_START != null && HKH_END != null &&
+                !cal.before(HKH_START) && !cal.after(HKH_END)) {
+            return "HK Hè";
+        }
         if (HK2_START != null && HK2_END != null &&
                 !cal.before(HK2_START) && !cal.after(HK2_END)) {
             return "HK II";
@@ -197,9 +208,10 @@ public class DateUtils {
 
     // lấy ngày bắt đầu của học kỳ chứa mốc thời gian
     public static Calendar getSemesterStart(Calendar cal) {
-        return getSemesterByDate(cal).equals("HK II")
-                ? (Calendar) HK2_START.clone()
-                : (Calendar) HK1_START.clone();
+        String semester = getSemesterByDate(cal);
+        if ("HK Hè".equals(semester)) return (Calendar) HKH_START.clone();
+        if ("HK II".equals(semester)) return (Calendar) HK2_START.clone();
+        return (Calendar) HK1_START.clone();
     }
 
     // tính số thứ tự tuần học dưới dạng chuỗi
@@ -234,15 +246,17 @@ public class DateUtils {
 
     // truy xuất ngày khởi đầu của học kỳ hiện tại
     public static Calendar getSemesterStart() {
-        return getCurrentSemester().equals("HK II")
-                ? (Calendar) HK2_START.clone()
-                : (Calendar) HK1_START.clone();
+        String semester = getCurrentSemester();
+        if ("HK Hè".equals(semester)) return (Calendar) HKH_START.clone();
+        if ("HK II".equals(semester)) return (Calendar) HK2_START.clone();
+        return (Calendar) HK1_START.clone();
     }
 
     // lấy ngày kết thúc của học kỳ hiện tại
     public static Calendar getSemesterEnd() {
-        return getCurrentSemester().equals("HK II")
-                ? (Calendar) HK2_END.clone()
-                : (Calendar) HK1_END.clone();
+        String semester = getCurrentSemester();
+        if ("HK Hè".equals(semester)) return (Calendar) HKH_END.clone();
+        if ("HK II".equals(semester)) return (Calendar) HK2_END.clone();
+        return (Calendar) HK1_END.clone();
     }
 }

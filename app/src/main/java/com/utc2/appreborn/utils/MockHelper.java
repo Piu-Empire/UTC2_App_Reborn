@@ -126,6 +126,8 @@ public final class MockHelper {
         List<NotificationItem> list = new ArrayList<>();
 
         list.add(new NotificationItem(
+                1L,
+                "SYSTEM",
                 "Phòng Đào Tạo",
                 "Thông báo lịch thi học kỳ 2 năm học 2024–2025",
                 "Sinh viên xem lịch thi chi tiết tại cổng thông tin UTC2. Phòng thi sẽ được công bố trước 3 ngày.",
@@ -133,6 +135,8 @@ public final class MockHelper {
                 false
         ));
         list.add(new NotificationItem(
+                2L,
+                "SYSTEM",
                 "Phòng Công tác SV",
                 "Xét học bổng khuyến khích học tập HK2",
                 "Sinh viên có điểm TB tích lũy ≥ 3.2 nộp hồ sơ trước ngày 15/5/2025.",
@@ -140,6 +144,8 @@ public final class MockHelper {
                 true
         ));
         list.add(new NotificationItem(
+                3L,
+                "SYSTEM",
                 "Ban Giám hiệu",
                 "Thông báo nghỉ lễ 30/4 và 1/5",
                 "Nhà trường thông báo lịch nghỉ lễ theo quy định của Nhà nước.",
@@ -147,6 +153,8 @@ public final class MockHelper {
                 true
         ));
         list.add(new NotificationItem(
+                4L,
+                "SYSTEM",
                 "Phòng QLSV",
                 "Nộp bản sao học bạ THPT cho sinh viên năm nhất",
                 "Các bạn sinh viên K2024 chưa nộp học bạ THPT vui lòng đến Phòng QLSV trước 20/5.",
@@ -154,6 +162,8 @@ public final class MockHelper {
                 true
         ));
         list.add(new NotificationItem(
+                5L,
+                "SYSTEM",
                 "Thư viện UTC2",
                 "Gia hạn thẻ thư viện học kỳ 2",
                 "Thẻ thư viện học kỳ 1 sẽ hết hạn vào cuối tháng 4. Gia hạn tại quầy thư viện hoặc online.",

@@ -1,0 +1,62 @@
+{
+  "1": {
+    "actionText": "Đến trang Lịch học",
+    "route": "tag_schedule"
+  },
+  "2": {
+    "actionText": "Xem điểm thi",
+    "route": "tag_result"
+  },
+  "3": {
+    "actionText": "Đăng ký tín chỉ",
+    "route": "tag_register"
+  },
+  "4": {
+    "actionText": "Về trang chủ",
+    "route": "tag_home"
+  },
+  "5": {
+    "actionText": "Hồ sơ cá nhân",
+    "route": "tag_profile"
+  },
+  "6": {
+    "actionText": "Xem học phí",
+    "route": "frag_tuition"
+  },
+  "7": {
+    "actionText": "Dịch vụ công",
+    "route": "frag_public_service"
+  },
+  "8": {
+    "actionText": "Đánh giá rèn luyện",
+    "route": "frag_assessment"
+  },
+  "9": {
+    "actionText": "Ký túc xá",
+    "route": "activity_dormitory"
+  },
+  "10": {
+    "actionText": "Hỗ trợ",
+    "route": "activity_support"
+  },
+  "11": {
+    "actionText": "Danh mục khác",
+    "route": "frag_other_features"
+  },
+  "12": {
+    "actionText": "Thông tin cá nhân",
+    "route": "frag_info"
+  },
+  "13": {
+    "actionText": "Mã QR",
+    "route": "frag_qr"
+  },
+  "14": {
+    "actionText": "Thông báo",
+    "route": "frag_notification"
+  },
+  "15": {
+    "actionText": "Tìm kiếm",
+    "route": "frag_search"
+  }
+}

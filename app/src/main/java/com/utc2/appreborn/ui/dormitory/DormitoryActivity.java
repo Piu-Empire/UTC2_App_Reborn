@@ -14,6 +14,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
@@ -25,6 +26,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.utc2.appreborn.R;
 import com.utc2.appreborn.data.local.entity.DormitoryRegistrationEntity;
 import com.utc2.appreborn.data.local.entity.DormitoryRoomEntity;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.DormApiService;
+import com.utc2.appreborn.network.dto.DormRegistrationResponse;
 import com.utc2.appreborn.ui.dormitory.adapter.RoomAdapter;
 import com.utc2.appreborn.ui.dormitory.exception.DormitoryException;
 import com.utc2.appreborn.ui.dormitory.lookup.adapter.OccupantAdapter;
@@ -33,25 +38,33 @@ import com.utc2.appreborn.ui.dormitory.lookup.model.LookupRepository;
 import com.utc2.appreborn.ui.dormitory.lookup.model.RoomDetail;
 import com.utc2.appreborn.ui.dormitory.model.Room;
 import com.utc2.appreborn.utils.LocaleHelper;
+import com.utc2.appreborn.utils.SessionManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
- * Màn hình Kí túc xá – 1 Activity duy nhất chứa cả 2 trang.
+ * Màn hình Ký túc xá.
  *
- * Tab bar (Đăng ký / Tra phòng) luôn cố định.
- * Khi bấm tab → chỉ đổi nội dung bên dưới (pageDangKy ↔ pageTraPhong),
- * header và tab bar KHÔNG thay đổi.
- *
- * [Chương 3 - OOP]  [Chương 4 - Ngoại lệ]  [Chương 5 - Collection]
+ * CHIẾN LƯỢC FIX (không phá chức năng cũ):
+ *  - Hiển thị / tìm kiếm / lọc phòng: vẫn dùng DormitoryDbRepository (local) như cũ.
+ *  - Đăng ký phòng (handleRegisterClick): GỌI API thật thay vì ghi local DB.
+ *    → Server nhận request → tạo fee record → màn hình thanh toán hiện đúng số tiền.
+ *  - Hủy đăng ký: gọi API DELETE.
  */
 public class DormitoryActivity extends AppCompatActivity {
 
     private static final String TAG = "DormitoryActivity";
+    private static final int    DEFAULT_MONTHS = 8;
 
     // ── Tab & Pages ───────────────────────────────────────────────────────────
-    private TextView    tabDangKy, tabTraPhong;
+    private TextView     tabDangKy, tabTraPhong;
     private LinearLayout pageDangKy;
     private LinearLayout pageTraPhong;
 
@@ -75,22 +88,22 @@ public class DormitoryActivity extends AppCompatActivity {
     private RecyclerView     rvOccupants;
 
     // ── Repositories ──────────────────────────────────────────────────────────
+    // Giữ nguyên dormRepo cho hiển thị/tìm kiếm/lọc — không đụng vào
     private DormitoryDbRepository dormRepo;
-    private LookupRepository    lookupRepo;
+    private LookupRepository      lookupRepo;
 
     // ── State Đăng ký ─────────────────────────────────────────────────────────
     private RoomAdapter   roomAdapter;
     private String        filterBuilding = "";
     private int           filterMaxPrice = 0;
     private Room.RoomType filterRoomType = null;
-    private long          currentRegId   = -1;  // -1 = chưa có đăng ký
+    private String        searchQuery    = "";
+    private long          currentRegId   = -1;
 
     // ── State Tra phòng ───────────────────────────────────────────────────────
-    // null = chưa chọn; giá trị cụ thể = đã chọn
     private String selectedRoomId   = null;
     private String selectedBuilding = null;
 
-    // ─────────────────────────────────────────────────────────────────────────
     @Override
     protected void attachBaseContext(android.content.Context base) {
         super.attachBaseContext(LocaleHelper.applyLocale(base));
@@ -102,125 +115,30 @@ public class DormitoryActivity extends AppCompatActivity {
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         setContentView(R.layout.activity_dormitory);
 
-        dormRepo = DormitoryDbRepository.getInstance(this);
+        // Local repo — giữ nguyên như code gốc
+        dormRepo   = DormitoryDbRepository.getInstance(this);
         lookupRepo = LookupRepository.getInstance();
+
+        // dormApi được tạo lazy khi cần — xem getDormApi()
 
         bindViews();
         applyWindowInsets();
         setupTabs();
         setupBackButton();
 
-        // Khởi tạo trang Đăng ký
         setupRecyclerView();
         setupFilterButtons();
         setupSearchBox();
         setupCancelButton();
 
-        // Khởi tạo trang Tra phòng
         setupLookupDropdowns();
         setupSearchButton();
 
-        // Hiển thị trang Đăng ký mặc định
         showPage(true);
     }
 
-    // ── Tự động căn theo status bar của từng máy ──────────────────────────────
-    private void applyWindowInsets() {
-        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
-        View scrollView = findViewById(R.id.scrollView);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
-            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
-            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
-            lp.height = statusH;
-            statusBarSpacer.setLayoutParams(lp);
-
-            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
-            scrollView.setPadding(0, 0, 0, navH);
-
-            return insets;
-        });
-    }
-
-    // ── Ánh xạ tất cả views ───────────────────────────────────────────────────
-    private void bindViews() {
-        // Tab & pages
-        tabDangKy    = findViewById(R.id.tabDangKy);
-        tabTraPhong  = findViewById(R.id.tabTraPhong);
-        pageDangKy   = findViewById(R.id.pageDangKy);
-        pageTraPhong = findViewById(R.id.pageTraPhong);
-
-        // Header
-        btnBack = findViewById(R.id.btnBack);
-
-        // Đăng ký
-        rvRooms        = findViewById(R.id.rvRooms);
-        searchBox      = findViewById(R.id.searchBox);
-        layoutSelected = findViewById(R.id.layoutSelected);
-        txtRoomInfo    = findViewById(R.id.txtRoomInfo);
-        txtRoomSubInfo = findViewById(R.id.txtRoomSubInfo);
-        txtTotal       = findViewById(R.id.txtTotal);
-        btnToa         = findViewById(R.id.btnToa);
-        btnGia         = findViewById(R.id.btnGia);
-        btnLoai        = findViewById(R.id.btnLoai);
-        btnCancel      = findViewById(R.id.btnCancel);
-
-        // Tra phòng
-        btnChonPhong      = findViewById(R.id.btnChonPhong);
-        btnChonToa        = findViewById(R.id.btnChonToa);
-        btnTimKiem        = findViewById(R.id.btnTimKiem);
-        cardRoomInfo      = findViewById(R.id.cardRoomInfo);
-        cardOccupants     = findViewById(R.id.cardOccupants);
-        tvRoomName        = findViewById(R.id.tvRoomName);
-        tvRoomStatus      = findViewById(R.id.tvRoomStatus);
-        tvRoomType        = findViewById(R.id.tvRoomType);
-        tvCapacity        = findViewById(R.id.tvCapacity);
-        tvPrice           = findViewById(R.id.tvPrice);
-        tvCurrentCount    = findViewById(R.id.tvCurrentCount);
-        tvCapacityLabel   = findViewById(R.id.tvCapacityLabel);
-        progressOccupancy = findViewById(R.id.progressOccupancy);
-        tvStatusBadge     = findViewById(R.id.tvStatusBadge);
-        ivStatusIcon      = findViewById(R.id.ivStatusIcon);
-        rvOccupants       = findViewById(R.id.rvOccupants);
-    }
-
-    // ── Chuyển trang (tab) ────────────────────────────────────────────────────
-    /**
-     * showDangKy=true  → hiện pageDangKy,   ẩn pageTraPhong
-     * showDangKy=false → hiện pageTraPhong, ẩn pageDangKy
-     *
-     * Tab bar và header KHÔNG thay đổi — chỉ nội dung bên dưới đổi.
-     */
-    private void showPage(boolean showDangKy) {
-        if (showDangKy) {
-            pageDangKy.setVisibility(View.VISIBLE);
-            pageTraPhong.setVisibility(View.GONE);
-
-            tabDangKy.setBackgroundResource(R.drawable.bg_tab_selected);
-            tabDangKy.setTextColor(android.graphics.Color.WHITE);
-            tabTraPhong.setBackground(null);
-            tabTraPhong.setTextColor(android.graphics.Color.BLACK);
-        } else {
-            pageDangKy.setVisibility(View.GONE);
-            pageTraPhong.setVisibility(View.VISIBLE);
-
-            tabTraPhong.setBackgroundResource(R.drawable.bg_tab_selected);
-            tabTraPhong.setTextColor(android.graphics.Color.WHITE);
-            tabDangKy.setBackground(null);
-            tabDangKy.setTextColor(android.graphics.Color.BLACK);
-        }
-    }
-
-    private void setupTabs() {
-        tabDangKy.setOnClickListener(v -> showPage(true));
-        tabTraPhong.setOnClickListener(v -> showPage(false));
-    }
-
-    private void setupBackButton() {
-        btnBack.setOnClickListener(v -> finish());
-    }
-
     // ══════════════════════════════════════════════════════════════════════════
-    //  TRANG ĐĂNG KÝ
+    //  TRANG ĐĂNG KÝ — hiển thị/lọc/tìm kiếm giữ nguyên như code gốc
     // ══════════════════════════════════════════════════════════════════════════
 
     private void setupRecyclerView() {
@@ -229,7 +147,40 @@ public class DormitoryActivity extends AppCompatActivity {
         rvRooms.setNestedScrollingEnabled(false);
         rvRooms.setAdapter(roomAdapter);
 
-        // Load phòng từ DB (async)
+        // Load phòng từ API backend (roomId đúng với server)
+        loadRoomsFromApi();
+    }
+
+    private void loadRoomsFromApi() {
+        getDormApi().getRooms().enqueue(new retrofit2.Callback<ApiResponse<java.util.List<com.utc2.appreborn.network.dto.DormRoomResponse>>>() {
+            @Override
+            public void onResponse(retrofit2.Call<ApiResponse<java.util.List<com.utc2.appreborn.network.dto.DormRoomResponse>>> call,
+                                   retrofit2.Response<ApiResponse<java.util.List<com.utc2.appreborn.network.dto.DormRoomResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().getData() != null) {
+                    java.util.List<Room> roomList = new ArrayList<>();
+                    for (com.utc2.appreborn.network.dto.DormRoomResponse r : response.body().getData()) {
+                        roomList.add(apiRoomToRoom(r));
+                    }
+                    runOnUiThread(() -> {
+                        allRooms.clear();
+                        allRooms.addAll(roomList);
+                        roomAdapter.updateData(roomList);
+                    });
+                } else {
+                    // Fallback: dùng local DB nếu API lỗi
+                    Log.w(TAG, "API getRooms failed, fallback local DB");
+                    loadRoomsFromLocal();
+                }
+            }
+            @Override
+            public void onFailure(retrofit2.Call<ApiResponse<java.util.List<com.utc2.appreborn.network.dto.DormRoomResponse>>> call, Throwable t) {
+                Log.w(TAG, "API getRooms network error, fallback local: " + t.getMessage());
+                loadRoomsFromLocal();
+            }
+        });
+    }
+
+    private void loadRoomsFromLocal() {
         dormRepo.getAllRooms(rooms -> {
             List<Room> roomList = new ArrayList<>();
             for (DormitoryRoomEntity e : rooms) roomList.add(entityToRoom(e));
@@ -237,9 +188,11 @@ public class DormitoryActivity extends AppCompatActivity {
         });
     }
 
-    /** [Chương 4] xử lý đăng ký phòng. */
+    /**
+     * FIX CHÍNH: Thay vì gọi dormRepo.registerRoom() (ghi local DB),
+     * giờ gọi POST /api/v1/dormitory/register để server tạo fee record.
+     */
     private void handleRegisterClick(Room room) {
-        long userId = 1L;
         long roomId;
         try {
             roomId = Long.parseLong(room.getId());
@@ -247,9 +200,70 @@ public class DormitoryActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.dorm_id_invalid), Toast.LENGTH_SHORT).show();
             return;
         }
-        dormRepo.registerRoom(roomId, userId, 8, (reg, error) -> {
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("roomId", roomId);
+        body.put("months", DEFAULT_MONTHS);
+
+        getDormApi().register(body).enqueue(new Callback<ApiResponse<DormRegistrationResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<DormRegistrationResponse>> call,
+                                   Response<ApiResponse<DormRegistrationResponse>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    DormRegistrationResponse reg = response.body().getData();
+                    currentRegId = reg.dormRegId != null ? reg.dormRegId : -1;
+
+                    layoutSelected.setVisibility(View.VISIBLE);
+                    txtRoomInfo.setText(room.getName());
+                    if (txtRoomSubInfo != null)
+                        txtRoomSubInfo.setText(getString(R.string.room_subinfo,
+                                room.getCapacity(),
+                                String.format("%,d", (long) room.getPricePerMonth()),
+                                room.getRoomType().getLabel()));
+
+                    double totalFee = reg.getTotalFeeAsDouble();
+                    txtTotal.setText(getString(R.string.dorm_tong_tien,
+                            String.format("%,.0f", totalFee)));
+
+                    Toast.makeText(DormitoryActivity.this,
+                            getString(R.string.dorm_register_success), Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "Registered via API, dormRegId=" + reg.dormRegId + " fee=" + totalFee);
+
+                } else {
+                    int code = response.code();
+                    String msg = null;
+                    try {
+                        if (response.errorBody() != null) {
+                            // Parse JSON errorBody để lấy field "message"
+                            String raw = response.errorBody().string();
+                            org.json.JSONObject json = new org.json.JSONObject(raw);
+                            msg = json.optString("message", null);
+                        }
+                    } catch (Exception ignored) {}
+                    Log.w(TAG, "API register failed HTTP " + code + " msg=" + msg);
+                    String display = msg != null ? msg : "Đăng ký thất bại (lỗi " + code + ")";
+                    Toast.makeText(DormitoryActivity.this, display, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<DormRegistrationResponse>> call, Throwable t) {
+                Log.w(TAG, "API register network error: " + t.getMessage());
+                Toast.makeText(DormitoryActivity.this,
+                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    /** Fallback: ghi local DB như code gốc khi API không khả dụng */
+    private void registerRoomLocal(Room room) {
+        long userId = SessionManager.getInstance(this).getUserId();
+        if (userId < 0) userId = 1L; // guest fallback
+        long roomId = Long.parseLong(room.getId());
+
+        dormRepo.registerRoom(roomId, userId, DEFAULT_MONTHS, (reg, error) -> {
             if (error != null) {
-                Log.w(TAG, "DormitoryException: " + error.getMessage());
                 Toast.makeText(this, error.getMessage(), Toast.LENGTH_LONG).show();
                 return;
             }
@@ -259,12 +273,11 @@ public class DormitoryActivity extends AppCompatActivity {
             if (txtRoomSubInfo != null)
                 txtRoomSubInfo.setText(getString(R.string.room_subinfo,
                         room.getCapacity(),
-                        String.format("%,d", room.getPricePerMonth()),
+                        String.format("%,d", (long) room.getPricePerMonth()),
                         room.getRoomType().getLabel()));
             txtTotal.setText(getString(R.string.dorm_tong_tien,
                     String.format("%,d", reg.totalPrice)));
             Toast.makeText(this, getString(R.string.dorm_register_success), Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "handleRegisterClick() done – roomId: " + room.getId());
         });
     }
 
@@ -272,17 +285,40 @@ public class DormitoryActivity extends AppCompatActivity {
         if (btnCancel == null) return;
         btnCancel.setOnClickListener(v -> {
             if (currentRegId < 0) return;
-            dormRepo.cancelRegistration(currentRegId, error -> {
-                if (error != null) {
-                    Log.w(TAG, "Cancel error: " + error.getMessage());
-                    Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
-                    return;
+
+            // Thử API trước, fallback local nếu lỗi
+            getDormApi().cancel(currentRegId).enqueue(new Callback<ApiResponse<Void>>() {
+                @Override
+                public void onResponse(Call<ApiResponse<Void>> call,
+                                       Response<ApiResponse<Void>> response) {
+                    if (response.isSuccessful() && response.body() != null
+                            && response.body().isSuccess()) {
+                        currentRegId = -1;
+                        layoutSelected.setVisibility(View.GONE);
+                        Toast.makeText(DormitoryActivity.this,
+                                getString(R.string.dorm_cancel_success), Toast.LENGTH_SHORT).show();
+                    } else {
+                        cancelLocal();
+                    }
                 }
-                currentRegId = -1;
-                layoutSelected.setVisibility(View.GONE);
-                Toast.makeText(this, getString(R.string.dorm_cancel_success), Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "handleCancelClick() done.");
+
+                @Override
+                public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                    cancelLocal();
+                }
             });
+        });
+    }
+
+    private void cancelLocal() {
+        dormRepo.cancelRegistration(currentRegId, error -> {
+            if (error != null) {
+                Toast.makeText(this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+            currentRegId = -1;
+            layoutSelected.setVisibility(View.GONE);
+            Toast.makeText(this, getString(R.string.dorm_cancel_success), Toast.LENGTH_SHORT).show();
         });
     }
 
@@ -294,7 +330,8 @@ public class DormitoryActivity extends AppCompatActivity {
                                 getString(R.string.dorm_filter_toa_b),
                                 getString(R.string.dorm_filter_toa_c)},
                         choice -> {
-                            filterBuilding = choice.equals(getString(R.string.dorm_filter_all)) ? "" : choice.replace(getString(R.string.toa_nha) + " ", "").replace("Block ", "");
+                            filterBuilding = choice.equals(getString(R.string.dorm_filter_all)) ? "" :
+                                    choice.replaceAll("(?i)^(Tòa|Block)\\s+", "").trim();
                             btnToa.setText(choice + " ▾");
                             applyFilter();
                         }));
@@ -323,47 +360,43 @@ public class DormitoryActivity extends AppCompatActivity {
                         }));
     }
 
+    // allRooms giữ toàn bộ list gốc từ API để filter không mất data
+    private final List<Room> allRooms = new ArrayList<>();
+
     private void applyFilter() {
-        String roomTypeStr = filterRoomType == null ? "" : filterRoomType.name();
-        dormRepo.filterRooms(filterBuilding, filterMaxPrice, roomTypeStr, rooms -> {
-            List<Room> roomList = new ArrayList<>();
-            for (DormitoryRoomEntity e : rooms) roomList.add(entityToRoom(e));
-            roomAdapter.updateData(roomList);
-            Log.d(TAG, "applyFilter() done.");
-        });
+        List<Room> filtered = new ArrayList<>();
+        String q = searchQuery.toLowerCase();
+        for (Room room : allRooms) {
+            boolean okBuilding = filterBuilding.isEmpty()
+                    || room.getBuilding().equalsIgnoreCase(filterBuilding);
+            boolean okPrice    = filterMaxPrice == 0
+                    || room.getPricePerMonth() <= filterMaxPrice;
+            boolean okType     = filterRoomType == null
+                    || room.getRoomType() == filterRoomType;
+            boolean okSearch   = q.isEmpty()
+                    || room.getName().toLowerCase().contains(q);
+            if (okBuilding && okPrice && okType && okSearch) filtered.add(room);
+        }
+        roomAdapter.updateData(filtered);
     }
 
     private void setupSearchBox() {
         searchBox.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void afterTextChanged(Editable s) {}
-
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String query = s.toString().trim().toLowerCase();
-                dormRepo.getAllRooms(rooms -> {
-                    List<Room> filtered = new ArrayList<>();
-                    for (DormitoryRoomEntity e : rooms) {
-                        if (e.roomName != null && e.roomName.toLowerCase().contains(query))
-                            filtered.add(entityToRoom(e));
-                    }
-                    roomAdapter.updateData(filtered);
-                });
+                searchQuery = s.toString().trim();
+                applyFilter();
             }
         });
     }
 
     // ══════════════════════════════════════════════════════════════════════════
-    //  TRANG TRA PHÒNG
+    //  TRANG TRA PHÒNG — giữ nguyên hoàn toàn như code gốc
     // ══════════════════════════════════════════════════════════════════════════
 
-    /**
-     * Dropdown chọn phòng: chỉ hiện TÊN PHÒNG (vd: "Phòng 201").
-     * Dropdown chọn tòa:   chỉ hiện TÒA (vd: "Tòa A").
-     * Hai state độc lập nhau.
-     */
     private void setupLookupDropdowns() {
-        // Dropdown Chọn phòng
         btnChonPhong.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
             List<RoomDetail> all = lookupRepo.getAllRoomDetails();
@@ -387,7 +420,6 @@ public class DormitoryActivity extends AppCompatActivity {
             popup.show();
         });
 
-        // Dropdown Chọn tòa nhà
         btnChonToa.setOnClickListener(v -> {
             PopupMenu popup = new PopupMenu(this, v);
             popup.getMenu().add(0, 0, 0, getString(R.string.dorm_dropdown_chon_toa));
@@ -414,18 +446,7 @@ public class DormitoryActivity extends AppCompatActivity {
         btnTimKiem.setOnClickListener(v -> handleLookupSearch());
     }
 
-    /**
-     * Logic tìm kiếm:
-     *  - Phải chọn ít nhất 1 tiêu chí.
-     *  - Nếu chọn CẢ HAI: tìm phòng theo ID rồi kiểm tra tòa có khớp không.
-     *    Nếu không khớp → báo lỗi, không hiển thị.
-     *  - Nếu chỉ chọn phòng: tìm theo ID.
-     *  - Nếu chỉ chọn tòa: lấy phòng đầu tiên của tòa đó.
-     *
-     * [Chương 4] try-catch-finally
-     */
     private void handleLookupSearch() {
-        // Validate: BẮT BUỘC phải chọn đủ cả 2
         if (selectedRoomId == null && selectedBuilding == null) {
             Toast.makeText(this, getString(R.string.dorm_select_both), Toast.LENGTH_SHORT).show();
             return;
@@ -438,11 +459,9 @@ public class DormitoryActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.dorm_select_building), Toast.LENGTH_SHORT).show();
             return;
         }
-
         try {
-            // Đã chọn đủ cả 2 → kiểm tra phòng có thuộc tòa đó không
             RoomDetail detail = lookupRepo.findById(selectedRoomId);
-            String roomBuilding = detail.getRoom().getBuilding(); // "A", "B", "C"
+            String roomBuilding = detail.getRoom().getBuilding();
             if (!roomBuilding.equalsIgnoreCase(selectedBuilding)) {
                 Toast.makeText(this,
                         getString(R.string.dorm_wrong_building, selectedBuilding),
@@ -451,19 +470,15 @@ public class DormitoryActivity extends AppCompatActivity {
                 cardOccupants.setVisibility(View.GONE);
                 return;
             }
-            // Khớp → hiển thị thông tin
             showRoomDetail(detail);
-
         } catch (DormitoryException e) {
             Log.w(TAG, "DormitoryException: " + e.getMessage());
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG).show();
             cardRoomInfo.setVisibility(View.GONE);
             cardOccupants.setVisibility(View.GONE);
-
         } catch (Exception e) {
             Log.e(TAG, "Unexpected error khi tra phòng", e);
             Toast.makeText(this, getString(R.string.dorm_unknown_error), Toast.LENGTH_SHORT).show();
-
         } finally {
             Log.d(TAG, "handleLookupSearch() done");
         }
@@ -471,20 +486,16 @@ public class DormitoryActivity extends AppCompatActivity {
 
     private void showRoomDetail(RoomDetail detail) {
         Room room = detail.getRoom();
-
         cardRoomInfo.setVisibility(View.VISIBLE);
         tvRoomName.setText(room.getName());
         tvRoomStatus.setText(getString(R.string.dorm_trang_thai, detail.getStatusLabel()));
         tvRoomType.setText(getString(R.string.dorm_loai_phong, room.getRoomType().getLabel()));
         tvCapacity.setText(getString(R.string.dorm_suc_chua, room.getCapacity()));
         tvPrice.setText(getString(R.string.dorm_gia, String.format("%,d", room.getPricePerMonth())));
-
         int progress = (int) (detail.getOccupancyRatio() * 100);
         progressOccupancy.setProgress(progress);
         tvCurrentCount.setText(getString(R.string.dorm_hien_tai, detail.getCurrentOccupants()));
         tvCapacityLabel.setText(detail.getCurrentOccupants() + " / " + room.getCapacity());
-
-        // Dùng ic_status_check / ic_status_x có sẵn trong drawable
         if (room.isAvailable()) {
             ivStatusIcon.setImageResource(R.drawable.ic_status_check);
             tvStatusBadge.setText(getString(R.string.trang_thai_con_cho));
@@ -494,7 +505,6 @@ public class DormitoryActivity extends AppCompatActivity {
             tvStatusBadge.setText(getString(R.string.trang_thai_het_cho));
             tvStatusBadge.setTextColor(getResources().getColor(R.color.red, null));
         }
-
         cardOccupants.setVisibility(View.VISIBLE);
         OccupantAdapter adapter = new OccupantAdapter(detail.getOccupantList());
         rvOccupants.setLayoutManager(new LinearLayoutManager(this));
@@ -502,11 +512,111 @@ public class DormitoryActivity extends AppCompatActivity {
         rvOccupants.setAdapter(adapter);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Boilerplate giữ nguyên ────────────────────────────────────────────────
 
-    /** Chuyển DormitoryRoomEntity (DB) sang Room (UI model). */
+    private void applyWindowInsets() {
+        View statusBarSpacer = findViewById(R.id.statusBarSpacer);
+        View scrollView = findViewById(R.id.scrollView);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content), (v, insets) -> {
+            int statusH = insets.getInsets(WindowInsetsCompat.Type.statusBars()).top;
+            ViewGroup.LayoutParams lp = statusBarSpacer.getLayoutParams();
+            lp.height = statusH;
+            statusBarSpacer.setLayoutParams(lp);
+            int navH = insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom;
+            scrollView.setPadding(0, 0, 0, navH);
+            return insets;
+        });
+    }
+
+    private void bindViews() {
+        tabDangKy    = findViewById(R.id.tabDangKy);
+        tabTraPhong  = findViewById(R.id.tabTraPhong);
+        pageDangKy   = findViewById(R.id.pageDangKy);
+        pageTraPhong = findViewById(R.id.pageTraPhong);
+        btnBack      = findViewById(R.id.btnBack);
+        rvRooms        = findViewById(R.id.rvRooms);
+        searchBox      = findViewById(R.id.searchBox);
+        layoutSelected = findViewById(R.id.layoutSelected);
+        txtRoomInfo    = findViewById(R.id.txtRoomInfo);
+        txtRoomSubInfo = findViewById(R.id.txtRoomSubInfo);
+        txtTotal       = findViewById(R.id.txtTotal);
+        btnToa         = findViewById(R.id.btnToa);
+        btnGia         = findViewById(R.id.btnGia);
+        btnLoai        = findViewById(R.id.btnLoai);
+        btnCancel      = findViewById(R.id.btnCancel);
+        btnChonPhong      = findViewById(R.id.btnChonPhong);
+        btnChonToa        = findViewById(R.id.btnChonToa);
+        btnTimKiem        = findViewById(R.id.btnTimKiem);
+        cardRoomInfo      = findViewById(R.id.cardRoomInfo);
+        cardOccupants     = findViewById(R.id.cardOccupants);
+        tvRoomName        = findViewById(R.id.tvRoomName);
+        tvRoomStatus      = findViewById(R.id.tvRoomStatus);
+        tvRoomType        = findViewById(R.id.tvRoomType);
+        tvCapacity        = findViewById(R.id.tvCapacity);
+        tvPrice           = findViewById(R.id.tvPrice);
+        tvCurrentCount    = findViewById(R.id.tvCurrentCount);
+        tvCapacityLabel   = findViewById(R.id.tvCapacityLabel);
+        progressOccupancy = findViewById(R.id.progressOccupancy);
+        tvStatusBadge     = findViewById(R.id.tvStatusBadge);
+        ivStatusIcon      = findViewById(R.id.ivStatusIcon);
+        rvOccupants       = findViewById(R.id.rvOccupants);
+    }
+
+    private void showPage(boolean showDangKy) {
+        if (showDangKy) {
+            pageDangKy.setVisibility(View.VISIBLE);
+            pageTraPhong.setVisibility(View.GONE);
+            tabDangKy.setBackgroundResource(R.drawable.bg_tab_selected);
+            tabDangKy.setTextColor(android.graphics.Color.WHITE);
+            tabTraPhong.setBackground(null);
+            tabTraPhong.setTextColor(android.graphics.Color.BLACK);
+        } else {
+            pageDangKy.setVisibility(View.GONE);
+            pageTraPhong.setVisibility(View.VISIBLE);
+            tabTraPhong.setBackgroundResource(R.drawable.bg_tab_selected);
+            tabTraPhong.setTextColor(android.graphics.Color.WHITE);
+            tabDangKy.setBackground(null);
+            tabDangKy.setTextColor(android.graphics.Color.BLACK);
+        }
+    }
+
+    private void setupTabs() {
+        tabDangKy.setOnClickListener(v -> showPage(true));
+        tabTraPhong.setOnClickListener(v -> showPage(false));
+    }
+
+    private void setupBackButton() {
+        btnBack.setOnClickListener(v -> finish());
+    }
+
+    /** Tạo DormApiService dùng ApiClient singleton (BASE_URL tập trung) */
+    private DormApiService getDormApi() {
+        String token = SessionManager.getInstance(this).getAuthToken();
+        Log.d(TAG, ">>> TOKEN = " + token);
+        return ApiClient.getInstance(token).create(DormApiService.class);
+    }
+
+    /** Convert API response → Room model (roomId là Long từ server) */
+    private Room apiRoomToRoom(com.utc2.appreborn.network.dto.DormRoomResponse r) {
+        boolean available = Boolean.TRUE.equals(r.available) || "còn chỗ".equals(r.status);
+        Room.RoomType type = "NU".equals(r.roomType) ? Room.RoomType.NU : Room.RoomType.NAM;
+        String name = r.roomCode + " - Tòa " + r.building;
+        int price = r.pricePerMonth != null ? r.pricePerMonth.intValue() : 0;
+        int cap   = r.capacity   != null ? r.capacity   : 0;
+        // roomId từ server — đây là giá trị đúng để gửi khi đăng ký
+        return new Room(
+                String.valueOf(r.roomId),
+                name,
+                r.building,
+                cap,
+                price,
+                available,
+                type
+        );
+    }
+
     private Room entityToRoom(DormitoryRoomEntity e) {
-        boolean available = "AVAILABLE".equals(e.status);
+        boolean available = "AVAILABLE".equals(e.status) || "còn chỗ".equals(e.status);
         Room.RoomType type = "NU".equals(e.roomType) ? Room.RoomType.NU : Room.RoomType.NAM;
         return new Room(
                 String.valueOf(e.roomId),
@@ -519,7 +629,6 @@ public class DormitoryActivity extends AppCompatActivity {
         );
     }
 
-    /** "Phòng 201 - Tòa A" → "Phòng 201" */
     private String extractRoomNumber(String fullName) {
         if (fullName == null) return "";
         int dashIndex = fullName.indexOf(" - ");

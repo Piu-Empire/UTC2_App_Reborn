@@ -170,24 +170,22 @@ public class CourseRegistrationFragment extends Fragment {
 
     private void handleRegisterClick(Course course) {
         if (confirmedIds.contains(course.getId())) {
-            Toast.makeText(requireContext(), "Môn này đã được xác nhận rồi!", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Môn này đã được xác nhận rồi!");
             return;
         }
         try {
             courseRepo.registerCourse(course.getId());
             updateSelectedPanel();
             refreshAdapterPending();
-            Toast.makeText(requireContext(),
-                    "Đã thêm \"" + course.getName() + "\" vào giỏ đăng ký.",
-                    Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Đã thêm \"" + course.getName() + "\" vào giỏ đăng ký.");
 
         } catch (CourseException e) {
             Log.w(TAG, "CourseException: " + e.getMessage());
-            Toast.makeText(requireContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), e.getMessage());
 
         } catch (Exception e) {
             Log.e(TAG, "Unexpected error", e);
-            Toast.makeText(requireContext(), "Lỗi không xác định, vui lòng thử lại.", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Lỗi không xác định, vui lòng thử lại.");
 
         } finally {
             Log.d(TAG, "handleRegisterClick() done – courseId: " + course.getId());
@@ -239,7 +237,7 @@ public class CourseRegistrationFragment extends Fragment {
         btnConfirm.setOnClickListener(v -> {
             Map<String, CourseRegistration> pending = courseRepo.getRegistrations();
             if (pending.isEmpty()) {
-                Toast.makeText(requireContext(), "Chưa có môn học nào trong giỏ đăng ký!", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Chưa có môn học nào trong giỏ đăng ký!");
                 return;
             }
 
@@ -249,15 +247,21 @@ public class CourseRegistrationFragment extends Fragment {
 
             CourseStorage.saveConfirmedIds(requireContext(), confirmedIds);
 
+            // Lưu credits: đọc map hiện tại rồi cập nhật thêm các môn vừa xác nhận
+            java.util.Map<String, Integer> creditsMap = CourseStorage.loadCreditsMap(requireContext());
+            for (String id : confirmedIds) {
+                Course c = courseRepo.findById(id);
+                if (c != null) creditsMap.put(id, c.getCredits());
+            }
+            CourseStorage.saveCreditsMap(requireContext(), creditsMap);
+
             courseRepo.clearPendingRegistrations();
             layoutSelected.setVisibility(View.GONE);
             layoutSelectedItems.removeAllViews();
 
             courseAdapter.setRegisteredIds(new ArrayList<>(confirmedIds));
 
-            Toast.makeText(requireContext(),
-                    "Xác nhận đăng ký thành công! Đã lưu dữ liệu.",
-                    Toast.LENGTH_LONG).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Xác nhận đăng ký thành công! Đã lưu dữ liệu.");
         });
     }
 
@@ -431,9 +435,7 @@ public class CourseRegistrationFragment extends Fragment {
                     confirmedIds.remove(courseId);
                     CourseStorage.saveConfirmedIds(requireContext(), confirmedIds);
                     courseAdapter.setRegisteredIds(new ArrayList<>(confirmedIds));
-                    Toast.makeText(requireContext(),
-                            "Đã hủy đăng ký môn \"" + tenMon + "\"",
-                            Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Đã hủy đăng ký môn \"" + tenMon + "\"");
                     buildKetQuaPage();
                 })
                 .setNegativeButton("Không", null)

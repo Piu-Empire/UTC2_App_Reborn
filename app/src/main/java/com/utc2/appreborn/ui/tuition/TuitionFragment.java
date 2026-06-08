@@ -60,14 +60,15 @@ public class TuitionFragment extends Fragment {
         // Kiểm tra mạng tức thời khi người dùng nhấn chọn chức năng
         cardTuitionSubject.setOnClickListener(v -> checkNetworkAndNavigate(SubjectTuitionActivity.class));
         cardDormitory.setOnClickListener(v -> checkNetworkAndNavigate(DormitoryTuitionActivity.class));
-        cardInvoice.setOnClickListener(v -> checkNetworkAndNavigate(InvoiceActivity.class));
+        // Invoice mở luôn không cần check mạng vì có local data
+        cardInvoice.setOnClickListener(v -> startActivity(new Intent(requireContext(), InvoiceActivity.class)));
     }
 
     private void checkNetworkAndNavigate(Class<?> targetActivity) {
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             startActivity(new Intent(requireContext(), targetActivity));
         } else {
-            Toast.makeText(requireContext(), "Vui lòng kết nối mạng để xem thông tin học phí!", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Vui lòng kết nối mạng để xem thông tin học phí!");
         }
     }
 }

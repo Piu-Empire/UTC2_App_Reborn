@@ -12,7 +12,7 @@
     <color name="transparent">#00000000</color>
 
 
-    <color name="primary">#1565C0</color>
+    <color name="primary">#FFC107</color>
 
 
     <color name="accent">#FF4081</color>
@@ -167,6 +167,23 @@
 
     <color name="schedule_theory">#5B58FF</color>
     <color name="schedule_practice">#00C897</color>
+
+    <!-- L\u1ecbch thi: cam v\u00e0ng -->
+    <color name="schedule_exam">#F59E0B</color>
+    <color name="schedule_exam_stroke">#D97706</color>
+    <color name="schedule_exam_badge_bg">#FEF3C7</color>
+    <color name="schedule_exam_badge_text">#92400E</color>
+
+    <!-- L\u1ecbch thi l\u1ea1i: \u0111\u1ecf -->
+    <color name="schedule_reexam">#EF4444</color>
+    <color name="schedule_reexam_stroke">#DC2626</color>
+    <color name="schedule_reexam_badge_bg">#FEE2E2</color>
+    <color name="schedule_reexam_badge_text">#991B1B</color>
+
+    <!-- L\u1ecbch h\u1ecdc: xanh (gi\u1eef c\u0169) -->
+    <color name="schedule_study_stroke">#1E293B</color>
+    <color name="schedule_study_badge_bg">#EFF6FF</color>
+    <color name="schedule_study_badge_text">#1E40AF</color>
 
     <color name="indicator_location">#FACC15</color>
     <color name="indicator_time_line">#E2E8F0</color>

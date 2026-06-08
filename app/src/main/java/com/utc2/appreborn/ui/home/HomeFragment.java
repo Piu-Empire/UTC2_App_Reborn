@@ -337,8 +337,7 @@ public class HomeFragment extends Fragment {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
         } catch (android.content.ActivityNotFoundException e) {
-            Toast.makeText(requireContext(),
-                    "Không tìm thấy trình duyệt", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Không tìm thấy trình duyệt");
         }
     }
 }

@@ -245,6 +245,6 @@ public class SupportActivity extends AppCompatActivity {
     }
 
     private void showToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        com.utc2.appreborn.utils.CustomToastHelper.showToast(this, msg);
     }
 }

@@ -65,8 +65,7 @@ public class InvoiceActivity extends AppCompatActivity {
         networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
             @Override public void onNetworkAvailable() {}
             @Override public void onNetworkLost() {
-                Toast.makeText(InvoiceActivity.this,
-                        "Mất kết nối mạng!", Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(InvoiceActivity.this, "Mất kết nối mạng!");
             }
         });
         networkUtils.register();
@@ -127,24 +126,32 @@ public class InvoiceActivity extends AppCompatActivity {
         runOnUiThread(() -> {
             List<Object> items = new ArrayList<>();
 
-            // Section 1: Học phí môn học
+            // ── Section 1: Học phí môn học ───────────────────
             items.add(getString(R.string.invoice_section_tuition));
-            if (tuitionPaid.isEmpty()) {
+
+            // Local invoices lên đầu
+            java.util.List<String[]> localList =
+                    com.utc2.appreborn.ui.courseregistration.model.CourseStorage
+                            .loadLocalInvoices(this);
+            for (String[] inv : localList) {
+                double amt = 0;
+                try { amt = Double.parseDouble(inv[2]); } catch (Exception ignore) {}
+                items.add(new Invoice(Invoice.Type.TUITION, inv[0], 0L, 0L,
+                        inv[1], inv[3], "online", amt, amt));
+            }
+
+            if (tuitionPaid.isEmpty() && localList.isEmpty()) {
                 items.add(getString(R.string.invoice_empty_tuition));
             } else {
                 for (TuitionResponse t : tuitionPaid) {
                     long feeId = t.id         != null ? t.id         : 0L;
                     long semId = t.semesterId != null ? t.semesterId : 0L;
-                    items.add(new Invoice(
-                            Invoice.Type.TUITION,
-                            "HP_" + feeId,
+                    items.add(new Invoice(Invoice.Type.TUITION, "HP_" + feeId,
                             feeId, semId,
                             getString(R.string.semester_label, semId),
                             t.paidAt        != null ? t.paidAt        : "",
                             t.paymentMethod != null ? t.paymentMethod : "",
-                            t.getTotalAmountAsDouble(),
-                            t.getPaidAmountAsDouble()
-                    ));
+                            t.getTotalAmountAsDouble(), t.getPaidAmountAsDouble()));
                 }
             }
 

@@ -25,7 +25,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@color/white"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:fitsSystemWindows="true">
 
     <View
         android:id="@+id/status_bar_spacer"
@@ -39,6 +42,8 @@
         android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
         android:layout_weight="1">
 
         <!-- ══════════════════════════════════════════════
@@ -204,6 +209,8 @@
             android:layout_marginTop="-20dp"
             android:background="@drawable/bg_content_rounded_top"
             android:fillViewport="true"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:overScrollMode="never"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -211,7 +218,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="16dp">
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:paddingBottom="120dp">
 
                 <!-- Features -->
                 <TextView
@@ -240,7 +249,7 @@
                     android:id="@+id/iv_campus_banner"
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="40dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/bg_campus_banner"
                     android:contentDescription="@string/cd_campus_banner" />
@@ -254,7 +263,7 @@
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"
                     android:layout_marginStart="16dp"
-                    android:layout_marginTop="18dp"
+                    android:layout_marginTop="28dp"
                     android:layout_marginBottom="10dp" />
 
                 <androidx.recyclerview.widget.RecyclerView

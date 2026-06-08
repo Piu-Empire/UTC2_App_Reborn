@@ -3,10 +3,13 @@ package com.utc2.appreborn.ui.notification;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,29 +20,41 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.utc2.appreborn.R;
-import com.utc2.appreborn.data.local.StudentProfile;
 import com.utc2.appreborn.databinding.FragmentNotificationBinding;
-import com.utc2.appreborn.ui.main.MainActivity;
-import com.utc2.appreborn.utils.MockHelper;
+import com.utc2.appreborn.network.ApiClient;
+import com.utc2.appreborn.network.ApiResponse;
+import com.utc2.appreborn.network.NotificationApiService;
+import com.utc2.appreborn.network.dto.GmailMessageResponse;
+import com.utc2.appreborn.network.dto.NotificationResponse;
+import com.utc2.appreborn.network.dto.PageResponse;
+import com.utc2.appreborn.ui.login.LoginActivity;
+import com.utc2.appreborn.utils.SessionManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NotificationFragment extends Fragment {
 
     public static final String TAG = "NotificationFragment";
-    private static final String STUDENT_EMAIL_DOMAIN = "@st.utc2.edu.vn";
-    private static final String GMAIL_SEARCH_URL_TEMPLATE =
-            "https://mail.google.com/mail/u/0/#search/to%%3A%s";
-    private static final String GMAIL_INBOX_URL =
-            "https://mail.google.com/mail/u/0/#inbox";
 
     private FragmentNotificationBinding binding;
     private NotificationAdapter adapter;
-    private String studentEmail = null;
+    private SessionManager sessionManager;
+    private NotificationApiService apiService;
+
+    // Polling 60s
+    private final Handler pollingHandler = new Handler(Looper.getMainLooper());
+    private final Runnable pollingRunnable = new Runnable() {
+        @Override
+        public void run() {
+            loadNotifications();
+            pollingHandler.postDelayed(this, 60000); // 60s
+        }
+    };
 
     public NotificationFragment() {
         super(R.layout.fragment_notification);
@@ -50,33 +65,52 @@ public class NotificationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        // khởi tạo giao diện bằng view binding cho fragment
         binding = FragmentNotificationBinding.inflate(inflater, container, false);
+        sessionManager = SessionManager.getInstance(requireContext());
+        if (sessionManager.isLoggedIn()) {
+            apiService = ApiClient.getInstance(sessionManager.getAuthToken()).create(NotificationApiService.class);
+        }
         return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
-        // thiết lập logic khởi tạo sau khi view sẵn sàng
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         applyStatusBarInset();
-        loadStudentEmail();
         setupRecyclerView();
         setupClickListeners();
-        loadNotifications();
+        
+        if (sessionManager.isLoggedIn()) {
+            binding.tvGmailAddress.setText(sessionManager.getEmail());
+        } else {
+            binding.tvGmailAddress.setText("Chưa đăng nhập");
+            showEmptyState("Vui lòng đăng nhập để xem thông báo");
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (sessionManager.isLoggedIn()) {
+            pollingHandler.post(pollingRunnable);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        pollingHandler.removeCallbacks(pollingRunnable);
     }
 
     @Override
     public void onDestroyView() {
-        // hủy binding để tránh rò rỉ bộ nhớ fragment
         super.onDestroyView();
+        pollingHandler.removeCallbacks(pollingRunnable);
         binding = null;
     }
 
     private void applyStatusBarInset() {
-        // điều chỉnh lề tránh bị thanh trạng thái đè giao diện
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, windowInsets) -> {
             Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
             ViewGroup.LayoutParams lp = binding.statusBarSpacer.getLayoutParams();
@@ -86,30 +120,7 @@ public class NotificationFragment extends Fragment {
         });
     }
 
-    private void loadStudentEmail() {
-        // tự động tạo địa chỉ email dựa trên mã sinh viên
-        String mssv = null;
-
-        try {
-            mssv = MockHelper.getMockStudentCode();
-        } catch (Exception e) {
-            Log.w(TAG, "MockHelper not available: " + e.getMessage());
-        }
-
-        if (mssv != null && !mssv.isEmpty()) {
-            studentEmail = mssv + STUDENT_EMAIL_DOMAIN;
-        }
-
-        if (binding != null) {
-            String displayEmail = (studentEmail != null)
-                    ? studentEmail
-                    : "mssv" + STUDENT_EMAIL_DOMAIN;
-            binding.tvGmailAddress.setText(displayEmail);
-        }
-    }
-
     private void setupRecyclerView() {
-        // cấu hình hiển thị danh sách thông báo hiệu quả nhất
         adapter = new NotificationAdapter(this::handleNotificationItemClick);
         binding.rvNotifications.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.rvNotifications.setNestedScrollingEnabled(false);
@@ -117,7 +128,6 @@ public class NotificationFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        // gắn các sự kiện click cho nút chức năng chính
         binding.btnBack.setOnClickListener(v -> {
             if (getParentFragmentManager().getBackStackEntryCount() > 0) {
                 getParentFragmentManager().popBackStack();
@@ -126,104 +136,157 @@ public class NotificationFragment extends Fragment {
             }
         });
 
-        binding.btnOpenGmail.setOnClickListener(v -> openGmailForStudent());
-        binding.btnViewInGmail.setOnClickListener(v -> openGmailForStudent());
+        binding.btnOpenGmail.setOnClickListener(v -> openGmailApp());
+        binding.btnViewInGmail.setOnClickListener(v -> openGmailApp());
     }
 
-    private void openGmailForStudent() {
-        // mở ứng dụng gmail theo bộ lọc email sinh viên
-        String searchUrl;
-        if (studentEmail != null && !studentEmail.isEmpty()) {
-            String encodedEmail = studentEmail.replace("@", "%40");
-            searchUrl = String.format(GMAIL_SEARCH_URL_TEMPLATE, encodedEmail);
-        } else {
-            searchUrl = GMAIL_INBOX_URL;
-        }
-
-        Log.d(TAG, "Opening Gmail URL: " + searchUrl);
-
+    private void openGmailApp() {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl));
-            intent.setPackage("com.google.android.gm");
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-            if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
+            Intent intent = requireContext().getPackageManager().getLaunchIntentForPackage("com.google.android.gm");
+            if (intent != null) {
                 startActivity(intent);
             } else {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl));
-                browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://mail.google.com"));
                 startActivity(browserIntent);
             }
-
         } catch (Exception e) {
             Log.e(TAG, "Cannot open Gmail: " + e.getMessage());
-            android.widget.Toast.makeText(
-                    requireContext(),
-                    getString(R.string.error_open_gmail),
-                    android.widget.Toast.LENGTH_SHORT
-            ).show();
         }
     }
 
     private void handleNotificationItemClick(NotificationItem item) {
-        // tìm kiếm gmail dựa theo tiêu đề thông báo cụ thể
         if (item == null) return;
 
-        String subject = item.getSubject();
-        if (subject != null && !subject.isEmpty()) {
-            String encodedSubject = Uri.encode(subject);
-            String searchUrl = "https://mail.google.com/mail/u/0/#search/" + encodedSubject;
-
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl));
-                intent.setPackage("com.google.android.gm");
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-                if (intent.resolveActivity(requireContext().getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(searchUrl)));
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Cannot open Gmail for item: " + e.getMessage());
+        if ("SYSTEM".equals(item.getSource())) {
+            // Đánh dấu đã đọc
+            if (!item.isRead()) {
+                markAsRead(item.getNotifId());
+                item.setRead(true);
+                adapter.notifyDataSetChanged();
             }
-        } else {
-            openGmailForStudent();
+        } else if ("GMAIL".equals(item.getSource())) {
+            openGmailApp();
         }
+    }
+
+    private void markAsRead(long notifId) {
+        if (apiService == null) return;
+        apiService.markAsRead(notifId).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {}
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {}
+        });
     }
 
     private void loadNotifications() {
-        // kiểm tra đăng nhập để chọn nguồn dữ liệu phù hợp
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(requireContext());
+        if (apiService == null) return;
+        
+        // Gọi API lấy thông báo hệ thống (trang 0, size 20)
+        apiService.getNotifications(0, 20).enqueue(new Callback<ApiResponse<PageResponse<NotificationResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<PageResponse<NotificationResponse>>> call, 
+                                   Response<ApiResponse<PageResponse<NotificationResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<NotificationResponse> content = response.body().getData().content;
+                    List<NotificationItem> items = new ArrayList<>();
+                    
+                    if (content != null) {
+                        for (NotificationResponse n : content) {
+                            items.add(new NotificationItem(
+                                    n.notificationId,
+                                    n.source != null ? n.source : "SYSTEM",
+                                    "Hệ thống",
+                                    n.title,
+                                    n.body,
+                                    n.sentAt,
+                                    n.isRead
+                            ));
+                        }
+                    }
+                    
+                    // TODO: gọi thêm fetchGmailInbox() rồi trộn vào `items`, nhưng hiện tại để đơn giản
+                    // mình cập nhật danh sách system notif trước.
+                    updateList(items);
+                    fetchGmailInbox(items);
+                    
+                } else if (response.code() == 401) {
+                    handleUnauthorized();
+                } else {
+                    showToast("Lỗi tải thông báo: " + response.message());
+                }
+            }
 
-        if (account != null && account.getAccount() != null) {
-            fetchGmailData(account);
-        } else {
-            loadMockNotifications();
-        }
+            @Override
+            public void onFailure(Call<ApiResponse<PageResponse<NotificationResponse>>> call, Throwable t) {
+                showToast("Lỗi kết nối");
+            }
+        });
     }
 
-    private void loadMockNotifications() {
-        // Lấy mock data từ MockHelper — tập trung, dễ bảo trì
-        List<NotificationItem> mockList = MockHelper.getMockNotificationList();
+    private void fetchGmailInbox(List<NotificationItem> currentItems) {
+        if (apiService == null) return;
+        apiService.getGmailInbox().enqueue(new Callback<ApiResponse<List<GmailMessageResponse>>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<List<GmailMessageResponse>>> call, 
+                                   Response<ApiResponse<List<GmailMessageResponse>>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<GmailMessageResponse> gmailMsgs = response.body().getData();
+                    if (gmailMsgs != null) {
+                        for (GmailMessageResponse m : gmailMsgs) {
+                            currentItems.add(new NotificationItem(
+                                    0, // không có ID server
+                                    "GMAIL",
+                                    m.from != null ? m.from : "Gmail",
+                                    m.subject != null ? m.subject : "(Không tiêu đề)",
+                                    m.snippet,
+                                    m.receivedAt,
+                                    !m.isUnread
+                            ));
+                        }
+                    }
+                    // Sort items lại theo thời gian hoặc cứ để Gmail ở dưới
+                    updateList(currentItems);
+                } else if (response.code() == 400 && response.body() != null && response.body().getMessage().contains("Token Gmail đã hết hạn")) {
+                    Log.w(TAG, "Gmail token expired");
+                }
+            }
 
-        if (mockList.isEmpty()) {
-            showEmptyState(getString(R.string.notification_empty));
+            @Override
+            public void onFailure(Call<ApiResponse<List<GmailMessageResponse>>> call, Throwable t) {
+                Log.e(TAG, "Lỗi lấy Gmail: " + t.getMessage());
+            }
+        });
+    }
+
+    private void updateList(List<NotificationItem> items) {
+        if (binding == null) return;
+        if (items.isEmpty()) {
+            showEmptyState("Không có thông báo nào");
         } else {
             binding.layoutEmptyState.setVisibility(View.GONE);
-            adapter.submitList(mockList);
+            adapter.submitList(items);
         }
     }
 
-    private void fetchGmailData(GoogleSignInAccount account) {
-        // chuẩn bị thực hiện lấy dữ liệu thư từ gmail api
-        Log.d(TAG, "Sẵn sàng gọi Gmail API cho: " + account.getEmail());
+    private void showEmptyState(String message) {
+        if (binding != null) {
+            binding.layoutEmptyState.setVisibility(View.VISIBLE);
+            binding.tvEmptyMessage.setText(message);
+        }
     }
 
+    private void handleUnauthorized() {
+        sessionManager.logout();
+        showToast("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại");
+        startActivity(new Intent(requireContext(), LoginActivity.class));
+        requireActivity().finish();
+    }
 
-    private void showEmptyState(String message) {
-        // cập nhật trạng thái hiển thị khi danh sách dữ liệu trống
-        binding.layoutEmptyState.setVisibility(View.VISIBLE);
-        binding.tvEmptyMessage.setText(message);
+    private void showToast(String msg) {
+        if (getContext() != null) {
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(getContext(), msg);
+        }
     }
 }

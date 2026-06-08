@@ -36,7 +36,6 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
         // Tên phòng — roomCode từ DormRegistrationResponse
         if (holder.tvRoomName != null) {
             String roomDisplay = item.getName();
-            // Thêm tên tòa nếu có
             if (item.getBuilding() != null && !item.getBuilding().isEmpty()) {
                 roomDisplay = item.getBuilding() + " · " + roomDisplay;
             }
@@ -56,22 +55,47 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
             holder.tvDormDetails.setText(detail);
         }
 
-        // Số tiền còn phải đóng
+        // ── LOGIC MỚI: chỉ hiện số tiền khi admin đã duyệt ──────────────────
         if (holder.tvDormAmount != null) {
-            double amount = item.getRemainingAmount();
-            holder.tvDormAmount.setText(
-                    String.format(Locale.getDefault(), "%,.0f VND", amount));
+            if (item.isApproved()) {
+                // Đã duyệt → hiện số tiền cần thanh toán
+                double amount = item.getRemainingAmount();
+                holder.tvDormAmount.setText(
+                        String.format(Locale.getDefault(), "%,.0f VND", amount));
+                holder.tvDormAmount.setTextColor(Color.parseColor("#B71C1C")); // đỏ đậm
+            } else if (item.isPendingReg()) {
+                // Chờ duyệt → ẩn số tiền, hiện thông báo
+                holder.tvDormAmount.setText("Chờ admin duyệt");
+                holder.tvDormAmount.setTextColor(Color.parseColor("#E65100")); // cam
+            } else {
+                // Từ chối / trạng thái khác
+                holder.tvDormAmount.setText("—");
+                holder.tvDormAmount.setTextColor(Color.parseColor("#757575"));
+            }
         }
 
-        // Trạng thái đóng tiền — dùng paidStatus ("đã đóng" / "chưa đóng")
+        // Trạng thái đăng ký (regStatus) + trạng thái đóng tiền (paidStatus)
         if (holder.tvStatus != null) {
+            String regStatus  = item.getRegStatus();
             String paidStatus = item.getDormPaidStatus();
-            if ("đã đóng".equals(paidStatus)) {
-                holder.tvStatus.setText("Đã đóng");
-                holder.tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh lá
+
+            if (DormTuition.REG_PENDING.equals(regStatus)) {
+                holder.tvStatus.setText("Chờ duyệt");
+                holder.tvStatus.setTextColor(Color.parseColor("#E65100")); // cam
+            } else if (DormTuition.REG_APPROVED.equals(regStatus)) {
+                if (DormTuition.DORM_PAY_PAID.equals(paidStatus)) {
+                    holder.tvStatus.setText("Đã đóng tiền");
+                    holder.tvStatus.setTextColor(Color.parseColor("#2E7D32")); // xanh lá
+                } else {
+                    holder.tvStatus.setText("Cần thanh toán");
+                    holder.tvStatus.setTextColor(Color.parseColor("#C62828")); // đỏ
+                }
+            } else if (DormTuition.REG_REJECTED.equals(regStatus)) {
+                holder.tvStatus.setText("Đã từ chối");
+                holder.tvStatus.setTextColor(Color.parseColor("#757575")); // xám
             } else {
-                holder.tvStatus.setText("Chưa đóng");
-                holder.tvStatus.setTextColor(Color.parseColor("#C62828")); // đỏ
+                holder.tvStatus.setText(regStatus != null ? regStatus : "—");
+                holder.tvStatus.setTextColor(Color.parseColor("#757575"));
             }
         }
     }
@@ -89,7 +113,7 @@ public class DormAdapter extends RecyclerView.Adapter<DormAdapter.ViewHolder> {
             tvRoomName    = itemView.findViewById(R.id.tvRoomName);
             tvDormDetails = itemView.findViewById(R.id.tvDormDetails);
             tvDormAmount  = itemView.findViewById(R.id.tvDormAmount);
-            tvStatus      = itemView.findViewById(R.id.tvStatus); // nullable — thêm nếu layout có
+            tvStatus      = itemView.findViewById(R.id.tvStatus);
         }
     }
 }

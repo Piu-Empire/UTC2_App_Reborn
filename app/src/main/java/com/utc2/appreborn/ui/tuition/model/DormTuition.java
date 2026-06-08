@@ -91,17 +91,23 @@ public class DormTuition extends Tuition {
     public String getIdentifier() { return "DORM-" + dormRegId; }
 
     // ── Getters ──────────────────────────────────────────────
-    public long   getDormRegId()      { return dormRegId; }
-    public long   getRoomId()         { return roomId; }
-    public String getBuilding()       { return building; }
-    public double getPricePerMonth()  { return pricePerMonth; }
-    public String getStartDate()      { return startDate; }
-    public String getEndDate()        { return endDate; }
-    public String getRegStatus()      { return regStatus; }
+    public long   getDormRegId()             { return dormRegId; }
+    public long   getRoomId()                { return roomId; }
+    /** Alias của getRoomId() — dùng trong DormitoryTuitionActivity */
+    public long   getDormRoomId()            { return roomId; }
+    /** Alias của getName() — tên phòng lưu trong field name */
+    public String getRoomName()              { return name; }
+    public String getBuilding()              { return building; }
+    public double getPricePerMonth()         { return pricePerMonth; }
+    public String getStartDate()             { return startDate; }
+    public String getEndDate()               { return endDate; }
+    public String getRegStatus()             { return regStatus; }
+    /** Alias của getRegStatus() — dùng trong DormitoryTuitionActivity */
+    public String getRegistrationStatus()    { return regStatus; }
     /** DORMITORY_REGISTRATION.total_fee */
-    public double getDormTotalFee()   { return dormTotalFee; }
+    public double getDormTotalFee()          { return dormTotalFee; }
     /** DORMITORY_REGISTRATION.paid_status */
-    public String getDormPaidStatus() { return dormPaidStatus; }
+    public String getDormPaidStatus()        { return dormPaidStatus; }
 
     // ── Setters ──────────────────────────────────────────────
     public void setRoomId(long v)            { this.roomId = v; }

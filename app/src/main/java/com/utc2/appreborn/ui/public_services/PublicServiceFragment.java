@@ -120,8 +120,7 @@ public class PublicServiceFragment extends Fragment {
         if (NetworkUtils.isNetworkAvailable(requireContext())) {
             startActivity(new Intent(requireContext(), destination));
         } else {
-            Toast.makeText(requireContext(),
-                    getString(R.string.error_connect_network), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), getString(R.string.error_connect_network));
         }
     }
 
@@ -156,8 +155,7 @@ public class PublicServiceFragment extends Fragment {
         if (!isAdded()) return;
 
         if (!NetworkUtils.isNetworkAvailable(requireContext())) {
-            Toast.makeText(requireContext(),
-                    getString(R.string.error_connect_network), Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), getString(R.string.error_connect_network));
             return;
         }
 
@@ -179,8 +177,7 @@ public class PublicServiceFragment extends Fragment {
                     List<ServiceRequestResponse> data = response.body().getData();
                     bindHistory(data != null ? data : new ArrayList<>());
                 } else {
-                    Toast.makeText(requireContext(),
-                            "Không tải được lịch sử yêu cầu", Toast.LENGTH_SHORT).show();
+                    com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Không tải được lịch sử yêu cầu");
                 }
             }
 
@@ -189,8 +186,7 @@ public class PublicServiceFragment extends Fragment {
                                   Throwable t) {
                 if (!isAdded()) return;
                 setLoading(false);
-                Toast.makeText(requireContext(),
-                        "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(requireContext(), "Lỗi kết nối: " + t.getMessage());
                 Log.e(TAG, "myRequests onFailure", t);
             }
         });

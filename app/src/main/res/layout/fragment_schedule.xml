@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background_main">
+    android:background="@color/background_main"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/layoutHeader"
@@ -13,7 +14,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
         android:background="@color/white"
         android:elevation="4dp">
 
@@ -77,6 +79,17 @@
             android:orientation="horizontal">
 
             <ImageButton
+                android:id="@+id/btnDownloadWeek"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                android:src="@drawable/ic_download"
+                android:contentDescription="Tải lịch tuần"
+                android:visibility="gone"
+                app:tint="@color/icon_normal" />
+
+            <ImageButton
                 android:id="@+id/btnGoToday"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
@@ -123,16 +136,18 @@
                 android:id="@+id/rvDateSelector"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
                 android:clipToPadding="false"
                 android:paddingHorizontal="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
                 android:overScrollMode="never" />
 
             <TextView
                 android:id="@+id/tvFullDateLabel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="12dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="8dp"
                 android:gravity="center"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp"
@@ -144,7 +159,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
-                android:paddingBottom="20dp" />
+                android:paddingBottom="120dp" />
         </LinearLayout>
 
         <ViewStub

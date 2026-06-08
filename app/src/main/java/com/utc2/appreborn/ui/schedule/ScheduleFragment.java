@@ -33,7 +33,7 @@ public class ScheduleFragment extends Fragment {
     private ScheduleWeekManager weekManager;
     private ScheduleDayManager dayManager;
 
-    private ImageButton btnToggle, btnSizeToggle;
+    private ImageButton btnToggle, btnSizeToggle, btnDownloadWeek;
     private View layoutDay;
     private RecyclerView recyclerViewSchedule;
     private ViewStub stubWeek;
@@ -57,6 +57,7 @@ public class ScheduleFragment extends Fragment {
         dateScheduleNavigator = new ScheduleNavigator();
         btnToggle = view.findViewById(R.id.btnCycleViewMode);
         btnSizeToggle = view.findViewById(R.id.btnSizeToggle);
+        btnDownloadWeek = view.findViewById(R.id.btnDownloadWeek);
         tvSemester = view.findViewById(R.id.tvSemester);
         tvCurrentWeek = view.findViewById(R.id.tvCurrentWeek);
         layoutDay = view.findViewById(R.id.layoutDay);
@@ -69,7 +70,8 @@ public class ScheduleFragment extends Fragment {
         setupData();
 
         DateUtils.setSemesterHK1(9, 1, 2, 28);
-        DateUtils.setSemesterHK2(3, 2, 6, 7);
+        DateUtils.setSemesterHK2(3, 2, 6, 30); // mở rộng đến hết tháng 6
+        DateUtils.setSemesterHKH(7, 1, 8, 20); // HK hè từ 1/7 đến 20/8
 
         updateDateDisplay();
 
@@ -161,8 +163,13 @@ public class ScheduleFragment extends Fragment {
         if (viewWeek != null) ViewUtils.hide(viewWeek);
 
         if (btnSizeToggle != null) {
-            if (currentMode == ViewMode.WEEK) ViewUtils.show(btnSizeToggle);
-            else ViewUtils.hide(btnSizeToggle);
+            if (currentMode == ViewMode.WEEK) {
+                ViewUtils.show(btnSizeToggle);
+                if (btnDownloadWeek != null) ViewUtils.show(btnDownloadWeek);
+            } else {
+                ViewUtils.hide(btnSizeToggle);
+                if (btnDownloadWeek != null) ViewUtils.hide(btnDownloadWeek);
+            }
         }
 
         switch (currentMode) {
@@ -179,6 +186,14 @@ public class ScheduleFragment extends Fragment {
                     viewWeek = stubWeek.inflate(); // nạp file xml lịch tuần vào bộ nhớ khi cần
                     weekManager = new ScheduleWeekManager(requireContext(), viewWeek, dateScheduleNavigator);
                     weekManager.init();
+
+                    if (btnDownloadWeek != null) {
+                        btnDownloadWeek.setOnClickListener(v -> {
+                            if (weekManager == null) return;
+                            String currentWeekText = tvCurrentWeek.getText().toString();
+                            ScheduleExportHelper.exportWeekScheduleToImage(requireActivity(), viewWeek, currentWeekText);
+                        });
+                    }
                 } else if (viewWeek != null) {
                     ViewUtils.show(viewWeek);
                 }

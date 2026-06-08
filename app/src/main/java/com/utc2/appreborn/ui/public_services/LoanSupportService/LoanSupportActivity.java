@@ -60,7 +60,7 @@ public class LoanSupportActivity extends AppCompatActivity {
     // ĐÃ SỬA
     private void handleLoanRegistration() {
         if (!NetworkUtils.isNetworkAvailable(this)) {
-            Toast.makeText(this, "Không có kết nối mạng. Không thể gửi đơn lúc này!", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Không có kết nối mạng. Không thể gửi đơn lúc này!");
             return;
         }
 
@@ -69,7 +69,7 @@ public class LoanSupportActivity extends AppCompatActivity {
         String phone  = edtPhone.getText().toString().trim();
 
         if (amount.isEmpty() || reason.isEmpty() || phone.isEmpty()) {
-            Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+            com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Vui lòng nhập đầy đủ thông tin");
             return;
         }
 
@@ -88,20 +88,16 @@ public class LoanSupportActivity extends AppCompatActivity {
                                            Response<ApiResponse<ServiceRequestResponse>> response) {
                         if (response.isSuccessful() && response.body() != null
                                 && response.body().isSuccess()) {
-                            Toast.makeText(LoanSupportActivity.this,
-                                    "Đăng ký thành công. Nhà trường sẽ liên hệ qua SĐT của bạn!",
-                                    Toast.LENGTH_LONG).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(LoanSupportActivity.this, "Đăng ký thành công. Nhà trường sẽ liên hệ qua SĐT của bạn!");
                             finish();
                         } else {
-                            Toast.makeText(LoanSupportActivity.this,
-                                    "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(LoanSupportActivity.this, "Gửi thất bại, thử lại sau.");
                         }
                     }
 
                     @Override
                     public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
-                        Toast.makeText(LoanSupportActivity.this,
-                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        com.utc2.appreborn.utils.CustomToastHelper.showToast(LoanSupportActivity.this, "Lỗi kết nối: " + t.getMessage());
                     }
                 });
     }

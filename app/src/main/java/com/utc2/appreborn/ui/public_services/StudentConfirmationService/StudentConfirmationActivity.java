@@ -90,7 +90,7 @@ public class StudentConfirmationActivity extends AppCompatActivity {
 
         btnConfirm.setOnClickListener(v -> {
             if (!NetworkUtils.isNetworkAvailable(this)) {
-                Toast.makeText(this, "Không có mạng! Vui lòng kết nối để gửi yêu cầu xác nhận.", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Không có mạng! Vui lòng kết nối để gửi yêu cầu xác nhận.");
                 return;
             }
 
@@ -128,19 +128,16 @@ public class StudentConfirmationActivity extends AppCompatActivity {
                                                Response<ApiResponse<ServiceRequestResponse>> response) {
                             if (response.isSuccessful() && response.body() != null
                                     && response.body().isSuccess()) {
-                                Toast.makeText(StudentConfirmationActivity.this,
-                                        "Đăng ký giấy xác nhận thành công!", Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(StudentConfirmationActivity.this, "Đăng ký giấy xác nhận thành công!");
                                 finish();
                             } else {
-                                Toast.makeText(StudentConfirmationActivity.this,
-                                        "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(StudentConfirmationActivity.this, "Gửi thất bại, thử lại sau.");
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
-                            Toast.makeText(StudentConfirmationActivity.this,
-                                    "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(StudentConfirmationActivity.this, "Lỗi kết nối: " + t.getMessage());
                         }
                     });
         });

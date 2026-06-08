@@ -104,7 +104,7 @@ public class TranscriptRegistrationActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
         btnConfirm.setOnClickListener(v -> {
             if (!NetworkUtils.isNetworkAvailable(this)) {
-                Toast.makeText(this, "Không có mạng! Vui lòng kết nối để gửi yêu cầu.", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Không có mạng! Vui lòng kết nối để gửi yêu cầu.");
                 return;
             }
 
@@ -114,7 +114,7 @@ public class TranscriptRegistrationActivity extends AppCompatActivity {
             String note         = edtNote.getText().toString().trim();
 
             if (academicYear.isEmpty() || semester.isEmpty() || quantityStr.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin bắt buộc", Toast.LENGTH_SHORT).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(this, "Vui lòng nhập đầy đủ thông tin bắt buộc");
                 return;
             }
 
@@ -139,19 +139,16 @@ public class TranscriptRegistrationActivity extends AppCompatActivity {
                                                Response<ApiResponse<ServiceRequestResponse>> response) {
                             if (response.isSuccessful() && response.body() != null
                                     && response.body().isSuccess()) {
-                                Toast.makeText(TranscriptRegistrationActivity.this,
-                                        "Đăng ký bảng điểm thành công!", Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(TranscriptRegistrationActivity.this, "Đăng ký bảng điểm thành công!");
                                 finish();
                             } else {
-                                Toast.makeText(TranscriptRegistrationActivity.this,
-                                        "Gửi thất bại, thử lại sau.", Toast.LENGTH_SHORT).show();
+                                com.utc2.appreborn.utils.CustomToastHelper.showToast(TranscriptRegistrationActivity.this, "Gửi thất bại, thử lại sau.");
                             }
                         }
 
                         @Override
                         public void onFailure(Call<ApiResponse<ServiceRequestResponse>> call, Throwable t) {
-                            Toast.makeText(TranscriptRegistrationActivity.this,
-                                    "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(TranscriptRegistrationActivity.this, "Lỗi kết nối: " + t.getMessage());
                         }
                     });
         });

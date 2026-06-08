@@ -27,7 +27,10 @@ import com.utc2.appreborn.utils.SessionManager;
 import com.utc2.appreborn.network.ApiClient;
 import com.utc2.appreborn.network.ApiResponse;
 import com.utc2.appreborn.network.DormApiService;
+import com.utc2.appreborn.network.TuitionApiService;
 import com.utc2.appreborn.network.dto.DormRegistrationResponse;
+import com.utc2.appreborn.network.dto.TuitionResponse;
+import com.utc2.appreborn.network.dto.TuitionSummaryResponse;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -45,6 +48,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
     private DormApiService dormApi;
+    private TuitionApiService tuitionApi;
 
     // dormRegId chưa đóng — dùng để gọi pay() sau khi xác nhận QR
     private long unpaidDormRegId = -1L;
@@ -71,7 +75,7 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
     private void initViews() {
         rvDormTuition = findViewById(R.id.rvDormTuition);
         btnPayDorm    = findViewById(R.id.btnPayDorm);
-        tvTotalAmount = findViewById(R.id.tvTotalAmount);
+        tvTotalAmount = findViewById(R.id.tvTotalDormAmount);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnPayDorm.setOnClickListener(v -> {
@@ -102,8 +106,10 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
 
     private void loadDormData() {
         String token = SessionManager.getInstance(this).getAuthToken();
-        dormApi = ApiClient.getInstance(token).create(DormApiService.class);
+        dormApi    = ApiClient.getInstance(token).create(DormApiService.class);
+        tuitionApi = ApiClient.getInstance(token).create(TuitionApiService.class);
 
+        // Lấy thông tin đăng ký KTX (phòng, ngày, trạng thái)
         dormApi.getMyRegistrations().enqueue(new Callback<ApiResponse<List<DormRegistrationResponse>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<DormRegistrationResponse>>> call,
@@ -137,13 +143,13 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
                             ));
 
                             // Track đăng ký KTX chưa đóng và đã duyệt để gọi pay()
-                            if (!dto.isPaid() && DormTuition.REG_APPROVED.equals(regSt) && unpaidDormRegId == -1L) {
+                            if (!dto.isPaid() && "đã duyệt".equals(regSt) && unpaidDormRegId == -1L) {
                                 unpaidDormRegId = regId;
                             }
                         }
                     }
-                    calculateTotal();
-                    setupRecyclerView();
+                    // Sau khi có danh sách đăng ký, gọi tiếp API tuition để lấy số tiền thực từ bảng fee
+                    loadDormFeeAmounts();
                 } else {
                     Toast.makeText(DormitoryTuitionActivity.this,
                             "Không tải được dữ liệu KTX", Toast.LENGTH_SHORT).show();
@@ -158,17 +164,91 @@ public class DormitoryTuitionActivity extends AppCompatActivity {
         });
     }
 
+    private void loadDormFeeAmounts() {
+        tuitionApi.getSummary().enqueue(new Callback<ApiResponse<TuitionSummaryResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<TuitionSummaryResponse>> call,
+                                   Response<ApiResponse<TuitionSummaryResponse>> response) {
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
+                    TuitionSummaryResponse summary = response.body().getData();
+                    List<TuitionResponse> dormFees = summary != null ? summary.dormitory : null;
+                    if (dormFees != null && !dormFees.isEmpty()) {
+                        // Build map dormRegId → fee để map chính xác, tránh lệch index
+                        java.util.Map<Long, TuitionResponse> feeByRegId = new java.util.HashMap<>();
+                        for (TuitionResponse fee : dormFees) {
+                            if (fee.dormRegId != null) {
+                                feeByRegId.put(fee.dormRegId, fee);
+                            }
+                        }
+
+                        for (int i = 0; i < dormList.size(); i++) {
+                            DormTuition item = dormList.get(i);
+                            TuitionResponse fee = feeByRegId.get(item.getDormRegId());
+                            if (fee == null) continue; // chưa có fee record cho đăng ký này
+
+                            double feeTotal  = fee.getTotalAmountAsDouble();
+                            double feePaid   = fee.getPaidAmountAsDouble();
+                            String feeStatus = fee.status != null ? fee.status : item.getDormPaidStatus();
+                            dormList.set(i, new DormTuition(
+                                    fee.id != null ? fee.id : 0L,
+                                    0L, 0L,
+                                    feeTotal, feePaid,
+                                    fee.dueDate != null ? fee.dueDate : item.getDueDate(),
+                                    feeStatus, "", "",
+                                    item.getDormRegId(), item.getRoomId(),
+                                    item.getName(), item.getBuilding(),
+                                    item.getPricePerMonth(),
+                                    item.getStartDate(), item.getEndDate(),
+                                    item.getRegStatus(), feeTotal, feeStatus
+                            ));
+                        }
+                    }
+                }
+                calculateTotal();
+                setupRecyclerView();
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<TuitionSummaryResponse>> call, Throwable t) {
+                calculateTotal();
+                setupRecyclerView();
+            }
+        });
+    }
+
     private void calculateTotal() {
         totalAmount = 0.0;
+        boolean hasApprovedUnpaid = false;
+
         for (DormTuition item : dormList) {
-            // FIX: isPaid() trong DormTuition so sánh status với Tuition.STATUS_PAID ("đã đóng đủ")
-            // nhưng paid_status của KTX là "đã đóng" → kiểm tra getDormPaidStatus() trực tiếp
-            if (!"đã đóng".equals(item.getDormPaidStatus())) {
+            // CHỈ tính tiền cho đăng ký ĐÃ ĐƯỢC ADMIN DUYỆT và chưa đóng
+            if (item.isApproved() && !DormTuition.DORM_PAY_PAID.equals(item.getDormPaidStatus())) {
                 totalAmount += item.getRemainingAmount();
+                hasApprovedUnpaid = true;
             }
         }
+
+        // Hiện tổng tiền + nút thanh toán CHỈ khi có đăng ký đã duyệt chưa đóng
         if (tvTotalAmount != null) {
-            tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
+            if (hasApprovedUnpaid) {
+                tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
+            } else {
+                boolean hasPending = false;
+                for (DormTuition item : dormList) {
+                    if (item.isPendingReg()) { hasPending = true; break; }
+                }
+                tvTotalAmount.setText(hasPending
+                        ? "Đang chờ admin duyệt"
+                        : "—");
+            }
+        }
+
+        // Nút thanh toán: ẩn khi chưa có đăng ký nào được duyệt và chưa đóng
+        if (btnPayDorm != null) {
+            btnPayDorm.setVisibility(hasApprovedUnpaid
+                    ? android.view.View.VISIBLE
+                    : android.view.View.GONE);
         }
     }
 

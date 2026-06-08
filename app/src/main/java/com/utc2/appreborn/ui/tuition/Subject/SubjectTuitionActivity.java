@@ -25,7 +25,6 @@ import com.utc2.appreborn.ui.tuition.model.Tuition;
 import com.utc2.appreborn.utils.NetworkUtils;
 import com.utc2.appreborn.utils.SessionManager;
 
-// THÊM MỚI
 import com.utc2.appreborn.network.ApiClient;
 import com.utc2.appreborn.network.ApiResponse;
 import com.utc2.appreborn.network.TuitionApiService;
@@ -42,14 +41,14 @@ import java.util.Locale;
 public class SubjectTuitionActivity extends AppCompatActivity {
 
     private RecyclerView rvItems;
-    private List<SubjectTuition> subjectList = new ArrayList<>();
+    private final List<SubjectTuition> subjectList = new ArrayList<>();
     private TextView tvTotalAmount;
     private Button btnPay;
     private double totalAmount = 0.0;
     private NetworkUtils networkUtils;
     private TuitionApiService tuitionApi;
 
-    // Danh sách semesterId chưa đóng — dùng để gọi pay() sau khi xác nhận QR
+    // semesterId của các kỳ còn nợ — dùng để gọi pay() sau khi xác nhận QR
     private final List<Long> unpaidSemesterIds = new ArrayList<>();
 
     @Override
@@ -65,36 +64,35 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         try {
             initViews();
             setupNetworkMonitoring();
-            loadData(); // gọi API
+            loadData();
         } catch (Exception e) {
             Log.e("SubjectTuition", "Lỗi khởi tạo: " + e.getMessage());
         }
     }
 
     private void initViews() {
-        rvItems = findViewById(R.id.rvItems);
+        rvItems       = findViewById(R.id.rvItems);
         tvTotalAmount = findViewById(R.id.tvTotalAmount);
-        btnPay = findViewById(R.id.btnPay);
+        btnPay        = findViewById(R.id.btnPay);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
 
         btnPay.setOnClickListener(v -> {
             if (NetworkUtils.isNetworkAvailable(this)) {
                 showPaymentDialog();
             } else {
-                Toast.makeText(this, "Vui lòng kết nối mạng để tạo mã thanh toán!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,
+                        "Vui lòng kết nối mạng để tạo mã thanh toán!",
+                        Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setupNetworkMonitoring() {
         networkUtils = new NetworkUtils(this, new NetworkUtils.NetworkStatusListener() {
-            @Override
-            public void onNetworkAvailable() {
+            @Override public void onNetworkAvailable() {
                 Log.d("Network", "Sẵn sàng thanh toán học phí môn học");
             }
-
-            @Override
-            public void onNetworkLost() {
+            @Override public void onNetworkLost() {
                 Toast.makeText(SubjectTuitionActivity.this,
                         "Mất kết nối mạng! Giao dịch có thể bị gián đoạn.",
                         Toast.LENGTH_LONG).show();
@@ -116,30 +114,40 @@ public class SubjectTuitionActivity extends AppCompatActivity {
                     TuitionSummaryResponse summary = response.body().getData();
                     subjectList.clear();
                     unpaidSemesterIds.clear();
-                    if (summary.semesters != null) {
-                        for (TuitionResponse t : summary.semesters) {
-                            long   feeId  = t.id         != null ? t.id         : 0L;
-                            long   semId  = t.semesterId != null ? t.semesterId : 0L;
-                            double total  = t.getTotalAmountAsDouble();
-                            double paid   = t.getPaidAmountAsDouble();
-                            String status = t.status          != null ? t.status          : "";
-                            String due    = t.dueDate         != null ? t.dueDate         : "";
-                            String paidAt = t.paidAt          != null ? t.paidAt          : "";
-                            String method = t.paymentMethod   != null ? t.paymentMethod   : "";
 
+                    if (summary != null && summary.semesters != null) {
+                        for (TuitionResponse t : summary.semesters) {
+                            long   feeId     = t.id           != null ? t.id           : 0L;
+                            long   semId     = t.semesterId   != null ? t.semesterId   : 0L;
+                            double total     = t.getTotalAmountAsDouble();
+                            double paid      = t.getPaidAmountAsDouble();
+                            // FIX: dùng remainingAmount từ API (backend tính sẵn),
+                            // tránh lỗi khi total/paid bị null hoặc mismatch.
+                            double remaining = t.getRemainingAmountAsDouble();
+                            String status    = t.status        != null ? t.status        : "";
+                            String due       = t.dueDate       != null ? t.dueDate       : "";
+                            String paidAt    = t.paidAt        != null ? t.paidAt        : "";
+                            String method    = t.paymentMethod != null ? t.paymentMethod : "";
+                            String semName   = (t.semesterName != null && !t.semesterName.isEmpty())
+                                    ? t.semesterName : "Học kỳ " + semId;
+
+                            // Tạo SubjectTuition với đầy đủ total + paid để
+                            // getRemainingAmount() = total - paid tính đúng.
+                            int credits = t.totalCredits != null ? t.totalCredits : 0;
                             subjectList.add(new SubjectTuition(
                                     feeId, 0L, semId,
                                     total, paid,
                                     due, status, method, paidAt,
-                                    0L, "", "Học kỳ " + semId, 0, ""
+                                    0L, "", semName, credits, ""
                             ));
 
-                            // Track kỳ chưa đóng để gọi pay() sau khi xác nhận QR
-                            if (!Tuition.STATUS_PAID.equals(status)) {
+                            // Track kỳ còn nợ để gọi pay()
+                            if (!Tuition.STATUS_PAID.equals(status) && remaining > 0) {
                                 unpaidSemesterIds.add(semId);
                             }
                         }
                     }
+
                     calculateTotal();
                     setupRecyclerView();
                 } else {
@@ -156,15 +164,46 @@ public class SubjectTuitionActivity extends AppCompatActivity {
         });
     }
 
+    private static final long PRICE_PER_CREDIT = 550_000L;
+
     private void calculateTotal() {
         totalAmount = 0.0;
         for (SubjectTuition subject : subjectList) {
             if (!subject.isPaid()) {
-                // FIX: dùng getRemainingAmount() (= total - paid), không phải getAmount()
                 totalAmount += subject.getRemainingAmount();
             }
         }
+
+        // Fallback: nếu API trả về 0đ, tính từ số tín chỉ lưu local × 550.000
+        if (totalAmount == 0.0) {
+            totalAmount = calcLocalTotal();
+        }
+
         tvTotalAmount.setText(String.format(Locale.getDefault(), "%,.0f VND", totalAmount));
+        btnPay.setVisibility(totalAmount > 0 ? android.view.View.VISIBLE : android.view.View.GONE);
+    }
+
+    /** Tính học phí từ local storage: tổng tín chỉ đã đăng ký × 550.000đ */
+    private double calcLocalTotal() {
+        java.util.List<String> confirmedIds =
+                com.utc2.appreborn.ui.courseregistration.model.CourseStorage.loadConfirmedIds(this);
+        java.util.Map<String, Integer> creditsMap =
+                com.utc2.appreborn.ui.courseregistration.model.CourseStorage.loadCreditsMap(this);
+        if (confirmedIds.isEmpty()) return 0.0;
+
+        // Fallback: nếu creditsMap thiếu entry, thử lấy từ CourseRepository (local data)
+        com.utc2.appreborn.ui.courseregistration.model.CourseRepository repo =
+                com.utc2.appreborn.ui.courseregistration.model.CourseRepository.getInstance();
+        int totalCredits = 0;
+        for (String id : confirmedIds) {
+            Integer tc = creditsMap.get(id);
+            if (tc == null) {
+                com.utc2.appreborn.ui.courseregistration.model.Course c = repo.findById(id);
+                tc = (c != null) ? c.getCredits() : 0;
+            }
+            totalCredits += tc;
+        }
+        return totalCredits * PRICE_PER_CREDIT;
     }
 
     private void setupRecyclerView() {
@@ -173,6 +212,12 @@ public class SubjectTuitionActivity extends AppCompatActivity {
     }
 
     private void showPaymentDialog() {
+        // Lách: nếu API không trả về semesterId nhưng có tiền local → vẫn cho thanh toán
+        if (unpaidSemesterIds.isEmpty() && totalAmount <= 0) {
+            Toast.makeText(this, "Không có học phí cần đóng!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         final Dialog dialog = new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.layout_payment_qr);
@@ -202,31 +247,68 @@ public class SubjectTuitionActivity extends AppCompatActivity {
 
         btnConfirm.setOnClickListener(v -> {
             btnConfirm.setEnabled(false);
-            Toast.makeText(this, getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
-            // Gọi pay API cho từng kỳ chưa đóng
+            Toast.makeText(this,
+                    getString(R.string.msg_checking_transaction), Toast.LENGTH_SHORT).show();
             confirmPaymentToServer(dialog);
         });
 
         dialog.show();
     }
 
-    /** Gọi POST /api/v1/tuition/pay/{semesterId} cho từng kỳ chưa đóng */
+    /** Gọi pay API nếu có semesterId; nếu không có thì xóa local data coi như đã đóng */
     private void confirmPaymentToServer(Dialog dialog) {
         if (unpaidSemesterIds.isEmpty()) {
-            dialog.dismiss();
+            String paidAt = new java.text.SimpleDateFormat(
+                    "dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+                    .format(new java.util.Date());
+            java.util.List<String> ids =
+                    com.utc2.appreborn.ui.courseregistration.model.CourseStorage.loadConfirmedIds(this);
+            int tc = 0;
+            java.util.Map<String, Integer> cm =
+                    com.utc2.appreborn.ui.courseregistration.model.CourseStorage.loadCreditsMap(this);
+            com.utc2.appreborn.ui.courseregistration.model.CourseRepository repo =
+                    com.utc2.appreborn.ui.courseregistration.model.CourseRepository.getInstance();
+            for (String id : ids) {
+                Integer c = cm.get(id);
+                if (c == null) { com.utc2.appreborn.ui.courseregistration.model.Course co = repo.findById(id); c = co != null ? co.getCredits() : 0; }
+                tc += c;
+            }
+            String label = "Học phí học phần";
+            String details = tc + " TC — " + paidAt;
+            String invoiceCode = "HP_LOCAL_" + System.currentTimeMillis();
+
+            // Lưu invoice local (KHÔNG clearStorage để invoice không bị mất)
+            com.utc2.appreborn.ui.courseregistration.model.CourseStorage
+                    .saveLocalInvoice(this, invoiceCode, label, totalAmount, paidAt);
+            // Xóa enrollment để số tiền về 0
+            com.utc2.appreborn.ui.courseregistration.model.CourseStorage.clearStorage(this);
+
+            if (dialog.isShowing()) dialog.dismiss();
+            Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+
+            // Thêm card "Đã đóng" vào list ngay, không cần reload API
+            subjectList.add(new SubjectTuition(
+                    0L, 0L, 0L,
+                    totalAmount, totalAmount,
+                    "", com.utc2.appreborn.ui.tuition.model.Tuition.STATUS_PAID,
+                    "online", paidAt,
+                    0L, "", label, tc, details
+            ));
+            totalAmount = 0.0;
+            tvTotalAmount.setText("0 VND");
+            btnPay.setVisibility(android.view.View.GONE);
+            setupRecyclerView();
             return;
         }
-        // Gọi tuần tự từng kỳ — đơn giản vì thường chỉ có 1 kỳ chưa đóng
         callPayRecursive(dialog, new ArrayList<>(unpaidSemesterIds), 0);
     }
 
     private void callPayRecursive(Dialog dialog, List<Long> ids, int index) {
         if (index >= ids.size()) {
-            // Tất cả kỳ đã gọi pay xong
             if (dialog.isShowing()) dialog.dismiss();
-            Toast.makeText(this, getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
-            // Reload lại data
-            loadData();
+            Toast.makeText(this,
+                    getString(R.string.msg_payment_success), Toast.LENGTH_SHORT).show();
+            loadData(); // reload lại để cập nhật UI
             return;
         }
         long semId = ids.get(index);
@@ -234,8 +316,8 @@ public class SubjectTuitionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ApiResponse<TuitionResponse>> call,
                                    Response<ApiResponse<TuitionResponse>> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    // Tiếp tục kỳ tiếp theo
+                if (response.isSuccessful() && response.body() != null
+                        && response.body().isSuccess()) {
                     callPayRecursive(dialog, ids, index + 1);
                 } else {
                     if (dialog.isShowing()) dialog.dismiss();

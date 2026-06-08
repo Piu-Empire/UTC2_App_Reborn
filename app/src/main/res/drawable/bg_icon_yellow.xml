@@ -7,10 +7,14 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
 
-    <!-- Vàng nhạt — đủ nhẹ để icon vẫn nổi bật -->
-    <solid android:color="#FFF3CD" />
+    <!-- Gradient tỏa ra từ giữa, nhạt dần ra viền màu trắng để tạo hiệu ứng hòa trộn -->
+    <gradient
+        android:type="radial"
+        android:gradientRadius="36dp"
+        android:startColor="#FFF3CD"
+        android:centerColor="#FFFAEB"
+        android:endColor="#FFFFFF" />
 
-    <!-- Bo góc 10dp — khớp với bo góc card (12dp) -->
-    <corners android:radius="10dp" />
+    <corners android:radius="16dp" />
 
 </shape>

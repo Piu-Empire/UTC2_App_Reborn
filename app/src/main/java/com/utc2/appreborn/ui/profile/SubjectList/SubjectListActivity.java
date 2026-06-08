@@ -112,9 +112,7 @@ public class SubjectListActivity extends AppCompatActivity {
                 Log.d("Network", "Đã có mạng");
             }
             @Override public void onNetworkLost() {
-                Toast.makeText(SubjectListActivity.this,
-                        "Mất kết nối mạng. Bạn đang xem dữ liệu ngoại tuyến.",
-                        Toast.LENGTH_LONG).show();
+                com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectListActivity.this, "Mất kết nối mạng. Bạn đang xem dữ liệu ngoại tuyến.");
             }
         });
         networkUtils.register();
@@ -141,8 +139,7 @@ public class SubjectListActivity extends AppCompatActivity {
                             setupYearDropdown(rawData);
                             applyFilters(null); // hiện tất cả ban đầu
                         } else {
-                            Toast.makeText(SubjectListActivity.this,
-                                    "Không tải được chương trình đào tạo", Toast.LENGTH_SHORT).show();
+                            com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectListActivity.this, "Không tải được chương trình đào tạo");
                         }
                     }
 
@@ -150,8 +147,7 @@ public class SubjectListActivity extends AppCompatActivity {
                     public void onFailure(Call<ApiResponse<List<EnrollmentResponse>>> call,
                                           Throwable t) {
                         if (progressBar != null) progressBar.setVisibility(View.GONE);
-                        Toast.makeText(SubjectListActivity.this,
-                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        com.utc2.appreborn.utils.CustomToastHelper.showToast(SubjectListActivity.this, "Lỗi kết nối: " + t.getMessage());
                     }
                 });
     }

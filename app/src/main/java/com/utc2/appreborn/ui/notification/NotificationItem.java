@@ -12,14 +12,18 @@ package com.utc2.appreborn.ui.notification;
  */
 public class NotificationItem {
 
+    private final long notifId;
+    private final String source;
     private final String senderName;
     private final String subject;
     private final String preview;
     private final String timeLabel;
     private boolean isRead;
 
-    public NotificationItem(String senderName, String subject,
+    public NotificationItem(long notifId, String source, String senderName, String subject,
                             String preview, String timeLabel, boolean isRead) {
+        this.notifId = notifId;
+        this.source = source;
         this.senderName = senderName;
         this.subject = subject;
         this.preview = preview;
@@ -28,6 +32,14 @@ public class NotificationItem {
     }
 
     // ── Getters ──────────────────────────────────────────────────
+
+    public long getNotifId() {
+        return notifId;
+    }
+
+    public String getSource() {
+        return source;
+    }
 
     public String getSenderName() {
         return senderName;
