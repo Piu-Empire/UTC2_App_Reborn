@@ -79,7 +79,9 @@
     <!-- ══ CONTENT AREA ══ -->
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:paddingBottom="120dp"
+        android:clipToPadding="false">
 
         <FrameLayout
             android:layout_width="match_parent"

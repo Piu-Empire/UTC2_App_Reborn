@@ -136,7 +136,7 @@ fun FloatingAiButton(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_bee),
+                    painter = painterResource(id = R.drawable.ic_lucide_bot),
                     contentDescription = "AI Assistant",
                     tint = Color.Black,
                     modifier = Modifier.size(40.dp)

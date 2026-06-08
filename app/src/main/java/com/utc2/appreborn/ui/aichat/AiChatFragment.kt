@@ -145,7 +145,9 @@ fun AiChatScreen(onBackClick: () -> Unit, onNavigate: (String) -> Unit) {
         coroutineScope.launch {
             isLoading = true
             try {
-                val api = ApiClient.getPublicInstance().create(AiChatApiService::class.java)
+                val sessionManager = com.utc2.appreborn.utils.SessionManager.getInstance(context)
+                val token = sessionManager.authToken
+                val api = ApiClient.getInstance(token).create(AiChatApiService::class.java)
                 val response = api.processMessage(request).awaitResponse()
                 if (response.isSuccessful && response.body() != null) {
                     val res = response.body()!!
@@ -181,6 +183,14 @@ fun AiChatScreen(onBackClick: () -> Unit, onNavigate: (String) -> Unit) {
                                 ChatSuggestion("Xem điểm thi"),
                                 ChatSuggestion("Đăng ký tín chỉ")
                             )
+                        }
+                        "permission_required" -> {
+                            messages = messages + ChatMessage(
+                                text = res.message ?: "",
+                                isUser = false,
+                                actionButtons = res.actionButtons
+                            )
+                            suggestions = emptyList()
                         }
                         "calculation" -> {
                             messages = messages + ChatMessage(
@@ -310,8 +320,8 @@ fun AiChatScreen(onBackClick: () -> Unit, onNavigate: (String) -> Unit) {
                     msg = msg,
                     chatActions = chatActions,
                     onNavigate = onNavigate,
-                    onActionClick = { actionType, actionData -> 
-                        handleSend("", action = actionType, actionId = actionData)
+                    onActionClick = { text, actionType, actionData -> 
+                        handleSend(text, action = actionType, actionId = actionData)
                     }
                 )
             }
@@ -345,7 +355,7 @@ fun ChatBubble(
     msg: ChatMessage,
     chatActions: Map<String, ActionConfig>,
     onNavigate: (String) -> Unit,
-    onActionClick: (String, String?) -> Unit
+    onActionClick: (String, String?, String?) -> Unit
 ) {
     val backgroundColor = if (msg.isUser) Color(0xFFFFE082) else Color.White
     val textColor = Color.Black
@@ -363,7 +373,7 @@ fun ChatBubble(
         Row(verticalAlignment = Alignment.Bottom) {
             if (!msg.isUser) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_bee),
+                    painter = painterResource(id = R.drawable.ic_lucide_bot),
                     contentDescription = null,
                     tint = Color.Black,
                     modifier = Modifier
@@ -398,29 +408,35 @@ fun ChatBubble(
                         }
                     }
 
-                    // Display Document Source if available
-                    if (msg.documentSource != null && !msg.isUser) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Nguồn: ${msg.documentTitle ?: "Tài liệu hệ thống"}",
-                            color = Color.Gray,
-                            fontSize = 12.sp,
-                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                        )
-                    }
-
-                    // Display Dynamic Action Buttons (e.g. Feedback)
+                    // Display Dynamic Action Buttons
                     if (!msg.actionButtons.isNullOrEmpty() && !msg.isUser) {
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+                        androidx.compose.foundation.layout.FlowRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             msg.actionButtons.forEach { btn ->
+                                val isNav = btn.type == "NAVIGATE"
+                                val btnLabel = if (isNav) chatActions[btn.data]?.text ?: btn.label else btn.label
+                                val btnColor = if (isNav) Color(0xFF81D4FA) else Color(0xFFE0E0E0)
                                 Button(
-                                    onClick = { onActionClick(btn.type, btn.data) },
-                                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
-                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                    modifier = Modifier.weight(1f)
+                                    onClick = { 
+                                        if (isNav) {
+                                            chatActions[btn.data]?.route?.let { onNavigate(it) }
+                                        } else if (btn.type == "SUGGESTED_QUESTION") {
+                                            onActionClick(btn.data, null, null)
+                                        } else if (btn.type == "GRANT_PERMISSION" || btn.type == "DENY_PERMISSION") {
+                                            onActionClick(btn.label, btn.type, btn.data)
+                                        } else {
+                                            onActionClick("", btn.type, btn.data)
+                                        }
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = btnColor),
+                                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                                 ) {
-                                    Text(btn.label, color = Color.Black, fontSize = 13.sp)
+                                    Text(btnLabel, color = Color.Black, fontSize = 13.sp)
                                 }
                             }
                         }
