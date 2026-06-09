@@ -115,7 +115,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 sHolder.tvStartPeriod.setText("-");
                 sHolder.tvEndPeriod.setText("-");
                 sHolder.tvSubjectName.setText(ScheduleLanguage.Label.noClass(context));
-                sHolder.itemView.findViewById(R.id.layoutContent).setAlpha(0.4f);
+                sHolder.layoutContent.setAlpha(0.4f);
 
                 // Reset màu viền về mặc định cho ô trống
                 if (sHolder.cardView != null) {
@@ -124,7 +124,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 sHolder.itemView.setOnClickListener(null);
 
             } else {
-                sHolder.itemView.findViewById(R.id.layoutContent).setAlpha(1.0f);
+                sHolder.layoutContent.setAlpha(1.0f);
                 sHolder.tvStartTime.setText(schedule.getStartTime() != null ? schedule.getStartTime() : "00:00");
                 sHolder.tvEndTime.setText(schedule.getEndTime() != null ? schedule.getEndTime() : "00:00");
                 sHolder.tvStartPeriod.setText(String.valueOf(schedule.getStartPeriod()));
@@ -255,6 +255,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         TextView tvLocation, tvDateRange, tvStudentCount, tvRemainingPeriods;
         com.google.android.material.card.MaterialCardView cardView;
         View viewTimeIndicator;
+        View layoutContent;
 
         public ScheduleViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -275,6 +276,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                 cardView = (com.google.android.material.card.MaterialCardView) itemView;
             }
             viewTimeIndicator = itemView.findViewById(R.id.viewTimeIndicator);
+            layoutContent = itemView.findViewById(R.id.layoutContent);
         }
     }
 }

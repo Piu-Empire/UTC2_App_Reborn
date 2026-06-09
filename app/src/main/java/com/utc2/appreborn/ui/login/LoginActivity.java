@@ -102,13 +102,11 @@ public class LoginActivity extends AppCompatActivity {
 
         Button loginBtn = findViewById(R.id.loginBtn);
         Button googleLoginBtn = findViewById(R.id.googleLoginBtn);
-        Button skipBtn = findViewById(R.id.skipBtn);
         TextView txtForgot = findViewById(R.id.txtForgot);
         TextView txtTerms = findViewById(R.id.txtTerms);
 
         loginBtn.setOnClickListener(v -> performManualLogin());
         googleLoginBtn.setOnClickListener(v -> performGoogleSignIn());
-        skipBtn.setOnClickListener(v -> performSkipLogin());
 
         if (txtForgot != null) {
             txtForgot.setOnClickListener(v ->
@@ -213,10 +211,6 @@ public class LoginActivity extends AppCompatActivity {
                         showToast("Lỗi kết nối: " + t.getMessage());
                     }
                 });
-    }
-
-    private void performSkipLogin() {
-        navigateToMain();
     }
 
     private void performGoogleSignIn() {

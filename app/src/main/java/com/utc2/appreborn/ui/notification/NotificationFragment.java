@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -164,6 +166,14 @@ public class NotificationFragment extends Fragment {
                 item.setRead(true);
                 adapter.notifyDataSetChanged();
             }
+            
+            // Hiển thị chi tiết thông báo
+            new MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(item.getSubject())
+                    .setMessage(item.getTimeLabel() + "\n\n" + item.getPreview())
+                    .setPositiveButton("Đóng", (dialog, which) -> dialog.dismiss())
+                    .show();
+                    
         } else if ("GMAIL".equals(item.getSource())) {
             openGmailApp();
         }
