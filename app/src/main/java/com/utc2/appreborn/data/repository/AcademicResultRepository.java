@@ -31,8 +31,11 @@ public class AcademicResultRepository {
 
     private final AcademicApiService api;
 
-    public AcademicResultRepository(String token) {
+    private final String className;
+
+    public AcademicResultRepository(String token, String className) {
         api = ApiClient.getInstance(token).create(AcademicApiService.class);
+        this.className = className;
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -116,7 +119,7 @@ public class AcademicResultRepository {
 
     public LiveData<List<LeaderboardEntry>> getLeaderboard(Long semesterId, String academicYear) {
         MutableLiveData<List<LeaderboardEntry>> liveData = new MutableLiveData<>();
-        api.getLeaderboard(semesterId, academicYear)
+        api.getLeaderboard(semesterId, academicYear, className)
                 .enqueue(new Callback<ApiResponse<List<LeaderboardEntryResponse>>>() {
                     @Override
                     public void onResponse(Call<ApiResponse<List<LeaderboardEntryResponse>>> call,

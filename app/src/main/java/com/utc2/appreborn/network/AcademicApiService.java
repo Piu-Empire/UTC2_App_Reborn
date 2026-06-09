@@ -25,7 +25,8 @@ public interface AcademicApiService {
     @GET("api/v1/academic/leaderboard")
     Call<ApiResponse<List<LeaderboardEntryResponse>>> getLeaderboard(
             @Query("semesterId")   Long   semesterId,
-            @Query("academicYear") String academicYear
+            @Query("academicYear") String academicYear,
+            @Query("className")    String className
     );
 
     @GET("api/v1/academic/scholarships")

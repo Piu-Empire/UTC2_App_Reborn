@@ -27,7 +27,8 @@ public class AcademicResultViewModel extends AndroidViewModel {
     public AcademicResultViewModel(@NonNull Application application) {
         super(application);
         String token = SessionManager.getInstance(application).getAuthToken();
-        repository = new AcademicResultRepository(token);
+        String className = SessionManager.getInstance(application).getClassName();
+        repository = new AcademicResultRepository(token, className);
     }
 
     /** Trả về cùng 1 LiveData instance — tránh gọi API nhiều lần */
