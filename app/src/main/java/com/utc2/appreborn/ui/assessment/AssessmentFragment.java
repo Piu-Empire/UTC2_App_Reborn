@@ -103,11 +103,6 @@ public class AssessmentFragment extends Fragment {
             lpTop.height = statusH;
             binding.statusBarSpacer.setLayoutParams(lpTop);
 
-            // Fragment nằm bên trong LiquidBar nên không cần navBarSpacer
-            ViewGroup.LayoutParams lpBot = binding.navBarSpacer.getLayoutParams();
-            lpBot.height = 0;
-            binding.navBarSpacer.setLayoutParams(lpBot);
-
             return insets;
         });
     }
