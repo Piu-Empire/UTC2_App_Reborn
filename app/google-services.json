@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "319562674855-qddme2jspb5fhp35coopunfsr794ceas.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.utc2.appreborn",
+            "certificate_hash": "5e8ca7a6de1722d73338c3116010dcd97c796323"
+          }
+        },
+        {
           "client_id": "319562674855-3aga5buil99dcfdpjtgtt44n1opfb2br.apps.googleusercontent.com",
           "client_type": 3
         }

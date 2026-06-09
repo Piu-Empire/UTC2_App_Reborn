@@ -24,8 +24,8 @@ import java.util.concurrent.TimeUnit;
 public class ApiClient {
 
     // ⚠️ Đổi BASE_URL sang địa chỉ server thực tế của bạn
-    private static final String BASE_URL = "http://10.0.2.2:8080/"; // emulator trỏ localhost
-    // private static final String BASE_URL = "https://api.yourdomain.com/";
+    private static final String BASE_URL = "https://utc2-web-server.onrender.com/"; 
+    // private static final String BASE_URL = "http://10.0.2.2:8080/"; // emulator trỏ localhost
 
     // Gson lenient: cho phép parse JSON number → String field (BigDecimal từ
     // backend)
